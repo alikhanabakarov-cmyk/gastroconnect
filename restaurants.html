@@ -27,22 +27,15 @@
           <p class="lead">Закрывайте срочные смены и находите сотрудников без лишней суеты, хаоса в чатах и потерянных контактов.</p>
           <div class="hero-buttons"><a class="btn primary" href="#form">Оставить заявку <span class="arrow">→</span></a><a class="btn" href="index.html">На главную</a></div>
         </div>
-        <div class="hero-visual"><div class="visual-circle"><img class="hero-logo" src="assets/logo-mark.png" alt="" /></div><div class="float-card one">Отклики быстро <small>на срочные смены</small></div><div class="float-card two">Проверенные анкеты <small>контакты и опыт</small></div></div>
-      </section>
-
-      <section class="section"><div class="grid-3">
-        <article class="card"><div class="icon">⏱</div><h3>Срочные смены</h3><p>Найдите сотрудника на сегодня или завтра.</p></article>
-        <article class="card"><div class="icon">👤</div><h3>Постоянный персонал</h3><p>Подбор сотрудников для долгосрочной работы.</p></article>
-        <article class="card"><div class="icon">🛡</div><h3>Проверенные кандидаты</h3><p>Анкеты, опыт, контакты и обратная связь.</p></article>
-      </div></section>
-
-      <section class="section">
-        <h2 class="section-title">Кого можно найти</h2>
-        <div class="grid-4">
-          <div class="mini-card"><h3>Официант</h3><p>Зал, банкеты, посадка и сервис.</p></div>
-          <div class="mini-card"><h3>Бармен</h3><p>Бар, коктейли и напитки.</p></div>
-          <div class="mini-card"><h3>Повар</h3><p>Кухня, цеха, заготовки.</p></div>
-          <div class="mini-card"><h3>Администратор</h3><p>Смена, гости и команда.</p></div>
+        <div class="hero-visual" aria-hidden="true">
+          <div class="people-scene scene-restaurants">
+            <div class="orbit"></div>
+            <div class="person-card person-main"><div class="person-emoji">👨‍💼</div><b>Управляющий</b><small>создаёт заявку</small></div>
+            <div class="person-card person-chef"><div class="person-emoji">👩‍🍳</div><b>Повар</b><small>закрывает смену</small></div>
+            <div class="person-card person-waiter"><div class="person-emoji">🍽️</div><b>Официант</b><small>готов к выходу</small></div>
+          </div>
+          <div class="float-card one">Отклики быстро <small>на срочные смены</small></div>
+          <div class="float-card two">Проверенные анкеты <small>контакты и опыт</small></div>
         </div>
       </section>
 
@@ -57,7 +50,7 @@
               <div class="field"><label>Telegram</label><input name="telegram" placeholder="@username"></div>
               <div class="field"><label>Город</label><select name="city" required><option value="">Выберите город</option><option>Москва</option><option>Санкт-Петербург</option><option>Казань</option><option>Сочи</option><option>Другой город</option></select></div>
               <div class="field"><label>Адрес / район</label><input name="address" placeholder="Адрес, район или метро"></div>
-              <div class="field"><label>Кто нужен</label><select name="needed_role" required><option value="">Кто нужен</option><option>Официант</option><option>Бармен</option><option>Повар</option><option>Повар горячего цеха</option><option>Повар холодного цеха</option><option>Су-шеф</option><option>Шеф-повар</option><option>Бариста</option><option>Хостес</option><option>Администратор</option><option>Кальянщик</option><option>Посудомойщик</option><option>Курьер</option><option>Раннер</option><option>Уборщик</option><option>Несколько сотрудников</option><option>Другое</option></select></div>
+              <div class="field"><label>Кто нужен</label><select name="needed_role" required><option value="">Кто нужен</option><option>Официант</option><option>Бармен</option><option>Повар</option><option>Повар горячего цеха</option><option>Повар холодного цеха</option><option>Су-шеф</option><option>Шеф-повар</option><option>Бариста</option><option>Хостес</option><option>Администратор</option><option>Кальянщик</option><option>Посудомойщик</option><option>Курьер</option><option>Раннер</option><option>Уборщик</option><option>Метрдотель</option><option>Сомелье</option><option>Кондитер</option><option>Пекарь</option><option>Заготовщик</option><option>Разнорабочий</option><option>Несколько сотрудников</option><option>Другое</option></select></div>
               <div class="field"><label>Формат</label><select name="format"><option value="">Выберите формат</option><option>Срочная смена</option><option>Подработка</option><option>Постоянная вакансия</option><option>Банкет / мероприятие</option><option>Сезонная работа</option></select></div>
               <div class="field"><label>Дата</label><input name="date" type="date"></div>
               <div class="field"><label>Время смены</label><input name="time" placeholder="Например: 18:00–02:00"></div>

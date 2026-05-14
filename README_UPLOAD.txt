@@ -1,7 +1,22 @@
-Как загрузить обновление на GitHub:
-1. Открой репозиторий gastroconnect.
+GastroConnect site v4 RU
+
+Что изменено:
+1. Добавлен favicon — иконка сайта во вкладке браузера.
+2. В HTML добавлены favicon.ico, favicon-32.png, favicon-16.png, apple-touch-icon и site.webmanifest.
+3. Пустые круги в hero-блоках заменены на живые карточки профессий: официант, повар, бариста, управляющий, поставщик.
+4. Меню и кнопки на русском.
+5. В формах расширены варианты профессий и категорий поставщиков.
+
+Как загрузить:
+1. Открой GitHub → репозиторий gastroconnect.
 2. Нажми Add file → Upload files.
-3. Перетащи index.html, workers.html, restaurants.html, suppliers.html, style.css, script.js и папку assets.
+3. Перетащи все файлы и папку assets.
 4. Нажми Commit changes.
-5. Подожди 1–3 минуты и открой gastroconnect.ru.
-6. Если видишь старую версию — нажми Ctrl + F5.
+5. Подожди 1–3 минуты.
+6. Открой gastroconnect.ru и нажми Ctrl + F5.
+
+Если иконка во вкладке не появилась сразу:
+— подожди 5–10 минут;
+— нажми Ctrl + F5;
+— либо открой сайт в режиме инкогнито.
+Браузер часто кэширует favicon.
