@@ -3,74 +3,70 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Работникам — GastroConnect</title>
+  <title>GastroConnect — сотрудникам HoReCa</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header class="site-header">
-    <a class="brand" href="index.html"><span class="brand-mark">GC</span><span class="brand-name">GastroConnect</span></a>
-    <nav class="main-nav"><a href="workers.html">Workers</a><a href="restaurants.html">Restaurants</a><a href="suppliers.html">Suppliers</a><a href="#contacts">Contacts</a></nav>
-    <a class="btn btn-primary small" href="#worker-form">Join</a>
-  </header>
+  <div class="page">
+    <header class="header">
+      <a class="logo" href="index.html"><img src="assets/logo-mark.png" alt="GastroConnect" /><span>GastroConnect</span></a>
+      <nav class="nav"><a href="workers.html">Сотрудникам</a><a href="restaurants.html">Заведениям</a><a href="suppliers.html">Поставщикам</a><a href="#contacts">Контакты</a></nav>
+      <div class="header-actions"><a class="btn primary" href="#form">Заполнить анкету <span class="arrow">→</span></a></div>
+    </header>
 
-  <main>
-    <section class="page-hero container">
-      <div>
-        <div class="eyebrow">Для сотрудников HoReCa</div>
-        <h1>Работа и смены для сотрудников HoReCa</h1>
-        <p>Находите смены, подработки и вакансии рядом с вами.</p>
-        <div class="actions"><a class="btn btn-primary" href="#worker-form">Заполнить анкету</a><a class="btn btn-outline" href="#roles">Посмотреть роли</a></div>
-      </div>
-      <div class="page-visual worker-visual"><span>☕</span><span>🍽️</span><span>👨‍🍳</span></div>
-    </section>
-
-    <section class="feature-row container">
-      <article><div class="icon-circle">📅</div><h3>Смены на сегодня</h3><p>Актуальные смены каждый день рядом с вами.</p></article>
-      <article><div class="icon-circle">💼</div><h3>Постоянные вакансии</h3><p>Надёжные заведения ищут сотрудников.</p></article>
-      <article><div class="icon-circle">🛡️</div><h3>Рейтинг и доверие</h3><p>Отзывы от заведений и история выходов.</p></article>
-    </section>
-
-    <section class="container" id="roles">
-      <h2 class="section-title">Популярные роли</h2>
-      <div class="mini-grid">
-        <article><span>🍽️</span><h3>Официант</h3><p>Смены и вакансии в зале.</p></article>
-        <article><span>🍸</span><h3>Бармен</h3><p>Работа за баром и в коктейльной.</p></article>
-        <article><span>👨‍🍳</span><h3>Повар</h3><p>Горячий, холодный цех и заготовки.</p></article>
-        <article><span>👥</span><h3>Хостес</h3><p>Встреча гостей и бронирование.</p></article>
-      </div>
-    </section>
-
-    <section class="split container">
-      <div class="process">
-        <h2>Как это работает</h2>
-        <div class="vertical-step"><b>1</b><div><h3>Заполните профиль</h3><p>Укажите опыт, навыки и предпочтения.</p></div></div>
-        <div class="vertical-step"><b>2</b><div><h3>Получайте предложения</h3><p>Мы подберём подходящие смены и вакансии.</p></div></div>
-        <div class="vertical-step"><b>3</b><div><h3>Выходите на смены</h3><p>Подтверждайте заявки и работайте в удобное время.</p></div></div>
-      </div>
-      <form class="form-card" id="worker-form" data-form="worker">
-        <h2>Заполните анкету работника</h2>
-        <p>Это займёт всего пару минут.</p>
-        <div class="form-grid">
-          <input name="name" placeholder="Имя" required />
-          <input name="phone" placeholder="Телефон" required />
-          <input name="telegram" placeholder="Telegram" />
-          <select name="profession" required><option value="">Профессия</option><option>Официант</option><option>Бармен</option><option>Повар</option><option>Хостес</option><option>Бариста</option></select>
-          <select name="experience"><option value="">Опыт работы</option><option>Без опыта</option><option>До 1 года</option><option>1–3 года</option><option>3+ года</option></select>
-          <input name="city" placeholder="Город" />
+    <main>
+      <section class="hero">
+        <div class="hero-left">
+          <div class="eyebrow">Для сотрудников HoReCa</div>
+          <h1>Работа и смены для сотрудников HoReCa</h1>
+          <p class="lead">Находите смены, подработки и постоянные вакансии рядом с вами. Заполните профиль — мы будем подбирать подходящие предложения.</p>
+          <div class="hero-buttons"><a class="btn primary" href="#form">Создать профиль <span class="arrow">→</span></a><a class="btn" href="index.html">На главную</a></div>
         </div>
-        <button class="btn btn-primary form-submit" type="submit">Заполнить анкету</button>
-        <small class="form-note">Пока заявки сохраняются в браузере. Следующий этап — подключение базы данных.</small>
-      </form>
-    </section>
+        <div class="hero-visual"><div class="visual-circle"><img class="hero-logo" src="assets/logo-mark.png" alt="" /></div><div class="float-card one">Смены рядом <small>по району и роли</small></div><div class="float-card two">Рейтинг и доверие <small>отзывы после смен</small></div></div>
+      </section>
 
-    <section class="feature-row container trust-row">
-      <article><div class="icon-circle">✅</div><h3>Проверенные заведения</h3><p>Работаем с надёжными ресторанами и кафе.</p></article>
-      <article><div class="icon-circle">⚡</div><h3>Быстрый отклик</h3><p>Заявки обрабатываются максимально быстро.</p></article>
-      <article><div class="icon-circle">🎧</div><h3>Поддержка</h3><p>Помогаем от регистрации до выхода на смену.</p></article>
-    </section>
-  </main>
+      <section class="section"><div class="grid-3">
+        <article class="card"><div class="icon">📅</div><h3>Смены на сегодня</h3><p>Получайте актуальные смены и быстрые подработки.</p></article>
+        <article class="card"><div class="icon">💼</div><h3>Постоянные вакансии</h3><p>Ищите работу в ресторанах, кафе, барах и кофейнях.</p></article>
+        <article class="card"><div class="icon">⭐</div><h3>Рейтинг и доверие</h3><p>Формируйте профессиональную репутацию в HoReCa.</p></article>
+      </div></section>
 
-  <footer class="footer container" id="contacts"><div class="brand footer-brand"><span class="brand-mark">GC</span><span class="brand-name">GastroConnect</span></div><div class="footer-contact"><strong>Telegram</strong><span>@GastroConnect_bot</span></div><div class="footer-contact"><strong>Email</strong><span>info@gastroconnect.ru</span></div></footer>
+      <section class="section">
+        <h2 class="section-title">Популярные роли</h2>
+        <div class="grid-4">
+          <div class="mini-card"><h3>Официант</h3><p>Смены и вакансии в зале.</p></div>
+          <div class="mini-card"><h3>Бармен</h3><p>Бар, коктейльная карта, сервис.</p></div>
+          <div class="mini-card"><h3>Повар</h3><p>Горячий, холодный цех и заготовки.</p></div>
+          <div class="mini-card"><h3>Хостес</h3><p>Встреча гостей и бронирование.</p></div>
+        </div>
+      </section>
+
+      <section class="section" id="form">
+        <div class="form-wrap">
+          <div class="form-intro"><h2>Заполните анкету работника</h2><p>Это займёт пару минут. Чем точнее данные, тем проще подобрать подходящую смену или вакансию.</p></div>
+          <form class="form-card" data-form-type="worker">
+            <div class="form-grid">
+              <div class="field"><label>Имя и фамилия</label><input name="name" required placeholder="Иван Иванов"></div>
+              <div class="field"><label>Телефон</label><input name="phone" required placeholder="+7 (___) ___-__-__"></div>
+              <div class="field"><label>Telegram</label><input name="telegram" placeholder="@username"></div>
+              <div class="field"><label>Город</label><select name="city" required><option value="">Выберите город</option><option>Москва</option><option>Санкт-Петербург</option><option>Казань</option><option>Сочи</option><option>Другой город</option></select></div>
+              <div class="field"><label>Район / метро</label><input name="district" placeholder="Например: Центр, Арбат, метро ..."></div>
+              <div class="field"><label>Профессия</label><select name="role" required><option value="">Кем вы работаете?</option><option>Официант</option><option>Бармен</option><option>Повар</option><option>Повар горячего цеха</option><option>Повар холодного цеха</option><option>Су-шеф</option><option>Шеф-повар</option><option>Бариста</option><option>Хостес</option><option>Администратор</option><option>Кальянщик</option><option>Посудомойщик</option><option>Курьер</option><option>Раннер</option><option>Уборщик</option><option>Другое</option></select></div>
+              <div class="field"><label>Опыт работы</label><select name="experience" required><option value="">Выберите опыт</option><option>Без опыта</option><option>До 1 года</option><option>1–3 года</option><option>3–5 лет</option><option>5+ лет</option></select></div>
+              <div class="field"><label>Желаемая оплата</label><input name="rate" placeholder="Например: от 350 ₽/час"></div>
+              <div class="field full"><label>Когда можете выходить?</label><select name="availability"><option value="">Выберите вариант</option><option>Сегодня</option><option>Завтра</option><option>По выходным</option><option>По будням</option><option>Вечером</option><option>Ночные смены</option><option>По договорённости</option></select></div>
+              <div class="field full"><label>Комментарий</label><textarea name="comment" placeholder="Расскажите о себе, форме, медкнижке, опыте, удобных районах"></textarea></div>
+            </div>
+            <p class="form-note">Пока форма сохраняет заявку в браузере. Следующим этапом подключим базу данных и уведомления.</p>
+            <button class="btn primary" type="submit">Заполнить анкету <span class="arrow">→</span></button>
+            <div class="success">Анкета сохранена. Следующий шаг — подключение базы заявок.</div>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer" id="contacts"><div class="footer-brand"><img src="assets/logo-mark.png" alt="" /> GastroConnect</div><div class="footer-contacts"><span>Telegram: @GastroConnect_bot</span><span>Email: info@gastroconnect.ru</span></div></footer>
+  </div>
   <script src="script.js"></script>
 </body>
 </html>

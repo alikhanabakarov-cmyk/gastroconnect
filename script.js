@@ -1,16 +1,23 @@
-document.querySelectorAll('form[data-form]').forEach((form) => {
-  form.addEventListener('submit', (event) => {
-    event.preventDefault();
-
-    const data = Object.fromEntries(new FormData(form).entries());
-    const formType = form.dataset.form;
-    const storageKey = `gastroconnect_${formType}_requests`;
-    const current = JSON.parse(localStorage.getItem(storageKey) || '[]');
-
-    current.push({ ...data, createdAt: new Date().toISOString() });
-    localStorage.setItem(storageKey, JSON.stringify(current));
-
-    form.reset();
-    alert('Заявка принята. Следующий этап — подключим базу данных, чтобы заявки приходили в админку.');
+document.addEventListener('DOMContentLoaded', () => {
+  const forms = document.querySelectorAll('[data-form-type]');
+  forms.forEach((form) => {
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const type = form.getAttribute('data-form-type');
+      const formData = new FormData(form);
+      const payload = {
+        type,
+        createdAt: new Date().toISOString(),
+        data: Object.fromEntries(formData.entries())
+      };
+      const key = `gastroconnect_${type}_requests`;
+      const current = JSON.parse(localStorage.getItem(key) || '[]');
+      current.push(payload);
+      localStorage.setItem(key, JSON.stringify(current));
+      const success = form.querySelector('.success');
+      if (success) success.style.display = 'block';
+      form.reset();
+      console.log('GastroConnect request:', payload);
+    });
   });
 });
