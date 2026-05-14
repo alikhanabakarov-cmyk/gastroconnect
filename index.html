@@ -1,194 +1,104 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <title>GastroConnect</title>
-
-  <style>
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      background: #F7F2EC;
-      font-family: Arial, sans-serif;
-      color: #1F1F1F;
-    }
-
-    .header {
-      width: 100%;
-      padding: 30px 80px;
-
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .logo {
-      font-size: 36px;
-      font-weight: bold;
-      color: #0D4D3C;
-    }
-
-    .nav {
-      display: flex;
-      gap: 40px;
-    }
-
-    .nav a {
-      text-decoration: none;
-      color: #1F1F1F;
-      font-size: 18px;
-    }
-
-    .join-btn {
-      background: #0D4D3C;
-      color: white;
-
-      border: none;
-      padding: 14px 26px;
-
-      border-radius: 14px;
-
-      cursor: pointer;
-    }
-
-    .hero {
-      width: 100%;
-
-      padding: 80px;
-
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .hero-left {
-      width: 50%;
-    }
-
-    .hero-left h1 {
-      font-size: 72px;
-      line-height: 1.1;
-
-      color: #0D4D3C;
-
-      margin-bottom: 30px;
-    }
-
-    .hero-left p {
-      font-size: 22px;
-      line-height: 1.6;
-
-      margin-bottom: 40px;
-    }
-
-    .hero-buttons {
-      display: flex;
-      gap: 20px;
-    }
-
-    .hero-buttons button {
-      background: #0D4D3C;
-      color: white;
-
-      border: none;
-
-      padding: 18px 28px;
-
-      border-radius: 16px;
-
-      font-size: 18px;
-
-      cursor: pointer;
-    }
-
-    .hero-right {
-      width: 40%;
-
-      display: flex;
-      justify-content: center;
-    }
-
-    .hero-image {
-      width: 500px;
-      height: 500px;
-
-      background: #0D4D3C;
-
-      border-radius: 50%;
-    }
-
-  </style>
-
+  <title>GastroConnect — HoReCa в одной системе</title>
+  <meta name="description" content="GastroConnect — платформа для работников, заведений и поставщиков HoReCa." />
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
+  <header class="site-header">
+    <a class="brand" href="index.html" aria-label="GastroConnect home">
+      <span class="brand-mark">GC</span>
+      <span class="brand-name">GastroConnect</span>
+    </a>
+    <nav class="main-nav" aria-label="Main navigation">
+      <a href="workers.html">Workers</a>
+      <a href="restaurants.html">Restaurants</a>
+      <a href="suppliers.html">Suppliers</a>
+      <a href="#contacts">Contacts</a>
+    </nav>
+    <a class="btn btn-primary small" href="#join">Join</a>
+  </header>
 
-<header class="header">
+  <main>
+    <section class="hero container">
+      <div class="hero-copy">
+        <div class="eyebrow">Единая система для HoReCa</div>
+        <h1>Персонал, заведения и поставщики HoReCa в одной системе</h1>
+        <p>Работникам — смены и подработки. Заведениям — быстрый поиск персонала. Поставщикам — доступ к ресторанам.</p>
+        <div class="actions" id="join">
+          <a class="btn btn-primary" href="workers.html">Я работник</a>
+          <a class="btn btn-outline" href="restaurants.html">Я ресторан</a>
+          <a class="btn btn-outline" href="suppliers.html">Я поставщик</a>
+        </div>
+      </div>
+      <div class="hero-visual" aria-hidden="true">
+        <div class="gold-orbit"></div>
+        <div class="circle-backdrop"></div>
+        <div class="person-card waiter">
+          <span class="person-icon">🍽️</span>
+          <strong>Смена</strong>
+          <small>Официант сегодня</small>
+        </div>
+        <div class="person-card chef">
+          <span class="person-icon">👨‍🍳</span>
+          <strong>Кандидат</strong>
+          <small>Рейтинг 4.9</small>
+        </div>
+        <div class="person-card supplier">
+          <span class="person-icon">🚚</span>
+          <strong>Поставщик</strong>
+          <small>Проверен</small>
+        </div>
+      </div>
+    </section>
 
-  <div class="logo">
-    GastroConnect
-  </div>
+    <section class="role-grid container">
+      <article class="role-card">
+        <div class="icon-circle">👤</div>
+        <h2>Я работник</h2>
+        <p>Смены, вакансии и быстрые подработки рядом с вами.</p>
+        <a class="btn btn-primary" href="workers.html">Найти работу</a>
+      </article>
+      <article class="role-card">
+        <div class="icon-circle">🏪</div>
+        <h2>Я ресторан</h2>
+        <p>Находите персонал быстро и без лишних хлопот.</p>
+        <a class="btn btn-outline" href="restaurants.html">Найти персонал</a>
+      </article>
+      <article class="role-card">
+        <div class="icon-circle">🚚</div>
+        <h2>Я поставщик</h2>
+        <p>Каталог поставщиков товаров и услуг для HoReCa.</p>
+        <a class="btn btn-outline" href="suppliers.html">Стать поставщиком</a>
+      </article>
+    </section>
 
-  <nav class="nav">
-    <a href="#">Workers</a>
-    <a href="#">Restaurants</a>
-    <a href="#">Suppliers</a>
-    <a href="#">Contacts</a>
-  </nav>
+    <section class="how container">
+      <h2>Как это работает</h2>
+      <div class="steps">
+        <div class="step"><span>1</span><h3>Выберите роль</h3><p>Работник, ресторан или поставщик.</p></div>
+        <div class="step"><span>2</span><h3>Заполните заявку</h3><p>Укажите информацию о себе или компании.</p></div>
+        <div class="step"><span>3</span><h3>Получите контакт</h3><p>Мы соединяем подходящие стороны.</p></div>
+      </div>
+    </section>
 
-  <button class="join-btn">
-    Join
-  </button>
+    <section class="cta container">
+      <div>
+        <div class="brand-mini">GC</div>
+        <h2>GastroConnect запускается</h2>
+        <p>Присоединяйтесь к первой базе HoReCa.</p>
+      </div>
+      <a class="btn btn-primary" href="workers.html">Присоединиться</a>
+    </section>
+  </main>
 
-</header>
-
-<section class="hero">
-
-  <div class="hero-left">
-
-    <h1>
-      HoReCa в одной системе
-    </h1>
-
-    <p>
-      Работникам — смены и подработки.
-      Заведениям — быстрый поиск персонала.
-      Поставщикам — доступ к ресторанам.
-    </p>
-
-    <div class="hero-buttons">
-
-      <button>
-        Я работник
-      </button>
-
-      <button>
-        Я ресторан
-      </button>
-
-      <button>
-        Я поставщик
-      </button>
-
-    </div>
-
-  </div>
-
-  <div class="hero-right">
-
-    <div class="hero-image"></div>
-
-  </div>
-
-</section>
-
+  <footer class="footer container" id="contacts">
+    <div class="brand footer-brand"><span class="brand-mark">GC</span><span class="brand-name">GastroConnect</span></div>
+    <div class="footer-contact"><strong>Telegram</strong><span>@GastroConnect_bot</span></div>
+    <div class="footer-contact"><strong>Email</strong><span>info@gastroconnect.ru</span></div>
+  </footer>
 </body>
 </html>

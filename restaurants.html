@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Заведениям — GastroConnect</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html"><span class="brand-mark">GC</span><span class="brand-name">GastroConnect</span></a>
+    <nav class="main-nav"><a href="workers.html">Workers</a><a href="restaurants.html">Restaurants</a><a href="suppliers.html">Suppliers</a><a href="#contacts">Contacts</a></nav>
+    <a class="btn btn-primary small" href="#restaurant-form">Join</a>
+  </header>
+
+  <main>
+    <section class="page-hero container">
+      <div>
+        <div class="eyebrow">Для ресторанов, кафе и баров</div>
+        <h1>Быстрый подбор персонала для заведений</h1>
+        <p>Закрывайте срочные смены и находите сотрудников без лишней суеты.</p>
+        <div class="actions"><a class="btn btn-primary" href="#restaurant-form">Оставить заявку</a><a class="btn btn-outline" href="#roles">Кого можно найти</a></div>
+      </div>
+      <div class="page-visual restaurant-visual"><span>🏪</span><span>🍷</span><span>📋</span></div>
+    </section>
+
+    <section class="feature-row container">
+      <article><div class="icon-circle">⏱️</div><h3>Срочные смены</h3><p>Найдите сотрудников на сегодня или завтра.</p></article>
+      <article><div class="icon-circle">👤</div><h3>Постоянный персонал</h3><p>Подбирайте людей для долгосрочной работы.</p></article>
+      <article><div class="icon-circle">🛡️</div><h3>Проверенные кандидаты</h3><p>Кандидаты проходят первичную проверку.</p></article>
+    </section>
+
+    <section class="container" id="roles">
+      <h2 class="section-title">Кого можно найти</h2>
+      <div class="mini-grid">
+        <article><span>🍽️</span><h3>Официант</h3><p>Сотрудники для зала и банкетов.</p></article>
+        <article><span>🍸</span><h3>Бармен</h3><p>Бар и коктейльная карта.</p></article>
+        <article><span>👨‍🍳</span><h3>Повар</h3><p>Разные направления кухни.</p></article>
+        <article><span>🛎️</span><h3>Администратор</h3><p>Организация смены и гостей.</p></article>
+      </div>
+    </section>
+
+    <section class="how container compact-how">
+      <h2>Как это работает</h2>
+      <div class="steps"><div class="step"><span>1</span><h3>Создайте заявку</h3><p>Кто нужен, когда и на каких условиях.</p></div><div class="step"><span>2</span><h3>Получите отклики</h3><p>Кандидаты откликаются на вашу заявку.</p></div><div class="step"><span>3</span><h3>Выберите сотрудника</h3><p>Смотрите профили и выбирайте подходящего.</p></div></div>
+    </section>
+
+    <section class="wide-form container">
+      <div><h2>Оставьте заявку</h2><p>Мы быстро найдём нужных сотрудников для вашего заведения.</p></div>
+      <form class="form-card horizontal" id="restaurant-form" data-form="restaurant">
+        <div class="form-grid three">
+          <input name="business" placeholder="Название заведения" required />
+          <input name="contact" placeholder="Контактное лицо" required />
+          <input name="phone" placeholder="Телефон" required />
+          <select name="role"><option value="">Кто нужен</option><option>Официант</option><option>Бармен</option><option>Повар</option><option>Администратор</option></select>
+          <input name="date" placeholder="Дата" onfocus="this.type='date'" />
+          <input name="pay" placeholder="Оплата" />
+        </div>
+        <button class="btn btn-primary form-submit" type="submit">Оставить заявку</button>
+        <small class="form-note">Ваши данные не передаются третьим лицам.</small>
+      </form>
+    </section>
+
+    <section class="feature-row container trust-row"><article><div class="icon-circle">⚡</div><h3>Быстрые отклики</h3><p>Заявки обрабатываются оперативно.</p></article><article><div class="icon-circle">🛡️</div><h3>Надёжные сотрудники</h3><p>Проверка опыта и рекомендаций.</p></article><article><div class="icon-circle">🎧</div><h3>Поддержка платформы</h3><p>Поможем на каждом этапе.</p></article></section>
+  </main>
+
+  <footer class="footer container" id="contacts"><div class="brand footer-brand"><span class="brand-mark">GC</span><span class="brand-name">GastroConnect</span></div><div class="footer-contact"><strong>Telegram</strong><span>@GastroConnect_bot</span></div><div class="footer-contact"><strong>Email</strong><span>info@gastroconnect.ru</span></div></footer>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Поставщикам — GastroConnect</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html"><span class="brand-mark">GC</span><span class="brand-name">GastroConnect</span></a>
+    <nav class="main-nav"><a href="workers.html">Workers</a><a href="restaurants.html">Restaurants</a><a href="suppliers.html">Suppliers</a><a href="#contacts">Contacts</a></nav>
+    <a class="btn btn-primary small" href="#supplier-form">Join</a>
+  </header>
+
+  <main>
+    <section class="page-hero container">
+      <div>
+        <div class="eyebrow">Для поставщиков HoReCa</div>
+        <h1>Поставщики для ресторанной индустрии</h1>
+        <p>Находите клиентов в HoReCa и продвигайте свои товары и услуги.</p>
+        <div class="actions"><a class="btn btn-primary" href="#supplier-form">Стать поставщиком</a><a class="btn btn-outline" href="#promo">Продвижение</a></div>
+      </div>
+      <div class="page-visual supplier-visual"><span>📦</span><span>🚚</span><span>🥬</span></div>
+    </section>
+
+    <section class="feature-row container">
+      <article><div class="icon-circle">🏪</div><h3>Каталог поставщиков</h3><p>Разместите компанию в каталоге.</p></article>
+      <article><div class="icon-circle">📣</div><h3>Рекламные размещения</h3><p>Продвигайте товары и услуги.</p></article>
+      <article><div class="icon-circle">🎯</div><h3>Целевые лиды</h3><p>Получайте запросы от заведений.</p></article>
+    </section>
+
+    <section class="container">
+      <h2 class="section-title">Категории поставщиков</h2>
+      <div class="mini-grid"><article><span>🛒</span><h3>Продукты</h3><p>Свежие продукты, мясо, рыба, бакалея.</p></article><article><span>🍾</span><h3>Напитки</h3><p>Кофе, чай, напитки и другое.</p></article><article><span>⚙️</span><h3>Оборудование</h3><p>Кухонное оборудование и инвентарь.</p></article><article><span>🧹</span><h3>Услуги</h3><p>Логистика, клининг, дизайн, ремонт.</p></article></div>
+    </section>
+
+    <section class="how container compact-how"><h2>Как это работает</h2><div class="steps"><div class="step"><span>1</span><h3>Создайте профиль</h3><p>Информация о компании и услугах.</p></div><div class="step"><span>2</span><h3>Выберите категорию</h3><p>Укажите товары или услуги.</p></div><div class="step"><span>3</span><h3>Получайте запросы</h3><p>Рестораны находят вас в каталоге.</p></div></div></section>
+
+    <section class="wide-form container">
+      <div><h2>Стать поставщиком</h2><p>Заполните форму, чтобы начать получать клиентов.</p></div>
+      <form class="form-card horizontal" id="supplier-form" data-form="supplier">
+        <div class="form-grid three">
+          <input name="company" placeholder="Название компании" required />
+          <input name="contact" placeholder="Контактное лицо" required />
+          <input name="phone" placeholder="Телефон" required />
+          <select name="category"><option value="">Категория</option><option>Продукты</option><option>Напитки</option><option>Оборудование</option><option>Услуги</option></select>
+          <input name="city" placeholder="Город" />
+          <textarea name="description" placeholder="Краткое описание компании и услуг"></textarea>
+        </div>
+        <button class="btn btn-primary form-submit" type="submit">Стать поставщиком</button>
+      </form>
+    </section>
+
+    <section class="container" id="promo">
+      <h2 class="section-title">Возможности продвижения</h2>
+      <div class="feature-row single-row"><article><div class="icon-circle">⭐</div><h3>Featured supplier</h3><p>Выделите компанию в каталоге.</p></article><article><div class="icon-circle">🏷️</div><h3>Partner banner</h3><p>Баннер на платформе и в разделах.</p></article><article><div class="icon-circle">📈</div><h3>Promoted listing</h3><p>Продвижение в поиске и категориях.</p></article></div>
+    </section>
+  </main>
+
+  <footer class="footer container" id="contacts"><div class="brand footer-brand"><span class="brand-mark">GC</span><span class="brand-name">GastroConnect</span></div><div class="footer-contact"><strong>Telegram</strong><span>@GastroConnect_bot</span></div><div class="footer-contact"><strong>Email</strong><span>info@gastroconnect.ru</span></div></footer>
+  <script src="script.js"></script>
+</body>
+</html>
