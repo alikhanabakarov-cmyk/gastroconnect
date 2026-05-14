@@ -1,12 +1,194 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>GastroConnect</title>
+
+  <style>
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #F7F2EC;
+      font-family: Arial, sans-serif;
+      color: #1F1F1F;
+    }
+
+    .header {
+      width: 100%;
+      padding: 30px 80px;
+
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 36px;
+      font-weight: bold;
+      color: #0D4D3C;
+    }
+
+    .nav {
+      display: flex;
+      gap: 40px;
+    }
+
+    .nav a {
+      text-decoration: none;
+      color: #1F1F1F;
+      font-size: 18px;
+    }
+
+    .join-btn {
+      background: #0D4D3C;
+      color: white;
+
+      border: none;
+      padding: 14px 26px;
+
+      border-radius: 14px;
+
+      cursor: pointer;
+    }
+
+    .hero {
+      width: 100%;
+
+      padding: 80px;
+
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .hero-left {
+      width: 50%;
+    }
+
+    .hero-left h1 {
+      font-size: 72px;
+      line-height: 1.1;
+
+      color: #0D4D3C;
+
+      margin-bottom: 30px;
+    }
+
+    .hero-left p {
+      font-size: 22px;
+      line-height: 1.6;
+
+      margin-bottom: 40px;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 20px;
+    }
+
+    .hero-buttons button {
+      background: #0D4D3C;
+      color: white;
+
+      border: none;
+
+      padding: 18px 28px;
+
+      border-radius: 16px;
+
+      font-size: 18px;
+
+      cursor: pointer;
+    }
+
+    .hero-right {
+      width: 40%;
+
+      display: flex;
+      justify-content: center;
+    }
+
+    .hero-image {
+      width: 500px;
+      height: 500px;
+
+      background: #0D4D3C;
+
+      border-radius: 50%;
+    }
+
+  </style>
+
 </head>
+
 <body>
-  <h1>GastroConnect работает</h1>
-  <p>Сайт успешно создан на GitHub Pages.</p>
+
+<header class="header">
+
+  <div class="logo">
+    GastroConnect
+  </div>
+
+  <nav class="nav">
+    <a href="#">Workers</a>
+    <a href="#">Restaurants</a>
+    <a href="#">Suppliers</a>
+    <a href="#">Contacts</a>
+  </nav>
+
+  <button class="join-btn">
+    Join
+  </button>
+
+</header>
+
+<section class="hero">
+
+  <div class="hero-left">
+
+    <h1>
+      HoReCa в одной системе
+    </h1>
+
+    <p>
+      Работникам — смены и подработки.
+      Заведениям — быстрый поиск персонала.
+      Поставщикам — доступ к ресторанам.
+    </p>
+
+    <div class="hero-buttons">
+
+      <button>
+        Я работник
+      </button>
+
+      <button>
+        Я ресторан
+      </button>
+
+      <button>
+        Я поставщик
+      </button>
+
+    </div>
+
+  </div>
+
+  <div class="hero-right">
+
+    <div class="hero-image"></div>
+
+  </div>
+
+</section>
+
 </body>
 </html>
