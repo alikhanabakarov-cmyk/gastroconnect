@@ -41,13 +41,38 @@ const SUPABASE_KEY = 'sb_publishable_0F-CDySnOiJYUdAr8khcJA_QiZc6J2y';
   function download(name, text, type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();URL.revokeObjectURL(a.href)}
   function renderAdmin(){
     const tbody=document.querySelector('#adminTable tbody'); if(!tbody) return;
-    const rows=get();
-    const counts={all:rows.length,worker:0,restaurant:0,supplier:0}; rows.forEach(r=>counts[r.type]=(counts[r.type]||0)+1);
-    document.getElementById('adminStats').innerHTML=`<div class="stat">Всего: ${counts.all}</div><div class="stat">Работники: ${counts.worker}</div><div class="stat">Заведения: ${counts.restaurant}</div><div class="stat">Поставщики: ${counts.supplier}</div>`;
-    tbody.innerHTML=rows.map(r=>`<tr><td>${r.created_at}</td><td>${r.type}</td><td>${r.data.name||r.data.business_name||r.data.company_name||''}</td><td>${r.data.phone||''}</td><td>${r.data.telegram||''}</td><td><pre>${JSON.stringify(r.data,null,2)}</pre></td></tr>`).join('') || '<tr><td colspan="6">Заявок пока нет</td></tr>';
-    document.getElementById('exportJson').onclick=()=>download('gastroconnect-submissions.json',JSON.stringify(rows,null,2),'application/json');
-    document.getElementById('exportCsv').onclick=()=>download('gastroconnect-submissions.csv','Дата,Тип,Имя/Компания,Телефон,Telegram,Данные\n'+toCsv(rows),'text/csv;charset=utf-8');
-    document.getElementById('clearData').onclick=()=>{if(confirm('Очистить локальные заявки?')){set([]);renderAdmin();}};
+  const rows = [];
+
+fetch(`${SUPABASE_URL}/rest/v1/suppliers?select=*`, {
+  headers: {
+    'apikey': SUPABASE_KEY,
+    'Authorization': `Bearer ${SUPABASE_KEY}`
+  }
+})
+.then(res => res.json())
+.then(data => {
+  rows.push(...data);
+
+  const counts={all:rows.length,worker:0,restaurant:0,supplier:0};
+  rows.forEach(r=>counts[r.type]=(counts[r.type]||0)+1);
+
+  document.getElementById('adminStats').innerHTML=
+  `<div class="stat">Всего: ${counts.all}</div>
+   <div class="stat">Работники: ${counts.worker}</div>
+   <div class="stat">Заведения: ${counts.restaurant}</div>
+   <div class="stat">Поставщики: ${counts.supplier}</div>`;
+
+  tbody.innerHTML=rows.map(r=>
+    `<tr>
+      <td>${r.created_at||''}</td>
+      <td>supplier</td>
+      <td>${r.company_name||''}</td>
+      <td>${r.phone||''}</td>
+      <td>${r.telegram||''}</td>
+      <td>${JSON.stringify(r)}</td>
+    </tr>`
+  ).join('');
+});
   }
   renderAdmin();
 })();
