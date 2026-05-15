@@ -1,71 +1,33 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="UTF-8" />
+<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GastroConnect — поставщикам HoReCa</title>
-  <link rel="icon" href="assets/favicon.ico" sizes="any" />
+  <meta name="description" content="GastroConnect — премиальная HoReCa-платформа для работников, заведений и поставщиков." />
+  <link rel="icon" href="favicon.ico" sizes="any" />
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png" />
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
   <link rel="manifest" href="site.webmanifest" />
   <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <div class="page">
-    <header class="header">
-      <a class="logo" href="index.html"><img src="assets/logo-mark.png" alt="GastroConnect" /><span>GastroConnect</span></a>
-      <nav class="nav"><a href="workers.html">Сотрудникам</a><a href="restaurants.html">Заведениям</a><a href="suppliers.html">Поставщикам</a><a href="#contacts">Контакты</a></nav>
-      <div class="header-actions"><a class="btn primary" href="#form">Стать поставщиком <span class="arrow">→</span></a></div>
-    </header>
-
-    <main>
-      <section class="hero">
-        <div class="hero-left">
-          <div class="eyebrow">Для поставщиков HoReCa</div>
-          <h1>Поставщики для ресторанной индустрии</h1>
-          <p class="lead">Находите клиентов в HoReCa и продвигайте свои товары и услуги среди ресторанов, кафе, баров и кофеен.</p>
-          <div class="hero-buttons"><a class="btn primary" href="#form">Стать поставщиком <span class="arrow">→</span></a><a class="btn" href="index.html">На главную</a></div>
-        </div>
-        <div class="hero-visual" aria-hidden="true">
-          <div class="people-scene scene-suppliers">
-            <div class="orbit"></div>
-            <div class="person-card person-main"><div class="person-emoji">🚚</div><b>Доставка</b><small>привозит продукты</small></div>
-            <div class="person-card person-chef"><div class="person-emoji">🥬</div><b>Продукты</b><small>овощи и зелень</small></div>
-            <div class="person-card person-barista"><div class="person-emoji">☕</div><b>Кофе</b><small>для кофеен</small></div>
-          </div>
-          <div class="float-card one">Каталог поставщиков <small>товары и услуги</small></div>
-          <div class="float-card two">Целевые заявки <small>от заведений HoReCa</small></div>
-        </div>
-      </section>
-
-      <section class="section" id="form">
-        <div class="form-wrap">
-          <div class="form-intro"><h2>Стать поставщиком</h2><p>Заполните профиль компании, выберите категорию и начните получать целевые запросы от заведений.</p></div>
-          <form class="form-card" data-form-type="supplier">
-            <div class="form-grid">
-              <div class="field"><label>Название компании</label><input name="company_name" required placeholder="Fresh Food Supply"></div>
-              <div class="field"><label>Контактное лицо</label><input name="contact_person" required placeholder="Имя, должность"></div>
-              <div class="field"><label>Телефон</label><input name="phone" required placeholder="+7 (___) ___-__-__"></div>
-              <div class="field"><label>Telegram</label><input name="telegram" placeholder="@username"></div>
-              <div class="field"><label>Город</label><select name="city" required><option value="">Выберите город</option><option>Москва</option><option>Санкт-Петербург</option><option>Казань</option><option>Сочи</option><option>Вся Россия</option><option>Другой город</option></select></div>
-              <div class="field"><label>Категория</label><select name="category" required><option value="">Выберите категорию</option><option>Овощи и фрукты</option><option>Мясо и птица</option><option>Рыба и морепродукты</option><option>Молочная продукция</option><option>Бакалея</option><option>Кофе и чай</option><option>Напитки</option><option>Посуда</option><option>Кухонное оборудование</option><option>Мебель</option><option>Униформа</option><option>Моющие средства</option><option>Клининг</option><option>Ремонт и обслуживание</option><option>Дизайн и интерьер</option><option>Автоматизация / кассы / CRM</option><option>Маркетинг / SMM</option><option>Другое</option></select></div>
-              <div class="field"><label>Сайт / соцсети</label><input name="website" placeholder="https://... или @username"></div>
-              <div class="field"><label>Интересует реклама?</label><select name="advertising"><option value="">Выберите вариант</option><option>Да, каталог</option><option>Да, баннер</option><option>Да, продвижение карточки</option><option>Пока нет</option></select></div>
-              <div class="field full"><label>Описание компании и услуг</label><textarea name="description" placeholder="Что поставляете, условия, география доставки, минимальный заказ"></textarea></div>
-            </div>
-            <p class="form-note">Пока форма сохраняет заявку в браузере. Следующим этапом подключим базу данных и уведомления.</p>
-            <button class="btn primary" type="submit">Стать поставщиком <span class="arrow">→</span></button>
-            <div class="success">Заявка сохранена. Следующий шаг — подключение базы заявок.</div>
-          </form>
-        </div>
-      </section>
-
-      <section class="section"><h2 class="section-title">Возможности продвижения</h2><div class="grid-3"><div class="mini-card"><h3>Выделенный поставщик</h3><p>Карточка выше в каталоге.</p></div><div class="mini-card"><h3>Баннер партнёра</h3><p>Размещение на страницах платформы.</p></div><div class="mini-card"><h3>Продвижение в категории</h3><p>Больше просмотров и заявок.</p></div></div></section>
-    </main>
-
-    <footer class="footer" id="contacts"><div class="footer-brand"><img src="assets/logo-mark.png" alt="" /> GastroConnect</div><div class="footer-contacts"><span>Telegram: @GastroConnect_bot</span><span>Email: info@gastroconnect.ru</span></div></footer>
-  </div>
-  <script src="script.js"></script>
-</body>
-</html>
+  <title>Поставщикам — GastroConnect</title></head><body><div class="page-shell"><header class="site-header">
+    <a class="brand" href="index.html" aria-label="GastroConnect">
+      <img src="assets/logo-mark.png" alt="" class="brand-mark" />
+      <span>GastroConnect</span>
+    </a>
+    <nav class="main-nav" aria-label="Главное меню">
+      <a href="workers.html">Сотрудникам</a>
+      <a href="restaurants.html">Заведениям</a>
+      <a href="suppliers.html">Поставщикам</a>
+      <a href="#contacts">Контакты</a>
+    </nav>
+    <a class="header-cta" href="#request">Оставить заявку</a>
+  </header><main><section class="poster-hero"><img src="assets/hero-suppliers.png" alt="Поставщики для HoReCa в одной экосистеме" />
+      <a class="hotspot nav-workers" href="workers.html" aria-label="Сотрудникам"></a><a class="hotspot nav-restaurants" href="restaurants.html" aria-label="Заведениям"></a><a class="hotspot nav-suppliers" href="suppliers.html" aria-label="Поставщикам"></a><a class="hotspot nav-contacts" href="#contacts" aria-label="Контакты"></a><a class="hotspot hero-button" href="#request" aria-label="Оставить заявку"></a>
+    </section><section class="section form-section" id="request"><div class="form-intro"><h2>Анкета поставщика</h2><p>Добавьте компанию в базу поставщиков GastroConnect и получите доступ к заведениями HoReCa.</p></div>
+<form class="form-card" data-form-type="supplier"><div class="form-grid">
+<label>Название компании<input name="company_name" required placeholder="ООО / ИП / бренд"></label><label>Контактное лицо<input name="contact_person" required placeholder="Имя"></label><label>Телефон<input name="phone" required placeholder="+7..."></label><label>Telegram<input name="telegram" placeholder="@username"></label><label>Город<input name="city" placeholder="Москва"></label><label>Категория<select name="category" required><option value="">Выберите категорию</option><option>Продукты</option><option>Овощи и фрукты</option><option>Мясо и птица</option><option>Рыба и морепродукты</option><option>Кофе и чай</option><option>Напитки</option><option>Посуда</option><option>Оборудование</option><option>Униформа</option><option>Клининг</option><option>Ремонт и обслуживание</option><option>Автоматизация</option><option>Услуги</option><option>Другое</option></select></label><label>Сайт / соцсеть<input name="website" placeholder="https://..."></label><label>Интерес к рекламе<select name="advertising_interest"><option>Пока нет</option><option>Каталог поставщиков</option><option>Премиум-размещение</option><option>Баннер / спецпредложение</option></select></label><label class="full">Описание товаров или услуг<textarea name="description" placeholder="Что поставляете, условия, минимальный заказ, доставка..."></textarea></label></div><button class="btn primary" type="submit">Стать поставщиком</button><div class="success"></div></form></section></main><footer class="footer" id="contacts">
+    <div class="footer-brand"><img src="assets/logo-mark.png" alt="" /> <strong>GastroConnect</strong></div>
+    <div class="footer-links">
+      <span>Telegram: @GastroConnect_bot</span>
+      <span>Email: info@gastroconnect.ru</span>
+      <a href="admin.html">Панель управления</a>
+    </div>
+  </footer></div><script src="script.js"></script></body></html>

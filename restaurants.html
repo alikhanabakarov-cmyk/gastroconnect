@@ -1,73 +1,33 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="UTF-8" />
+<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GastroConnect — заведениям HoReCa</title>
-  <link rel="icon" href="assets/favicon.ico" sizes="any" />
+  <meta name="description" content="GastroConnect — премиальная HoReCa-платформа для работников, заведений и поставщиков." />
+  <link rel="icon" href="favicon.ico" sizes="any" />
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png" />
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
   <link rel="manifest" href="site.webmanifest" />
   <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <div class="page">
-    <header class="header">
-      <a class="logo" href="index.html"><img src="assets/logo-mark.png" alt="GastroConnect" /><span>GastroConnect</span></a>
-      <nav class="nav"><a href="workers.html">Сотрудникам</a><a href="restaurants.html">Заведениям</a><a href="suppliers.html">Поставщикам</a><a href="#contacts">Контакты</a></nav>
-      <div class="header-actions"><a class="btn primary" href="#form">Оставить заявку <span class="arrow">→</span></a></div>
-    </header>
-
-    <main>
-      <section class="hero">
-        <div class="hero-left">
-          <div class="eyebrow">Для ресторанов, кафе и баров</div>
-          <h1>Быстрый подбор персонала для заведений</h1>
-          <p class="lead">Закрывайте срочные смены и находите сотрудников без лишней суеты, хаоса в чатах и потерянных контактов.</p>
-          <div class="hero-buttons"><a class="btn primary" href="#form">Оставить заявку <span class="arrow">→</span></a><a class="btn" href="index.html">На главную</a></div>
-        </div>
-        <div class="hero-visual" aria-hidden="true">
-          <div class="people-scene scene-restaurants">
-            <div class="orbit"></div>
-            <div class="person-card person-main"><div class="person-emoji">👨‍💼</div><b>Управляющий</b><small>создаёт заявку</small></div>
-            <div class="person-card person-chef"><div class="person-emoji">👩‍🍳</div><b>Повар</b><small>закрывает смену</small></div>
-            <div class="person-card person-waiter"><div class="person-emoji">🍽️</div><b>Официант</b><small>готов к выходу</small></div>
-          </div>
-          <div class="float-card one">Отклики быстро <small>на срочные смены</small></div>
-          <div class="float-card two">Проверенные анкеты <small>контакты и опыт</small></div>
-        </div>
-      </section>
-
-      <section class="section" id="form">
-        <div class="form-wrap">
-          <div class="form-intro"><h2>Оставьте заявку</h2><p>Укажите, кто нужен, когда, где и на каких условиях. Чем точнее заявка, тем быстрее можно подобрать человека.</p></div>
-          <form class="form-card" data-form-type="restaurant">
-            <div class="form-grid">
-              <div class="field"><label>Название заведения</label><input name="business_name" required placeholder="Ресторан Green"></div>
-              <div class="field"><label>Контактное лицо</label><input name="contact_person" required placeholder="Имя, должность"></div>
-              <div class="field"><label>Телефон</label><input name="phone" required placeholder="+7 (___) ___-__-__"></div>
-              <div class="field"><label>Telegram</label><input name="telegram" placeholder="@username"></div>
-              <div class="field"><label>Город</label><select name="city" required><option value="">Выберите город</option><option>Москва</option><option>Санкт-Петербург</option><option>Казань</option><option>Сочи</option><option>Другой город</option></select></div>
-              <div class="field"><label>Адрес / район</label><input name="address" placeholder="Адрес, район или метро"></div>
-              <div class="field"><label>Кто нужен</label><select name="needed_role" required><option value="">Кто нужен</option><option>Официант</option><option>Бармен</option><option>Повар</option><option>Повар горячего цеха</option><option>Повар холодного цеха</option><option>Су-шеф</option><option>Шеф-повар</option><option>Бариста</option><option>Хостес</option><option>Администратор</option><option>Кальянщик</option><option>Посудомойщик</option><option>Курьер</option><option>Раннер</option><option>Уборщик</option><option>Метрдотель</option><option>Сомелье</option><option>Кондитер</option><option>Пекарь</option><option>Заготовщик</option><option>Разнорабочий</option><option>Несколько сотрудников</option><option>Другое</option></select></div>
-              <div class="field"><label>Формат</label><select name="format"><option value="">Выберите формат</option><option>Срочная смена</option><option>Подработка</option><option>Постоянная вакансия</option><option>Банкет / мероприятие</option><option>Сезонная работа</option></select></div>
-              <div class="field"><label>Дата</label><input name="date" type="date"></div>
-              <div class="field"><label>Время смены</label><input name="time" placeholder="Например: 18:00–02:00"></div>
-              <div class="field"><label>Оплата</label><input name="payment" placeholder="Например: 4000 ₽ за смену"></div>
-              <div class="field"><label>Срочность</label><select name="urgency"><option value="">Выберите срочность</option><option>Сегодня</option><option>Завтра</option><option>В течение недели</option><option>На постоянную работу</option><option>Пока собираю варианты</option></select></div>
-              <div class="field full"><label>Требования и условия</label><textarea name="requirements" placeholder="Форма одежды, питание, опыт, обязанности, медкнижка, такси после смены"></textarea></div>
-            </div>
-            <p class="form-note">Пока форма сохраняет заявку в браузере. Следующим этапом подключим базу данных и уведомления.</p>
-            <button class="btn primary" type="submit">Оставить заявку <span class="arrow">→</span></button>
-            <div class="success">Заявка сохранена. Следующий шаг — подключение базы заявок.</div>
-          </form>
-        </div>
-      </section>
-    </main>
-
-    <footer class="footer" id="contacts"><div class="footer-brand"><img src="assets/logo-mark.png" alt="" /> GastroConnect</div><div class="footer-contacts"><span>Telegram: @GastroConnect_bot</span><span>Email: info@gastroconnect.ru</span></div></footer>
-  </div>
-  <script src="script.js"></script>
-</body>
-</html>
+  <title>Заведениям — GastroConnect</title></head><body><div class="page-shell"><header class="site-header">
+    <a class="brand" href="index.html" aria-label="GastroConnect">
+      <img src="assets/logo-mark.png" alt="" class="brand-mark" />
+      <span>GastroConnect</span>
+    </a>
+    <nav class="main-nav" aria-label="Главное меню">
+      <a href="workers.html">Сотрудникам</a>
+      <a href="restaurants.html">Заведениям</a>
+      <a href="suppliers.html">Поставщикам</a>
+      <a href="#contacts">Контакты</a>
+    </nav>
+    <a class="header-cta" href="#request">Оставить заявку</a>
+  </header><main><section class="poster-hero"><img src="assets/hero-restaurants.png" alt="Быстрый подбор персонала для заведений" />
+      <a class="hotspot nav-workers" href="workers.html" aria-label="Сотрудникам"></a><a class="hotspot nav-restaurants" href="restaurants.html" aria-label="Заведениям"></a><a class="hotspot nav-suppliers" href="suppliers.html" aria-label="Поставщикам"></a><a class="hotspot nav-contacts" href="#contacts" aria-label="Контакты"></a><a class="hotspot hero-button" href="#request" aria-label="Оставить заявку"></a>
+    </section><section class="section form-section" id="request"><div class="form-intro"><h2>Заявка заведения</h2><p>Оставьте заявку на персонал. В первой версии заявки сохраняются в локальную панель управления.</p></div>
+<form class="form-card" data-form-type="restaurant"><div class="form-grid">
+<label>Название заведения<input name="business_name" required placeholder="Ресторан / кафе / бар"></label><label>Контактное лицо<input name="contact_person" required placeholder="Имя"></label><label>Телефон<input name="phone" required placeholder="+7..."></label><label>Telegram<input name="telegram" placeholder="@username"></label><label>Город<input name="city" placeholder="Москва"></label><label>Адрес<input name="address" placeholder="Улица, метро"></label><label>Кто нужен<select name="needed_role" required><option value="">Выберите вариант</option><option>Официант</option><option>Бармен</option><option>Повар</option><option>Повар горячего цеха</option><option>Повар холодного цеха</option><option>Су-шеф</option><option>Шеф-повар</option><option>Бариста</option><option>Хостес</option><option>Администратор</option><option>Кальянщик</option><option>Посудомойщик</option><option>Курьер</option><option>Раннер</option><option>Уборщик</option><option>Метрдотель</option><option>Сомелье</option><option>Кондитер</option><option>Пекарь</option><option>Заготовщик</option><option>Разнорабочий</option><option>Несколько сотрудников</option><option>Другое</option></select></label><label>Дата<input type="date" name="date"></label><label>Время<input name="time" placeholder="18:00–02:00"></label><label>Оплата<input name="payment" placeholder="4000 ₽ / 350 ₽ час"></label><label>Срочность<select name="urgency"><option>Сегодня</option><option>Завтра</option><option>На этой неделе</option><option>Постоянная вакансия</option></select></label><label class="full">Требования и условия<textarea name="requirements" placeholder="Форма, питание, опыт, задачи на смену..."></textarea></label></div><button class="btn primary" type="submit">Оставить заявку</button><div class="success"></div></form></section></main><footer class="footer" id="contacts">
+    <div class="footer-brand"><img src="assets/logo-mark.png" alt="" /> <strong>GastroConnect</strong></div>
+    <div class="footer-links">
+      <span>Telegram: @GastroConnect_bot</span>
+      <span>Email: info@gastroconnect.ru</span>
+      <a href="admin.html">Панель управления</a>
+    </div>
+  </footer></div><script src="script.js"></script></body></html>
