@@ -1,4 +1,6 @@
 
+  const SUPABASE_URL = 'https://fqxbtojjhpkibixvnbnn.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_0F-CDySnOiJYUdAr8khcJA_QiZc6J2y';
 (function(){
   const KEY='gc_submissions';
   const get=()=>JSON.parse(localStorage.getItem(KEY)||'[]');
