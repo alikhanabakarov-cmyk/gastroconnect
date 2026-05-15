@@ -10,6 +10,24 @@ const SUPABASE_KEY = 'sb_publishable_0F-CDySnOiJYUdAr8khcJA_QiZc6J2y';
       e.preventDefault();
       const data=Object.fromEntries(new FormData(form).entries());
       const entry={id:Date.now(),created_at:new Date().toLocaleString('ru-RU'),type:form.dataset.formType,data};
+      fetch(`${SUPABASE_URL}/rest/v1/suppliers`, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'apikey': SUPABASE_KEY,
+    'Authorization': `Bearer ${SUPABASE_KEY}`
+  },
+  body: JSON.stringify({
+    company_name: data.company_name || '',
+    contact_name: data.contact_name || '',
+    phone: data.phone || '',
+    telegram: data.telegram || '',
+    city: data.city || '',
+    category: data.category || '',
+    website: data.website || '',
+    description: data.description || ''
+  })
+});
       const all=get(); all.unshift(entry); set(all);
       const box=form.querySelector('.success');
       if(box){box.textContent='Заявка сохранена в локальную панель управления. Следующий этап — подключение базы данных.';box.style.display='block';}
