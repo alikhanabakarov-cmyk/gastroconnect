@@ -69,7 +69,12 @@ fetch(`${SUPABASE_URL}/rest/v1/suppliers?select=*`, {
       <td>${r.company_name||''}</td>
       <td>${r.phone||''}</td>
       <td>${r.telegram||''}</td>
-      <td>${JSON.stringify(r)}</td>
+<td>
+  <strong>Город:</strong> ${r.city || '-'}<br>
+  <strong>Категория:</strong> ${r.category || '-'}<br>
+  <strong>Сайт:</strong> ${r.website || '-'}<br>
+  <strong>Описание:</strong> ${r.description || '-'}
+</td>
     </tr>`
   ).join('');
 });
