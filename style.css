@@ -16,3 +16,13 @@ img:not([src]),
   align-items: center;
   gap: 12px;
 }
+#adminTable a {
+  color: var(--green);
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+#adminTable a:hover {
+  color: var(--gold);
+}
