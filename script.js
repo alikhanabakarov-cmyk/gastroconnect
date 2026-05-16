@@ -71,45 +71,86 @@ const SUPABASE_KEY = 'sb_publishable_0F-CDySnOiJYUdAr8khcJA_QiZc6J2y';
     return rows.map(r=>[r.created_at,r.type,r.data.name||r.data.business_name||r.data.company_name||'',r.data.phone||'',r.data.telegram||'',JSON.stringify(r.data)].map(esc).join(',')).join('\n');
   }
   function download(name, text, type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();URL.revokeObjectURL(a.href)}
-  function renderAdmin(){
-    const tbody=document.querySelector('#adminTable tbody'); if(!tbody) return;
-  const rows = [];
+ function renderAdmin(){
+  const tbody=document.querySelector('#adminTable tbody');
+  if(!tbody) return;
 
-fetch(`${SUPABASE_URL}/rest/v1/suppliers?select=*`, {
-  headers: {
+  const rows=[];
+
+  const headers={
     'apikey': SUPABASE_KEY,
     'Authorization': `Bearer ${SUPABASE_KEY}`
-  }
-})
-.then(res => res.json())
-.then(data => {
-  rows.push(...data);
+  };
 
-  const counts={all:rows.length,worker:0,restaurant:0,supplier:0};
-  rows.forEach(r=>counts[r.type]=(counts[r.type]||0)+1);
+  const loadTable=(table,type)=>{
+    return fetch(`${SUPABASE_URL}/rest/v1/${table}?select=*`, {headers})
+      .then(res=>res.json())
+      .then(data=>Array.isArray(data) ? data.map(r=>({...r,type})) : [])
+      .catch(()=>[]);
+  };
 
-  document.getElementById('adminStats').innerHTML=
-  `<div class="stat">Всего: ${counts.all}</div>
-   <div class="stat">Работники: ${counts.worker}</div>
-   <div class="stat">Заведения: ${counts.restaurant}</div>
-   <div class="stat">Поставщики: ${counts.supplier}</div>`;
+  Promise.all([
+    loadTable('suppliers','supplier'),
+    loadTable('restaurants','restaurant')
+  ])
+  .then(([suppliers,restaurants])=>{
+    rows.push(...suppliers,...restaurants);
 
-  tbody.innerHTML=rows.map(r=>
-    `<tr>
-      <td>${r.created_at||''}</td>
-      <td>supplier</td>
-      <td>${r.company_name||''}</td>
-      <td>${r.phone||''}</td>
-      <td>${r.telegram||''}</td>
-      <td>
-<strong>Город:</strong> ${r.city || '-'}<br>
-<strong>Категория:</strong> ${r.category || '-'}<br>
-<strong>Сайт:</strong> ${r.website || '-'}<br>
-<strong>Описание:</strong> ${r.description || '-'}
-</td>
-    </tr>`
-  ).join('');
-});
+    const counts={all:rows.length,worker:0,restaurant:0,supplier:0};
+    rows.forEach(r=>counts[r.type]=(counts[r.type]||0)+1);
+
+    document.getElementById('adminStats').innerHTML=
+      `<div class="stat">Всего: ${counts.all}</div>
+       <div class="stat">Работники: ${counts.worker}</div>
+       <div class="stat">Заведения: ${counts.restaurant}</div>
+       <div class="stat">Поставщики: ${counts.supplier}</div>`;
+
+    tbody.innerHTML=rows.map(r=>`
+      <tr>
+        <td>${r.created_at || ''}</td>
+        <td>${r.type || ''}</td>
+        <td>${r.company_name || r.business_name || ''}</td>
+        <td>${r.phone || ''}</td>
+        <td>${r.telegram || ''}</td>
+        <td>
+          <strong>Город:</strong> ${r.city || '-'}<br>
+          <strong>Категория/формат:</strong> ${r.category || r.format || '-'}<br>
+          <strong>Сайт:</strong> ${r.website || '-'}<br>
+          <strong>Описание:</strong> ${r.description || '-'}
+        </td>
+      </tr>
+    `).join('');
+
+    document.getElementById('exportJson').onclick=()=>download(
+      'gastroconnect-submissions.json',
+      JSON.stringify(rows,null,2),
+      'application/json'
+    );
+
+    document.getElementById('exportCsv').onclick=()=>download(
+      'gastroconnect-submissions.csv',
+      'Дата,Тип,Название,Телефон,Telegram,Город,Категория/Формат,Сайт,Описание\n' +
+      rows.map(r=>[
+        r.created_at || '',
+        r.type || '',
+        r.company_name || r.business_name || '',
+        r.phone || '',
+        r.telegram || '',
+        r.city || '',
+        r.category || r.format || '',
+        r.website || '',
+        r.description || ''
+      ].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n'),
+      'text/csv;charset=utf-8'
+    );
+
+    document.getElementById('clearData').onclick=()=>{
+      if(confirm('Очистить локальные заявки?')){
+        set([]);
+        renderAdmin();
+      }
+    };
+  })
   }
   renderAdmin();
 })();
