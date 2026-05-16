@@ -54,7 +54,6 @@ const payload = formType === 'restaurant'
       website: data.website || '',
       description: data.description || ''
     };
-          };
 
       fetch(`${SUPABASE_URL}/rest/v1/${tableName}`, {
         method: 'POST',
