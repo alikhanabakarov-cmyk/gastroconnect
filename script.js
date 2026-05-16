@@ -102,28 +102,28 @@ const formatDate = (value) => {
 };
 const detailsText = (r) => {
   if (r.type === 'worker') {
-    return `
-      <strong>Город:</strong> ${r.city || '-'}<br>
-      <strong>Должность:</strong> ${r.position || '-'}<br>
-      <strong>Опыт:</strong> ${r.experience || '-'}<br>
-      <strong>Описание:</strong> ${r.description || '-'}
-    `;
+    return [
+      `<strong>Город:</strong> ${r.city || '-'}`,
+      `<strong>Должность:</strong> ${r.position || '-'}`,
+      `<strong>Опыт:</strong> ${r.experience || '-'}`,
+      `<strong>Описание:</strong> ${r.description || '-'}`
+    ].join('<br>');
   }
 
   if (r.type === 'restaurant') {
-    return `
-      <strong>Город:</strong> ${r.city || '-'}<br>
-      <strong>Формат:</strong> ${r.format || '-'}<br>
-      <strong>Описание:</strong> ${r.description || '-'}
-    `;
+    return [
+      `<strong>Город:</strong> ${r.city || '-'}`,
+      `<strong>Формат:</strong> ${r.format || '-'}`,
+      `<strong>Описание:</strong> ${r.description || '-'}`
+    ].join('<br>');
   }
 
-  return 
-    <strong>Город:</strong> ${r.city || '-'}<br>
-    <strong>Категория:</strong> ${r.category || '-'}<br>
-    <strong>Сайт:</strong> ${r.website || '-'}<br>
-    <strong>Описание:</strong> ${r.description || '-'}
-  `;
+  return [
+    `<strong>Город:</strong> ${r.city || '-'}`,
+    `<strong>Категория:</strong> ${r.category || '-'}`,
+    `<strong>Сайт:</strong> ${r.website || '-'}`,
+    `<strong>Описание:</strong> ${r.description || '-'}`
+  ].join('<br>');
 };
   const headers={
     'apikey': SUPABASE_KEY,
