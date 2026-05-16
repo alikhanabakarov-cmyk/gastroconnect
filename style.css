@@ -26,3 +26,32 @@ img:not([src]),
 #adminTable a:hover {
   color: var(--gold);
 }
+.type-badge {
+  display: inline-block;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1;
+  border: 1px solid var(--border);
+  background: #fffaf2;
+  color: var(--green);
+}
+
+.type-worker {
+  background: #eefaf4;
+  color: #064b3b;
+  border-color: #bfe7d4;
+}
+
+.type-restaurant {
+  background: #fff5df;
+  color: #7a4b00;
+  border-color: #f1cf8b;
+}
+
+.type-supplier {
+  background: #f3f1ff;
+  color: #3f317d;
+  border-color: #d4ccff;
+}
