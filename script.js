@@ -88,7 +88,18 @@ const payload = formType === 'restaurant'
   if(!tbody) return;
 
   const rows=[];
+const typeLabel = {
+  supplier: 'Поставщик',
+  restaurant: 'Заведение',
+  worker: 'Работник'
+};
 
+const formatDate = (value) => {
+  if (!value) return '-';
+  const date = new Date(value);
+  if (isNaN(date)) return value;
+  return date.toLocaleString('ru-RU');
+};
   const headers={
     'apikey': SUPABASE_KEY,
     'Authorization': `Bearer ${SUPABASE_KEY}`
@@ -119,8 +130,8 @@ const payload = formType === 'restaurant'
 
     tbody.innerHTML=rows.map(r=>`
       <tr>
-        <td>${r.created_at || ''}</td>
-        <td>${r.type || ''}</td>
+<td>${formatDate(r.created_at)}</td>
+<td>${typeLabel[r.type] || r.type || '-'}</td>
         <td>${r.company_name || r.business_name || r.name || ''}</td>
         <td>${r.phone || ''}</td>
         <td>${r.telegram || ''}</td>
