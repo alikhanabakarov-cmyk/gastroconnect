@@ -100,6 +100,31 @@ const formatDate = (value) => {
   if (isNaN(date)) return value;
   return date.toLocaleString('ru-RU');
 };
+const detailsText = (r) => {
+  if (r.type === 'worker') {
+    return `
+      <strong>Город:</strong> ${r.city || '-'}<br>
+      <strong>Должность:</strong> ${r.position || '-'}<br>
+      <strong>Опыт:</strong> ${r.experience || '-'}<br>
+      <strong>Описание:</strong> ${r.description || '-'}
+    `;
+  }
+
+  if (r.type === 'restaurant') {
+    return `
+      <strong>Город:</strong> ${r.city || '-'}<br>
+      <strong>Формат:</strong> ${r.format || '-'}<br>
+      <strong>Описание:</strong> ${r.description || '-'}
+    `;
+  }
+
+  return `
+    <strong>Город:</strong> ${r.city || '-'}<br>
+    <strong>Категория:</strong> ${r.category || '-'}<br>
+    <strong>Сайт:</strong> ${r.website || '-'}<br>
+    <strong>Описание:</strong> ${r.description || '-'}
+  `;
+};
   const headers={
     'apikey': SUPABASE_KEY,
     'Authorization': `Bearer ${SUPABASE_KEY}`
@@ -135,13 +160,7 @@ const formatDate = (value) => {
         <td>${r.company_name || r.business_name || r.name || ''}</td>
         <td>${r.phone || ''}</td>
         <td>${r.telegram || ''}</td>
-        <td>
-<strong>Город:</strong> ${r.city || '-'}<br>
-<strong>Категория/формат:</strong> ${r.category || r.format || '-'}<br>
-<strong>Должность:</strong> ${r.position || '-'}<br>
-<strong>Опыт:</strong> ${r.experience || '-'}<br>
-<strong>Сайт:</strong> ${r.website || '-'}<br>
-<strong>Описание:</strong> ${r.description || '-'}        </td>
+<td>${detailsText(r)}</td>
       </tr>
     `).join('');
 
