@@ -118,7 +118,7 @@ const detailsText = (r) => {
     `;
   }
 
-  return `
+  return 
     <strong>Город:</strong> ${r.city || '-'}<br>
     <strong>Категория:</strong> ${r.category || '-'}<br>
     <strong>Сайт:</strong> ${r.website || '-'}<br>
@@ -144,6 +144,7 @@ const detailsText = (r) => {
 ])
 .then(([suppliers,restaurants,workers])=>{
   rows.push(...suppliers,...restaurants,...workers);
+  rows.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     const counts={all:rows.length,worker:0,restaurant:0,supplier:0};
     rows.forEach(r=>counts[r.type]=(counts[r.type]||0)+1);
 
