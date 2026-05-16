@@ -160,8 +160,7 @@ const detailsText = (r) => {
 <td>${typeLabel[r.type] || r.type || '-'}</td>
         <td>${r.company_name || r.business_name || r.name || ''}</td>
 <td>${r.phone ? '<a href="tel:' + r.phone + '">' + r.phone + '</a>' : '-'}</td>
-        <td>${r.telegram || ''}</td>
-<td>${detailsText(r)}</td>
+<td>${r.telegram ? '<a href="https://t.me/' + String(r.telegram).replace('@','') + '" target="_blank">' + r.telegram + '</a>' : '-'}</td><td>${detailsText(r)}</td>
       </tr>
     `).join('');
 
