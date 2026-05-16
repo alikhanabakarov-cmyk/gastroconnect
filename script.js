@@ -154,8 +154,8 @@ const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
 const visibleRows = query
   ? rows.filter(r => JSON.stringify(r).toLowerCase().includes(query))
   : rows;
-    const counts={all:rows.length,worker:0,restaurant:0,supplier:0};
-    rows.forEach(r=>counts[r.type]=(counts[r.type]||0)+1);
+  const counts={all:visibleRows.length,worker:0,restaurant:0,supplier:0};
+visibleRows.forEach(r=>counts[r.type]=(counts[r.type]||0)+1);
 
     document.getElementById('adminStats').innerHTML=
       `<div class="stat">Всего: ${counts.all}</div>
