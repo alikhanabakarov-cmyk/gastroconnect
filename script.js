@@ -157,8 +157,7 @@ const detailsText = (r) => {
     tbody.innerHTML=rows.map(r=>`
       <tr>
 <td>${formatDate(r.created_at)}</td>
-<td>${typeLabel[r.type] || r.type || '-'}</td>
-        <td>${r.company_name || r.business_name || r.name || ''}</td>
+<td><span class="type-badge type-${r.type || 'unknown'}">${typeLabel[r.type] || r.type || '-'}</span></td>        <td>${r.company_name || r.business_name || r.name || ''}</td>
 <td>${r.phone ? '<a href="tel:' + r.phone + '">' + r.phone + '</a>' : '-'}</td>
 <td>${r.telegram ? '<a href="https://t.me/' + String(r.telegram).replace('@','') + '" target="_blank">' + r.telegram + '</a>' : '-'}</td><td>${detailsText(r)}</td>
       </tr>
