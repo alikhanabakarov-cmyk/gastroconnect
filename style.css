@@ -54,4 +54,26 @@ img:not([src]),
   background: #f3f1ff;
   color: #3f317d;
   border-color: #d4ccff;
+}.admin-search {
+  min-width: 320px;
+  max-width: 460px;
+  height: 52px;
+  padding: 0 18px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: #fffaf2;
+  color: var(--green);
+  font-size: 15px;
+  font-weight: 700;
+  outline: none;
+}
+
+.admin-search::placeholder {
+  color: #9b8a72;
+  font-weight: 600;
+}
+
+.admin-search:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 4px rgba(6, 76, 59, 0.12);
 }

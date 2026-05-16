@@ -145,6 +145,15 @@ const detailsText = (r) => {
 .then(([suppliers,restaurants,workers])=>{
   rows.push(...suppliers,...restaurants,...workers);
   rows.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  const searchInput = document.getElementById('adminSearch');
+  if (searchInput && !searchInput.dataset.ready) {
+  searchInput.dataset.ready = '1';
+  searchInput.addEventListener('input', renderAdmin);
+}
+const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+const visibleRows = query
+  ? rows.filter(r => JSON.stringify(r).toLowerCase().includes(query))
+  : rows;
     const counts={all:rows.length,worker:0,restaurant:0,supplier:0};
     rows.forEach(r=>counts[r.type]=(counts[r.type]||0)+1);
 
@@ -154,14 +163,16 @@ const detailsText = (r) => {
        <div class="stat">Заведения: ${counts.restaurant}</div>
        <div class="stat">Поставщики: ${counts.supplier}</div>`;
 
-    tbody.innerHTML=rows.map(r=>`
-      <tr>
-<td>${formatDate(r.created_at)}</td>
-<td><span class="type-badge type-${r.type || 'unknown'}">${typeLabel[r.type] || r.type || '-'}</span></td>        <td>${r.company_name || r.business_name || r.name || ''}</td>
-<td>${r.phone ? '<a href="tel:' + r.phone + '">' + r.phone + '</a>' : '-'}</td>
-<td>${r.telegram ? '<a href="https://t.me/' + String(r.telegram).replace('@','') + '" target="_blank">' + r.telegram + '</a>' : '-'}</td><td>${detailsText(r)}</td>
-      </tr>
-    `).join('');
+  tbody.innerHTML=visibleRows.map(r=>`
+   <tr>
+    <td>${formatDate(r.created_at)}</td>
+    <td><span class="type-badge type-${r.type || 'unknown'}">${typeLabel[r.type] || r.type || '-'}</span></td>
+    <td>${r.company_name || r.business_name || r.name || ''}</td>
+    <td>${r.phone ? '<a href="tel:' + r.phone + '">' + r.phone + '</a>' : '-'}</td>
+    <td>${r.telegram ? '<a href="https://t.me/' + String(r.telegram).replace('@','') + '" target="_blank">' + r.telegram + '</a>' : '-'}</td>
+    <td>${detailsText(r)}</td>
+   </tr>
+  `).join('');
 
     document.getElementById('exportJson').onclick=()=>download(
       'gastroconnect-submissions.json',
