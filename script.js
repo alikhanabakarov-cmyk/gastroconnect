@@ -20,27 +20,40 @@ const SUPABASE_KEY = 'sb_publishable_0F-CDySnOiJYUdAr8khcJA_QiZc6J2y';
         data
       };
 
-      const tableName = formType === 'restaurant' ? 'restaurants' : 'suppliers';
-
-      const payload = formType === 'restaurant'
-        ? {
-            business_name: data.business_name || data.company_name || '',
-            contact_name: data.contact_name || '',
-            phone: data.phone || '',
-            telegram: data.telegram || '',
-            city: data.city || '',
-            format: data.format || '',
-            description: data.description || ''
-          }
-        : {
-            company_name: data.company_name || '',
-            contact_name: data.contact_name || '',
-            phone: data.phone || '',
-            telegram: data.telegram || '',
-            city: data.city || '',
-            category: data.category || '',
-            website: data.website || '',
-            description: data.description || ''
+const tableName =
+  formType === 'restaurant' ? 'restaurants' :
+  formType === 'worker' ? 'workers' :
+  'suppliers';
+const payload = formType === 'restaurant'
+  ? {
+      business_name: data.business_name || data.company_name || '',
+      contact_name: data.contact_name || '',
+      phone: data.phone || '',
+      telegram: data.telegram || '',
+      city: data.city || '',
+      format: data.format || '',
+      description: data.description || ''
+    }
+  : formType === 'worker'
+  ? {
+      name: data.name || '',
+      phone: data.phone || '',
+      telegram: data.telegram || '',
+      city: data.city || '',
+      position: data.position || '',
+      experience: data.experience || '',
+      description: data.description || ''
+    }
+  : {
+      company_name: data.company_name || '',
+      contact_name: data.contact_name || '',
+      phone: data.phone || '',
+      telegram: data.telegram || '',
+      city: data.city || '',
+      category: data.category || '',
+      website: data.website || '',
+      description: data.description || ''
+    };
           };
 
       fetch(`${SUPABASE_URL}/rest/v1/${tableName}`, {
@@ -89,13 +102,13 @@ const SUPABASE_KEY = 'sb_publishable_0F-CDySnOiJYUdAr8khcJA_QiZc6J2y';
       .catch(()=>[]);
   };
 
-  Promise.all([
-    loadTable('suppliers','supplier'),
-    loadTable('restaurants','restaurant')
-  ])
-  .then(([suppliers,restaurants])=>{
-    rows.push(...suppliers,...restaurants);
-
+ Promise.all([
+  loadTable('suppliers','supplier'),
+  loadTable('restaurants','restaurant'),
+  loadTable('workers','worker')
+])
+.then(([suppliers,restaurants,workers])=>{
+  rows.push(...suppliers,...restaurants,...workers);
     const counts={all:rows.length,worker:0,restaurant:0,supplier:0};
     rows.forEach(r=>counts[r.type]=(counts[r.type]||0)+1);
 
@@ -109,15 +122,16 @@ const SUPABASE_KEY = 'sb_publishable_0F-CDySnOiJYUdAr8khcJA_QiZc6J2y';
       <tr>
         <td>${r.created_at || ''}</td>
         <td>${r.type || ''}</td>
-        <td>${r.company_name || r.business_name || ''}</td>
+        <td>${r.company_name || r.business_name || r.name || ''}</td>
         <td>${r.phone || ''}</td>
         <td>${r.telegram || ''}</td>
         <td>
-          <strong>Город:</strong> ${r.city || '-'}<br>
-          <strong>Категория/формат:</strong> ${r.category || r.format || '-'}<br>
-          <strong>Сайт:</strong> ${r.website || '-'}<br>
-          <strong>Описание:</strong> ${r.description || '-'}
-        </td>
+<strong>Город:</strong> ${r.city || '-'}<br>
+<strong>Категория/формат:</strong> ${r.category || r.format || '-'}<br>
+<strong>Должность:</strong> ${r.position || '-'}<br>
+<strong>Опыт:</strong> ${r.experience || '-'}<br>
+<strong>Сайт:</strong> ${r.website || '-'}<br>
+<strong>Описание:</strong> ${r.description || '-'}        </td>
       </tr>
     `).join('');
 
@@ -133,7 +147,7 @@ const SUPABASE_KEY = 'sb_publishable_0F-CDySnOiJYUdAr8khcJA_QiZc6J2y';
       rows.map(r=>[
         r.created_at || '',
         r.type || '',
-        r.company_name || r.business_name || '',
+r.company_name || r.business_name || r.name || '',
         r.phone || '',
         r.telegram || '',
         r.city || '',
