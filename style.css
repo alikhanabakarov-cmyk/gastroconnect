@@ -1225,4 +1225,21 @@ body{
   font-size:17px !important;
   font-weight:900 !important;
   box-shadow:0 16px 34px rgba(6,76,59,.24) !important;
+}/* === FORM SCROLL LOGIC === */
+
+#request{
+  scroll-margin-top:120px;
+}
+
+.form-section{
+  position:relative;
+}
+
+.form-section::before{
+  content:"";
+  position:absolute;
+  inset:-24px;
+  border-radius:34px;
+  background:linear-gradient(180deg,rgba(255,250,242,.72),rgba(247,236,221,.58));
+  z-index:-1;
 }
