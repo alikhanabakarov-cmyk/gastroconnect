@@ -891,3 +891,239 @@ body{
     object-fit:contain !important;
   }
 }
+/* === FIX HEADER + HERO SIZE 18.05 === */
+
+/* шапка как отдельный sticky-блок */
+.site-header{
+  position:sticky !important;
+  top:0 !important;
+  z-index:9999 !important;
+
+  width:100% !important;
+  max-width:none !important;
+  min-height:92px !important;
+  margin:0 !important;
+  padding:14px 64px !important;
+
+  display:grid !important;
+  grid-template-columns:auto 1fr auto !important;
+  align-items:center !important;
+  gap:40px !important;
+
+  background:rgba(255,250,242,.92) !important;
+  backdrop-filter:blur(18px) !important;
+  -webkit-backdrop-filter:blur(18px) !important;
+
+  border:0 !important;
+  border-bottom:1px solid rgba(201,154,63,.22) !important;
+  border-radius:0 !important;
+  box-shadow:0 10px 32px rgba(42,33,18,.06) !important;
+}
+
+/* логотип слева */
+.site-header .brand{
+  grid-column:1 !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:16px !important;
+  color:#073f33 !important;
+  font-size:34px !important;
+  font-weight:900 !important;
+  text-decoration:none !important;
+  white-space:nowrap !important;
+}
+
+/* временно убираем битый квадрат логотипа, пока файл logo-mark.png не загружен */
+.site-header .brand img{
+  display:none !important;
+}
+
+/* делаем CSS-логотип вместо битой картинки */
+.site-header .brand::before{
+  content:"GC";
+  width:58px;
+  height:58px;
+  border-radius:50%;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+
+  color:#064c3b;
+  font-size:24px;
+  font-weight:900;
+
+  border:2px solid rgba(201,154,63,.55);
+  background:rgba(255,250,242,.9);
+  box-shadow:0 8px 22px rgba(42,33,18,.10);
+}
+
+/* меню по центру */
+.site-header .main-nav{
+  grid-column:2 !important;
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;
+  gap:34px !important;
+}
+
+.site-header .main-nav a{
+  color:#111 !important;
+  text-decoration:none !important;
+  font-size:17px !important;
+  font-weight:800 !important;
+}
+
+/* кнопка строго справа */
+.site-header .header-cta{
+  grid-column:3 !important;
+  justify-self:end !important;
+
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  min-width:180px !important;
+  min-height:56px !important;
+  padding:0 28px !important;
+
+  border-radius:16px !important;
+  background:#064c3b !important;
+  color:#fff !important;
+  text-decoration:none !important;
+  font-size:17px !important;
+  font-weight:900 !important;
+
+  box-shadow:0 16px 34px rgba(6,76,59,.24) !important;
+}
+
+/* первый экран */
+.poster-hero{
+  width:100% !important;
+  max-width:none !important;
+  min-height:calc(100vh - 92px) !important;
+
+  margin:0 !important;
+  padding:70px 64px 60px !important;
+
+  display:grid !important;
+  grid-template-columns:44% 56% !important;
+  align-items:center !important;
+  gap:0 !important;
+
+  background:
+    radial-gradient(circle at 20% 35%, rgba(255,255,255,.95), transparent 32%),
+    linear-gradient(180deg,#fffaf2 0%,#f8eedf 100%) !important;
+
+  border:0 !important;
+  border-radius:0 !important;
+  box-shadow:none !important;
+  overflow:hidden !important;
+}
+
+/* текст слева */
+.poster-copy{
+  max-width:690px !important;
+  padding-left:0 !important;
+  z-index:3 !important;
+}
+
+.poster-copy h1{
+  font-size:clamp(64px, 5.3vw, 86px) !important;
+  line-height:1.04 !important;
+  letter-spacing:-3px !important;
+  margin:0 0 28px !important;
+  color:#064c3b !important;
+}
+
+.poster-copy p{
+  max-width:560px !important;
+  font-size:24px !important;
+  line-height:1.45 !important;
+  margin:0 0 36px !important;
+  color:#2f3432 !important;
+}
+
+/* кнопки */
+.hero-actions{
+  display:flex !important;
+  gap:24px !important;
+  margin-bottom:48px !important;
+}
+
+.hero-actions .btn{
+  min-width:230px !important;
+  min-height:66px !important;
+  border-radius:16px !important;
+  font-size:20px !important;
+  font-weight:850 !important;
+}
+
+/* правая картинка крупнее */
+.poster-visual{
+  width:100% !important;
+  height:calc(100vh - 150px) !important;
+  min-height:620px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:flex-end !important;
+
+  overflow:visible !important;
+}
+
+.poster-visual img{
+  display:block !important;
+  width:116% !important;
+  height:116% !important;
+
+  object-fit:cover !important;
+  object-position:78% center !important;
+
+  border-radius:0 !important;
+  box-shadow:none !important;
+  filter:drop-shadow(0 28px 60px rgba(42,33,18,.14)) !important;
+}
+
+/* форма ниже */
+.form-section{
+  max-width:1460px !important;
+  margin:70px auto 70px !important;
+}
+
+/* мобильная */
+@media (max-width:900px){
+  .site-header{
+    padding:14px 20px !important;
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:flex-start !important;
+  }
+
+  .poster-hero{
+    grid-template-columns:1fr !important;
+    padding:38px 20px 50px !important;
+  }
+
+  .poster-copy h1{
+    font-size:44px !important;
+  }
+
+  .poster-copy p{
+    font-size:18px !important;
+  }
+
+  .hero-actions{
+    flex-direction:column !important;
+  }
+
+  .poster-visual{
+    height:auto !important;
+    min-height:0 !important;
+  }
+
+  .poster-visual img{
+    width:100% !important;
+    height:auto !important;
+    object-fit:contain !important;
+  }
+}
