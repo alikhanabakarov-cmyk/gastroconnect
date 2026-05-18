@@ -263,3 +263,395 @@ img:not([src]),
     grid-template-columns:1fr;
   }
 }
+/* === INSTAWORK-LIKE FINAL LAYOUT / GASTROCONNECT === */
+
+/* база страницы */
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  background:
+    radial-gradient(circle at 12% 8%, rgba(255,255,255,.96), transparent 28%),
+    linear-gradient(180deg,#fffaf2 0%,#f7ecdd 100%);
+}
+
+/* sticky header — шапка не убегает */
+.site-header{
+  position:sticky;
+  top:0;
+  z-index:1000;
+
+  max-width:1540px;
+  margin:0 auto;
+  padding:18px 44px;
+
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:center;
+  gap:42px;
+
+  background:rgba(255,250,242,.86);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+
+  border:0;
+  border-bottom:1px solid rgba(201,154,63,.22);
+  border-radius:0;
+  box-shadow:0 14px 40px rgba(42,33,18,.06);
+}
+
+/* логотип */
+.brand{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  text-decoration:none;
+  color:#073f33;
+  font-size:30px;
+  font-weight:900;
+  white-space:nowrap;
+}
+
+.brand img,
+.brand-mark{
+  display:block !important;
+  width:72px;
+  height:72px;
+  object-fit:contain;
+}
+
+/* меню */
+.main-nav{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:34px;
+}
+
+.main-nav a{
+  color:#111;
+  text-decoration:none;
+  font-size:17px;
+  font-weight:750;
+  transition:color .25s ease, transform .25s ease;
+}
+
+.main-nav a:hover{
+  color:#064c3b;
+  transform:translateY(-2px);
+}
+
+/* золотые точки между пунктами */
+.main-nav a::after{
+  content:"";
+  display:inline-block;
+  width:5px;
+  height:5px;
+  margin-left:30px;
+  border-radius:50%;
+  background:#c99a3f;
+  vertical-align:middle;
+}
+
+.main-nav a:last-child::after{
+  display:none;
+}
+
+/* кнопка справа */
+.header-cta{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+
+  min-height:56px;
+  padding:0 30px;
+
+  border-radius:16px;
+  background:#064c3b;
+  color:#fff;
+  text-decoration:none;
+  font-size:17px;
+  font-weight:850;
+
+  box-shadow:0 14px 34px rgba(6,76,59,.22);
+  transition:transform .25s ease, box-shadow .25s ease;
+}
+
+.header-cta:hover{
+  transform:translateY(-2px);
+  box-shadow:0 20px 44px rgba(6,76,59,.28);
+}
+
+/* hero — первый экран */
+.poster-hero{
+  max-width:1540px;
+  min-height:calc(100vh - 110px);
+  margin:0 auto;
+  padding:54px 44px 70px;
+
+  display:grid;
+  grid-template-columns:46% 54%;
+  align-items:center;
+  gap:20px;
+
+  background:
+    radial-gradient(circle at 32% 42%, rgba(255,255,255,.86), transparent 32%),
+    linear-gradient(135deg,rgba(255,250,242,.92),rgba(247,236,221,.92));
+
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+  overflow:visible;
+}
+
+/* текст слева */
+.poster-copy{
+  position:relative;
+  z-index:3;
+  max-width:680px;
+  padding-left:0;
+  animation:heroTextIn .85s ease both;
+}
+
+.eyebrow{
+  display:none;
+}
+
+.poster-copy h1{
+  margin:0 0 28px;
+  color:#064c3b;
+  font-size:clamp(54px, 5vw, 82px);
+  line-height:1.04;
+  letter-spacing:-3px;
+  font-weight:950;
+}
+
+.poster-copy p{
+  max-width:560px;
+  margin:0 0 34px;
+  color:#323734;
+  font-size:clamp(20px, 1.6vw, 25px);
+  line-height:1.45;
+}
+
+/* кнопки hero */
+.hero-actions{
+  display:flex;
+  align-items:center;
+  gap:24px;
+  margin-bottom:54px;
+}
+
+.hero-actions .btn{
+  min-width:250px;
+  min-height:68px;
+  padding:0 34px;
+
+  border-radius:16px;
+  border:1px solid #c99a3f;
+  background:rgba(255,250,242,.78);
+  color:#c08a2d;
+
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:20px;
+  font-weight:800;
+  text-decoration:none;
+
+  box-shadow:0 12px 28px rgba(42,33,18,.08);
+  transition:transform .25s ease, box-shadow .25s ease;
+}
+
+.hero-actions .btn.primary{
+  background:#064c3b;
+  color:#fff;
+  border-color:#064c3b;
+  box-shadow:0 16px 38px rgba(6,76,59,.25);
+}
+
+.hero-actions .btn:hover{
+  transform:translateY(-3px);
+  box-shadow:0 22px 46px rgba(42,33,18,.16);
+}
+
+/* преимущества слева */
+.hero-benefits{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:24px;
+  max-width:680px;
+}
+
+.hero-benefits span{
+  position:relative;
+  padding-left:44px;
+
+  border:0;
+  background:transparent;
+  box-shadow:none;
+
+  color:#1b2d27;
+  font-size:15px;
+  line-height:1.35;
+  font-weight:800;
+}
+
+.hero-benefits span::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:-6px;
+
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  background:#064c3b;
+  box-shadow:0 8px 20px rgba(6,76,59,.18);
+}
+
+/* картинка справа отдельно */
+.poster-visual{
+  position:relative;
+  z-index:2;
+  width:100%;
+  height:min(760px, calc(100vh - 150px));
+  min-height:560px;
+
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+
+  overflow:visible;
+  animation:heroImageIn 1s ease both;
+}
+
+.poster-visual img{
+  display:block !important;
+  width:100%;
+  height:100%;
+
+  object-fit:contain;
+  object-position:right center;
+
+  border-radius:0;
+  filter:drop-shadow(0 26px 50px rgba(42,33,18,.13));
+}
+
+/* лёгкое движение картинки */
+@media (prefers-reduced-motion:no-preference){
+  .poster-visual img{
+    animation:softFloat 5.5s ease-in-out infinite;
+  }
+}
+
+/* форма ниже hero */
+.form-section{
+  max-width:1460px;
+  margin:40px auto 70px;
+}
+
+/* анимации */
+@keyframes heroTextIn{
+  from{
+    opacity:0;
+    transform:translateY(22px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+@keyframes heroImageIn{
+  from{
+    opacity:0;
+    transform:translateX(28px);
+  }
+  to{
+    opacity:1;
+    transform:translateX(0);
+  }
+}
+
+@keyframes softFloat{
+  0%,100%{
+    transform:translateY(0);
+  }
+  50%{
+    transform:translateY(-10px);
+  }
+}
+
+/* мобильная версия */
+@media (max-width:900px){
+  .site-header{
+    position:sticky;
+    padding:16px 20px;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:16px;
+  }
+
+  .brand{
+    font-size:26px;
+  }
+
+  .brand img,
+  .brand-mark{
+    width:58px;
+    height:58px;
+  }
+
+  .main-nav{
+    flex-wrap:wrap;
+    justify-content:flex-start;
+    gap:16px;
+  }
+
+  .main-nav a::after{
+    display:none;
+  }
+
+  .poster-hero{
+    grid-template-columns:1fr;
+    min-height:auto;
+    padding:38px 20px 50px;
+  }
+
+  .poster-copy h1{
+    font-size:44px;
+    letter-spacing:-1.5px;
+  }
+
+  .poster-copy p{
+    font-size:18px;
+  }
+
+  .hero-actions{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  .hero-actions .btn{
+    width:100%;
+    min-width:0;
+  }
+
+  .hero-benefits{
+    grid-template-columns:1fr;
+  }
+
+  .poster-visual{
+    height:auto;
+    min-height:0;
+    margin-top:24px;
+  }
+
+  .poster-visual img{
+    height:auto;
+  }
+}
