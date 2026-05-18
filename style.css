@@ -1126,4 +1126,103 @@ body{
     height:auto !important;
     object-fit:contain !important;
   }
+}/* === FINAL HEADER LOGIC FIX === */
+
+.site-header{
+  position:sticky !important;
+  top:0 !important;
+  z-index:9999 !important;
+  width:100% !important;
+  height:92px !important;
+  margin:0 !important;
+  padding:0 64px !important;
+  display:grid !important;
+  grid-template-columns:auto 1fr auto !important;
+  align-items:center !important;
+  gap:40px !important;
+  background:rgba(255,250,242,.94) !important;
+  backdrop-filter:blur(18px) !important;
+  -webkit-backdrop-filter:blur(18px) !important;
+  border-bottom:1px solid rgba(201,154,63,.22) !important;
+  box-shadow:0 10px 34px rgba(42,33,18,.06) !important;
+}
+
+.site-header .brand{
+  grid-column:1 !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:16px !important;
+  color:#064c3b !important;
+  text-decoration:none !important;
+  font-size:34px !important;
+  font-weight:900 !important;
+  white-space:nowrap !important;
+}
+
+/* временно убираем битую картинку логотипа */
+.site-header .brand img{
+  display:none !important;
+}
+
+.site-header .brand::before{
+  content:"GC";
+  width:56px;
+  height:56px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:2px solid #c99a3f;
+  color:#064c3b;
+  background:#fffaf2;
+  font-size:22px;
+  font-weight:900;
+}
+
+.site-header .main-nav{
+  grid-column:2 !important;
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;
+  gap:34px !important;
+}
+
+.site-header .main-nav a{
+  color:#111 !important;
+  text-decoration:none !important;
+  font-size:17px !important;
+  font-weight:800 !important;
+}
+
+.site-header .main-nav a::after{
+  content:"";
+  display:inline-block;
+  width:5px;
+  height:5px;
+  margin-left:26px;
+  border-radius:50%;
+  background:#c99a3f;
+  vertical-align:middle;
+}
+
+.site-header .main-nav a:last-child::after{
+  display:none;
+}
+
+.site-header .header-cta{
+  grid-column:3 !important;
+  justify-self:end !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  min-width:180px !important;
+  height:56px !important;
+  padding:0 28px !important;
+  border-radius:16px !important;
+  background:#064c3b !important;
+  color:#fff !important;
+  text-decoration:none !important;
+  font-size:17px !important;
+  font-weight:900 !important;
+  box-shadow:0 16px 34px rgba(6,76,59,.24) !important;
 }
