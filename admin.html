@@ -24,18 +24,4 @@
       <span>Email: info@gastroconnect.ru</span>
       <a href="admin.html">Панель управления</a>
     </div>
-  </footer></div><script>
-  const ADMIN_PASSWORD = 'Alikhan1992jizn)';
-
-  if (sessionStorage.getItem('gastro_admin_access') !== 'yes') {
-    const password = prompt('Введите пароль администратора');
-
-    if (password === ADMIN_PASSWORD) {
-      sessionStorage.setItem('gastro_admin_access', 'yes');
-    } else {
-      alert('Неверный пароль');
-      window.location.href = 'index.html';
-    }
-  }
-</script>
-<script src="script.js"></script>
+  </footer></div><script src="script.js"></script></body></html>
