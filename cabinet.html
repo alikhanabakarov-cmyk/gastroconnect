@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Кабинет — GastroConnect</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <main style="max-width: 900px; margin: 40px auto; padding: 20px;">
+    <h1>Кабинет GastroConnect</h1>
+
+    <p id="userInfo">Проверяем вход...</p>
+
+    <section id="workerCabinet" style="display: none;">
+      <h2>Кабинет работника</h2>
+      <p>Здесь работник будет заполнять профиль, искать смены и откликаться.</p>
+    </section>
+
+    <section id="restaurantCabinet" style="display: none;">
+      <h2>Кабинет заведения</h2>
+      <p>Здесь заведение будет создавать смены, смотреть отклики и работать с поставщиками.</p>
+    </section>
+
+    <section id="supplierCabinet" style="display: none;">
+      <h2>Кабинет поставщика</h2>
+      <p>Здесь поставщик будет добавлять предложения и получать запросы от заведений.</p>
+    </section>
+
+    <section id="unknownRole" style="display: none;">
+      <h2>Роль не найдена</h2>
+      <p>Профиль пользователя пока не настроен.</p>
+    </section>
+
+    <button id="logoutBtn" style="margin-top: 30px;">Выйти</button>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+  <script src="cabinet.js"></script>
+
+</body>
+</html>
