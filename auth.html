@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Вход и регистрация — GastroConnect</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <main style="max-width: 520px; margin: 60px auto; padding: 20px;">
+    <h1>Вход и регистрация</h1>
+
+    <p>
+      Выберите роль и создайте аккаунт. После входа вы попадёте в кабинет.
+    </p>
+
+    <label>Email</label>
+    <input id="email" type="email" placeholder="example@mail.ru" />
+
+    <label>Пароль</label>
+    <input id="password" type="password" placeholder="Минимум 6 символов" />
+
+    <label>Роль</label>
+    <select id="role">
+      <option value="worker">Работник</option>
+      <option value="restaurant">Заведение</option>
+      <option value="supplier">Поставщик</option>
+    </select>
+
+    <div style="display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap;">
+      <button id="registerBtn">Зарегистрироваться</button>
+      <button id="loginBtn">Войти</button>
+    </div>
+
+    <p id="authMessage" style="margin-top: 20px;"></p>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+
+  <script>
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const roleInput = document.getElementById('role');
+    const message = document.getElementById('authMessage');
+
+    const registerBtn = document.getElementById('registerBtn');
+    const loginBtn = document.getElementById('loginBtn');
+
+    registerBtn.addEventListener('click', async () => {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+      const role = roleInput.value;
+
+      message.textContent = 'Регистрируем...';
+
+      const { data, error } = await window.supabaseClient.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            role: role
+          }
+        }
+      });
+
+      if (error) {
+        message.textContent = 'Ошибка регистрации: ' + error.message;
+        return;
+      }
+
+      const user = data.user;
+
+      if (user) {
+        const { error: profileError } = await window.supabaseClient
+          .from('profiles')
+          .insert({
+            id: user.id,
+            role: role,
+            email: email
+          });
+
+        if (profileError) {
+          message.textContent = 'Аккаунт создан, но профиль не записался: ' + profileError.message;
+          return;
+        }
+      }
+
+      message.textContent = 'Регистрация успешна. Проверьте почту или попробуйте войти.';
+    });
+
+    loginBtn.addEventListener('click', async () => {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+
+      message.textContent = 'Входим...';
+
+      const { error } = await window.supabaseClient.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) {
+        message.textContent = 'Ошибка входа: ' + error.message;
+        return;
+      }
+
+      window.location.href = 'cabinet.html';
+    });
+  </script>
+
+</body>
+</html>
