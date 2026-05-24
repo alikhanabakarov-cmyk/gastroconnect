@@ -53,11 +53,16 @@
       const password = passwordInput.value;
       const role = roleInput.value;
 
+      if (!email || !password) {
+        message.textContent = 'Введите email и пароль.';
+        return;
+      }
+
       message.textContent = 'Регистрируем...';
 
-      const { data, error } = await window.supabaseClient.auth.signUp({
-        email,
-        password,
+      const { error } = await window.supabaseClient.auth.signUp({
+        email: email,
+        password: password,
         options: {
           data: {
             role: role
@@ -70,35 +75,23 @@
         return;
       }
 
-      const user = data.user;
-
-      if (user) {
-        const { error: profileError } = await window.supabaseClient
-          .from('profiles')
-          .insert({
-            id: user.id,
-            role: role,
-            email: email
-          });
-
-        if (profileError) {
-          message.textContent = 'Аккаунт создан, но профиль не записался: ' + profileError.message;
-          return;
-        }
-      }
-
-      message.textContent = 'Регистрация успешна. Проверьте почту или попробуйте войти.';
+      message.textContent = 'Регистрация успешна. Теперь попробуйте войти. Если Supabase попросит подтверждение, проверьте почту.';
     });
 
     loginBtn.addEventListener('click', async () => {
       const email = emailInput.value.trim();
       const password = passwordInput.value;
 
+      if (!email || !password) {
+        message.textContent = 'Введите email и пароль.';
+        return;
+      }
+
       message.textContent = 'Входим...';
 
       const { error } = await window.supabaseClient.auth.signInWithPassword({
-        email,
-        password
+        email: email,
+        password: password
       });
 
       if (error) {
