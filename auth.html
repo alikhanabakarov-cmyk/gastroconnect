@@ -3,103 +3,105 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Кабинет — GastroConnect</title>
+  <title>Вход и регистрация — GastroConnect</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <main style="max-width: 900px; margin: 40px auto; padding: 20px;">
-    <h1>Кабинет GastroConnect</h1>
+  <main style="max-width: 520px; margin: 60px auto; padding: 20px;">
+    <h1>Вход и регистрация</h1>
 
-    <p id="userInfo">Проверяем вход...</p>
+    <p>
+      Выберите роль и создайте аккаунт. После входа вы попадёте в кабинет.
+    </p>
 
-    <section id="workerCabinet" style="display: none;">
-      <h2>Кабинет работника</h2>
-      <p>Заполните профиль, чтобы заведения понимали, кого они приглашают на смену.</p>
+    <label>Email</label>
+    <input id="email" type="email" placeholder="example@mail.ru" />
 
-      <div style="display: grid; gap: 14px; max-width: 640px; margin-top: 20px;">
-        <label>
-          Профессии
-          <input id="workerProfessions" type="text" placeholder="Повар, официант, бариста" />
-        </label>
+    <label>Пароль</label>
+    <input id="password" type="password" placeholder="Минимум 6 символов" />
 
-        <label>
-          Опыт
-          <textarea id="workerExperience" placeholder="Например: 3 года поваром в ресторане"></textarea>
-        </label>
+    <label>Роль</label>
+    <select id="role">
+      <option value="worker">Работник</option>
+      <option value="restaurant">Заведение</option>
+      <option value="supplier">Поставщик</option>
+    </select>
 
-        <label>
-          Доступные дни
-          <input id="workerAvailableDays" type="text" placeholder="Пн, Вт, Ср, Сб" />
-        </label>
+    <div style="display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap;">
+      <button id="registerBtn">Зарегистрироваться</button>
+      <button id="loginBtn">Войти</button>
+    </div>
 
-        <label>
-          Доступное время
-          <input id="workerAvailableTime" type="text" placeholder="Например: 10:00–22:00" />
-        </label>
-
-        <label>
-          Минимальная ставка
-          <input id="workerMinRate" type="number" placeholder="Например: 3500" />
-        </label>
-
-        <label>
-          Тип оплаты
-          <select id="workerPaymentType">
-            <option value="">Не выбрано</option>
-            <option value="per_shift">За смену</option>
-            <option value="per_hour">За час</option>
-            <option value="per_day">За день</option>
-          </select>
-        </label>
-
-        <label>
-          <input id="workerCanTravel" type="checkbox" />
-          Готов ехать в другой город
-        </label>
-
-        <label>
-          Города, куда готов ехать
-          <input id="workerTravelCities" type="text" placeholder="Каспийск, Избербаш, Дербент" />
-        </label>
-
-        <label>
-          Радиус поездки, км
-          <input id="workerTravelRadiusKm" type="number" placeholder="Например: 30" />
-        </label>
-
-        <label>
-          О себе
-          <textarea id="workerAbout" placeholder="Коротко о себе, навыках и пожеланиях"></textarea>
-        </label>
-
-        <button id="saveWorkerProfileBtn">Сохранить профиль работника</button>
-
-        <p id="workerProfileMessage"></p>
-      </div>
-    </section>
-
-    <section id="restaurantCabinet" style="display: none;">
-      <h2>Кабинет заведения</h2>
-      <p>Здесь заведение будет создавать смены, смотреть отклики и работать с поставщиками.</p>
-    </section>
-
-    <section id="supplierCabinet" style="display: none;">
-      <h2>Кабинет поставщика</h2>
-      <p>Здесь поставщик будет добавлять предложения и получать запросы от заведений.</p>
-    </section>
-
-    <section id="unknownRole" style="display: none;">
-      <h2>Роль не найдена</h2>
-      <p>Профиль пользователя пока не настроен.</p>
-    </section>
-
-    <button id="logoutBtn" style="margin-top: 30px;">Выйти</button>
+    <p id="authMessage" style="margin-top: 20px;"></p>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase.js?v=10"></script>
-  <script src="cabinet.js?v=11"></script>
+
+  <script>
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const roleInput = document.getElementById('role');
+    const message = document.getElementById('authMessage');
+
+    const registerBtn = document.getElementById('registerBtn');
+    const loginBtn = document.getElementById('loginBtn');
+
+    registerBtn.addEventListener('click', async () => {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+      const role = roleInput.value;
+
+      if (!email || !password) {
+        message.textContent = 'Введите email и пароль.';
+        return;
+      }
+
+      message.textContent = 'Регистрируем...';
+
+      const { error } = await window.supabaseClient.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+          data: {
+            role: role
+          }
+        }
+      });
+
+      if (error) {
+        message.textContent = 'Ошибка регистрации: ' + error.message;
+        return;
+      }
+
+      message.textContent = 'Регистрация успешна. Теперь попробуйте войти.';
+    });
+
+    loginBtn.addEventListener('click', async () => {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+
+      if (!email || !password) {
+        message.textContent = 'Введите email и пароль.';
+        return;
+      }
+
+      message.textContent = 'Входим...';
+
+      const { error } = await window.supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
+
+      if (error) {
+        message.textContent = 'Ошибка входа: ' + error.message;
+        return;
+      }
+
+      window.location.href = 'cabinet.html?v=11';
+    });
+  </script>
 
 </body>
 </html>
