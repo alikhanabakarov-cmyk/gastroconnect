@@ -1,191 +1,87 @@
-// cabinet.js
+const loadWorkersBtn = document.getElementById('loadWorkersBtn');
+const workersList = document.getElementById('workersList');
+const workersMessage = document.getElementById('workersMessage');
 
-const userInfo = document.getElementById('userInfo');
-
-const workerCabinet = document.getElementById('workerCabinet');
-const restaurantCabinet = document.getElementById('restaurantCabinet');
-const supplierCabinet = document.getElementById('supplierCabinet');
-const unknownRole = document.getElementById('unknownRole');
-
-const logoutBtn = document.getElementById('logoutBtn');
-
-const saveWorkerProfileBtn = document.getElementById('saveWorkerProfileBtn');
-const workerProfileMessage = document.getElementById('workerProfileMessage');
-
-let currentUser = null;
-
-function textToArray(value) {
-  return value
-    .split(',')
-    .map(item => item.trim())
-    .filter(item => item.length > 0);
-}
-
-function setInputValue(id, value) {
-  const element = document.getElementById(id);
-  if (element) {
-    element.value = value || '';
+function showValue(value) {
+  if (Array.isArray(value)) {
+    return value.length ? value.join(', ') : '—';
   }
-}
 
-function setCheckboxValue(id, value) {
-  const element = document.getElementById(id);
-  if (element) {
-    element.checked = Boolean(value);
+  if (value === true) {
+    return 'да';
   }
+
+  if (value === false) {
+    return 'нет';
+  }
+
+  return value || '—';
 }
 
-async function loadCabinet() {
-  userInfo.textContent = 'Проверяем вход...';
-
-  const { data: sessionData, error: sessionError } = await window.supabaseClient.auth.getSession();
-
-  if (sessionError) {
-    userInfo.textContent = 'Ошибка проверки входа: ' + sessionError.message;
+async function loadWorkers() {
+  if (!workersList || !workersMessage) {
     return;
   }
 
-  const session = sessionData.session;
-
-  if (!session) {
-    userInfo.textContent = 'Вы не вошли. Сейчас перенаправим на страницу входа...';
-    window.location.href = 'auth.html?v=10';
-    return;
-  }
-
-  currentUser = session.user;
-
-  const { data: profile, error: profileError } = await window.supabaseClient
-    .from('profiles')
-    .select('role, name')
-    .eq('id', currentUser.id)
-    .single();
-
-  if (profileError) {
-    userInfo.textContent = 'Вход есть, но профиль не найден: ' + profileError.message;
-    unknownRole.style.display = 'block';
-    return;
-  }
-
-  if (!profile || !profile.role) {
-    userInfo.textContent = 'Профиль найден, но роль не указана.';
-    unknownRole.style.display = 'block';
-    return;
-  }
-
-  userInfo.textContent = 'Вы вошли как: ' + currentUser.email + '. Роль: ' + profile.role;
-
-  if (profile.role === 'worker') {
-    workerCabinet.style.display = 'block';
-    await loadWorkerProfile();
-  } else if (profile.role === 'restaurant') {
-    restaurantCabinet.style.display = 'block';
-  } else if (profile.role === 'supplier') {
-    supplierCabinet.style.display = 'block';
-  } else {
-    unknownRole.style.display = 'block';
-  }
-}
-
-async function loadWorkerProfile() {
-  if (!currentUser) return;
+  workersMessage.textContent = 'Загружаем работников...';
+  workersList.innerHTML = '';
 
   const { data, error } = await window.supabaseClient
     .from('worker_profiles')
-    .select('*')
-    .eq('user_id', currentUser.id)
-    .maybeSingle();
+    .select(`
+      user_id,
+      professions,
+      experience,
+      available_days,
+      available_time,
+      min_rate,
+      payment_type,
+      can_travel,
+      travel_cities,
+      travel_radius_km,
+      about,
+      updated_at
+    `)
+    .order('updated_at', { ascending: false });
 
   if (error) {
-    workerProfileMessage.textContent = 'Не удалось загрузить профиль работника: ' + error.message;
+    workersMessage.textContent = 'Ошибка загрузки работников: ' + error.message;
     return;
   }
 
-  if (!data) {
-    workerProfileMessage.textContent = 'Профиль работника пока не заполнен.';
+  if (!data || data.length === 0) {
+    workersMessage.textContent = 'Анкет работников пока нет.';
     return;
   }
 
-  setInputValue('workerProfessions', (data.professions || []).join(', '));
-  setInputValue('workerExperience', data.experience);
-  setInputValue('workerAvailableDays', (data.available_days || []).join(', '));
-  setInputValue('workerAvailableTime', data.available_time);
-  setInputValue('workerMinRate', data.min_rate);
-  setInputValue('workerPaymentType', data.payment_type);
-  setCheckboxValue('workerCanTravel', data.can_travel);
-  setInputValue('workerTravelCities', (data.travel_cities || []).join(', '));
-  setInputValue('workerTravelRadiusKm', data.travel_radius_km);
-  setInputValue('workerAbout', data.about);
+  workersMessage.textContent = 'Найдено работников: ' + data.length;
 
-  workerProfileMessage.textContent = 'Профиль работника загружен.';
+  data.forEach(function (worker) {
+    const card = document.createElement('div');
+
+    card.style.border = '1px solid #ddd';
+    card.style.borderRadius = '12px';
+    card.style.padding = '14px';
+    card.style.background = '#fffaf0';
+
+    card.innerHTML = `
+      <h3>${showValue(worker.professions)}</h3>
+
+      <p><b>Опыт:</b> ${showValue(worker.experience)}</p>
+      <p><b>Дни:</b> ${showValue(worker.available_days)}</p>
+      <p><b>Время:</b> ${showValue(worker.available_time)}</p>
+      <p><b>Минимальная ставка:</b> ${showValue(worker.min_rate)}</p>
+      <p><b>Тип оплаты:</b> ${showValue(worker.payment_type)}</p>
+      <p><b>Готов ехать:</b> ${showValue(worker.can_travel)}</p>
+      <p><b>Города:</b> ${showValue(worker.travel_cities)}</p>
+      <p><b>Радиус:</b> ${showValue(worker.travel_radius_km)} км</p>
+      <p><b>О себе:</b> ${showValue(worker.about)}</p>
+    `;
+
+    workersList.appendChild(card);
+  });
 }
 
-async function saveWorkerProfile() {
-  if (!currentUser) {
-    workerProfileMessage.textContent = 'Сначала нужно войти.';
-    return;
-  }
-
-  workerProfileMessage.textContent = 'Сохраняем профиль...';
-
-  const workerData = {
-    user_id: currentUser.id,
-    professions: textToArray(document.getElementById('workerProfessions').value),
-    experience: document.getElementById('workerExperience').value.trim(),
-    available_days: textToArray(document.getElementById('workerAvailableDays').value),
-    available_time: document.getElementById('workerAvailableTime').value.trim(),
-    min_rate: document.getElementById('workerMinRate').value
-      ? Number(document.getElementById('workerMinRate').value)
-      : null,
-    payment_type: document.getElementById('workerPaymentType').value || null,
-    can_travel: document.getElementById('workerCanTravel').checked,
-    travel_cities: textToArray(document.getElementById('workerTravelCities').value),
-    travel_radius_km: document.getElementById('workerTravelRadiusKm').value
-      ? Number(document.getElementById('workerTravelRadiusKm').value)
-      : null,
-    about: document.getElementById('workerAbout').value.trim(),
-    updated_at: new Date().toISOString()
-  };
-
-  const { data: existingProfile, error: checkError } = await window.supabaseClient
-    .from('worker_profiles')
-    .select('user_id')
-    .eq('user_id', currentUser.id)
-    .maybeSingle();
-
-  if (checkError) {
-    workerProfileMessage.textContent = 'Ошибка проверки профиля: ' + checkError.message;
-    return;
-  }
-
-  let result;
-
-  if (existingProfile) {
-    result = await window.supabaseClient
-      .from('worker_profiles')
-      .update(workerData)
-      .eq('user_id', currentUser.id);
-  } else {
-    result = await window.supabaseClient
-      .from('worker_profiles')
-      .insert(workerData);
-  }
-
-  if (result.error) {
-    workerProfileMessage.textContent = 'Ошибка сохранения: ' + result.error.message;
-    return;
-  }
-
-  workerProfileMessage.textContent = 'Профиль работника сохранён.';
+if (loadWorkersBtn) {
+  loadWorkersBtn.addEventListener('click', loadWorkers);
 }
-
-if (saveWorkerProfileBtn) {
-  saveWorkerProfileBtn.addEventListener('click', saveWorkerProfile);
-}
-
-logoutBtn.addEventListener('click', async () => {
-  await window.supabaseClient.auth.signOut();
-  window.location.href = 'auth.html?v=10';
-});
-
-loadCabinet();
