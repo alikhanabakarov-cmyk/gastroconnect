@@ -23,17 +23,15 @@ async function loadCabinet() {
 
   if (!session) {
     userInfo.textContent = 'Вы не вошли. Сейчас перенаправим на страницу входа...';
-    window.location.href = 'auth.html';
+    window.location.href = 'auth.html?v=10';
     return;
   }
 
   const user = session.user;
 
-  userInfo.textContent = 'Вы вошли как: ' + user.email;
-
   const { data: profile, error: profileError } = await window.supabaseClient
     .from('profiles')
-    .select('role, email')
+    .select('role, name')
     .eq('id', user.id)
     .single();
 
@@ -49,7 +47,7 @@ async function loadCabinet() {
     return;
   }
 
-  userInfo.textContent = 'Вы вошли как: ' + profile.email + '. Роль: ' + profile.role;
+  userInfo.textContent = 'Вы вошли как: ' + user.email + '. Роль: ' + profile.role;
 
   if (profile.role === 'worker') {
     workerCabinet.style.display = 'block';
@@ -64,7 +62,7 @@ async function loadCabinet() {
 
 logoutBtn.addEventListener('click', async () => {
   await window.supabaseClient.auth.signOut();
-  window.location.href = 'auth.html';
+  window.location.href = 'auth.html?v=10';
 });
 
 loadCabinet();
