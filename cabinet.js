@@ -208,12 +208,12 @@ if (saveWorkerProfileBtn) {
   saveWorkerProfileBtn.addEventListener('click', saveWorkerProfile);
 }
 
-window.loadWorkers = loadWorkers;
-
 if (loadWorkersBtn) {
-  loadWorkersBtn.onclick = loadWorkers;
+  loadWorkersBtn.addEventListener('click', loadWorkers);
 } else {
   console.error('Кнопка loadWorkersBtn не найдена в HTML');
 }
+
+window.loadWorkers = loadWorkers;
 
 initCabinet();
