@@ -8,105 +8,122 @@
 </head>
 <body>
 
-  <main style="max-width: 900px; margin: 40px auto; padding: 20px;">
-    <h1>Кабинет GastroConnect</h1>
+<main style="max-width: 900px; margin: 40px auto; padding: 20px;">
+  <h1>Кабинет GastroConnect</h1>
 
-    <p id="userInfo">Проверяем вход...</p>
+  <p id="userInfo">Проверяем вход...</p>
 
-    <section id="workerCabinet" style="display: none;">
-      <h2>Кабинет работника</h2>
-      <p>Заполните профиль, чтобы заведения понимали, кого они приглашают на смену.</p>
+  <!-- Кабинет работника -->
+  <section id="workerCabinet" style="display: none;">
+    <h2>Кабинет работника</h2>
 
-      <div style="display: grid; gap: 14px; max-width: 640px; margin-top: 20px;">
-        <label>
-          Профессии
-          <input id="workerProfessions" type="text" placeholder="Повар, официант, бариста" />
-        </label>
+    <p>Заполните профиль, чтобы заведения понимали, кого они приглашают на смену.</p>
 
-        <label>
-          Опыт
-          <textarea id="workerExperience" placeholder="Например: 3 года поваром в ресторане"></textarea>
-        </label>
+    <div style="display: grid; gap: 14px; max-width: 640px; margin-top: 20px;">
+      <label>
+        Профессии
+        <input id="workerProfessions" type="text" placeholder="повар, официант, бариста" />
+      </label>
 
-        <label>
-          Доступные дни
-          <input id="workerAvailableDays" type="text" placeholder="Пн, Вт, Ср, Сб" />
-        </label>
+      <label>
+        Опыт
+        <textarea id="workerExperience" placeholder="Например: 3 года поваром в ресторане"></textarea>
+      </label>
 
-        <label>
-          Доступное время
-          <input id="workerAvailableTime" type="text" placeholder="Например: 10:00–22:00" />
-        </label>
+      <label>
+        Доступные дни
+        <input id="workerAvailableDays" type="text" placeholder="пн, вт, ср" />
+      </label>
 
-        <label>
-          Минимальная ставка
-          <input id="workerMinRate" type="number" placeholder="Например: 3500" />
-        </label>
+      <label>
+        Доступное время
+        <input id="workerAvailableTime" type="text" placeholder="10:00-22:00" />
+      </label>
 
-        <label>
-          Тип оплаты
-          <select id="workerPaymentType">
-            <option value="">Не выбрано</option>
-            <option value="per_shift">За смену</option>
-            <option value="per_hour">За час</option>
-            <option value="per_day">За день</option>
-          </select>
-        </label>
+      <label>
+        Минимальная ставка
+        <input id="workerMinRate" type="number" placeholder="3500" />
+      </label>
 
-        <label>
-          <input id="workerCanTravel" type="checkbox" />
-          Готов ехать в другой город
-        </label>
+      <label>
+        Тип оплаты
+        <select id="workerPaymentType">
+          <option value="per_shift">За смену</option>
+          <option value="per_hour">За час</option>
+          <option value="per_day">За день</option>
+          <option value="per_month">За месяц</option>
+        </select>
+      </label>
 
-        <label>
-          Города, куда готов ехать
-          <input id="workerTravelCities" type="text" placeholder="Каспийск, Избербаш, Дербент" />
-        </label>
+      <label>
+        <input id="workerCanTravel" type="checkbox" />
+        Готов ехать в другой город
+      </label>
 
-        <label>
-          Радиус поездки, км
-          <input id="workerTravelRadiusKm" type="number" placeholder="Например: 30" />
-        </label>
+      <label>
+        Города, куда готов ехать
+        <input id="workerTravelCities" type="text" placeholder="Москва, Казань, Сочи" />
+      </label>
 
-        <label>
-          О себе
-          <textarea id="workerAbout" placeholder="Коротко о себе, навыках и пожеланиях"></textarea>
-        </label>
+      <label>
+        Радиус поездки, км
+        <input id="workerTravelRadiusKm" type="number" placeholder="30" />
+      </label>
 
-        <button id="saveWorkerProfileBtn">Сохранить профиль работника</button>
+      <label>
+        О себе
+        <textarea id="workerAbout" placeholder="Коротко о себе, навыках и пожеланиях"></textarea>
+      </label>
 
-        <p id="workerProfileMessage"></p>
-      </div>
-    </section>
+      <button id="saveWorkerProfileBtn" type="button">Сохранить профиль работника</button>
 
- <section id="restaurantCabinet" style="display: none;">
-  <h2>Кабинет заведения</h2>
-  <p>Здесь заведение сможет смотреть анкеты работников и приглашать их на смену.</p>
+      <p id="workerProfileMessage"></p>
+    </div>
 
-  <h3>Работники</h3>
+    <hr style="margin: 30px 0;" />
 
-  <button id="loadWorkersBtn" type="button">Показать работников</button>
+    <h3>Приглашения на смены</h3>
 
-  <div id="workersList" style="display: grid; gap: 14px; margin-top: 20px;"></div>
+    <button id="loadWorkerInvitesBtn" type="button">Показать приглашения</button>
 
-  <p id="workersMessage"></p>
-</section>
+    <div id="workerInvitesList" style="display: grid; gap: 14px; margin-top: 20px;"></div>
 
-    <section id="supplierCabinet" style="display: none;">
-      <h2>Кабинет поставщика</h2>
-      <p>Здесь поставщик будет добавлять предложения и получать запросы от заведений.</p>
-    </section>
+    <p id="workerInvitesMessage"></p>
+  </section>
 
-    <section id="unknownRole" style="display: none;">
-      <h2>Роль не найдена</h2>
-      <p>Профиль пользователя пока не настроен.</p>
-    </section>
+  <!-- Кабинет заведения -->
+  <section id="restaurantCabinet" style="display: none;">
+    <h2>Кабинет заведения</h2>
 
-    <button id="logoutBtn" style="margin-top: 30px;">Выйти</button>
-  </main>
+    <p>Здесь заведение сможет смотреть анкеты работников и приглашать их на смену.</p>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase.js?v=10"></script>
-<script src="cabinet.js?v=19"></script>
+    <h3>Работники</h3>
+
+    <button id="loadWorkersBtn" type="button">Показать работников</button>
+
+    <div id="workersList" style="display: grid; gap: 14px; margin-top: 20px;"></div>
+
+    <p id="workersMessage"></p>
+  </section>
+
+  <!-- Кабинет поставщика -->
+  <section id="supplierCabinet" style="display: none;">
+    <h2>Кабинет поставщика</h2>
+    <p>Здесь поставщик будет добавлять предложения и получать запросы от заведений.</p>
+  </section>
+
+  <!-- Неизвестная роль -->
+  <section id="unknownRole" style="display: none;">
+    <h2>Роль не найдена</h2>
+    <p>Профиль пользователя пока не настроен.</p>
+  </section>
+
+  <button id="logoutBtn" style="margin-top: 30px;">Выйти</button>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js?v=10"></script>
+<script src="cabinet.js?v=21"></script>
+
 </body>
 </html>
