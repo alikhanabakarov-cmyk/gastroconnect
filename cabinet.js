@@ -130,7 +130,29 @@ async function saveWorkerProfile() {
     workerProfileMessage.textContent = 'Профиль работника сохранён.';
   }
 }
+async function inviteWorker(workerId) {
+  if (!currentUser) {
+    alert('Сначала войдите в аккаунт заведения');
+    return;
+  }
 
+  const { error } = await window.supabaseClient
+    .from('shift_invites')
+    .insert({
+      restaurant_id: currentUser.id,
+      worker_id: workerId,
+      status: 'pending',
+      message: 'Приглашение на смену'
+    });
+
+  if (error) {
+    alert('Ошибка приглашения: ' + error.message);
+    console.error(error);
+    return;
+  }
+
+  alert('Приглашение отправлено');
+}
 async function loadWorkers() {
   if (!workersList || !workersMessage) {
     alert('Ошибка: на странице не найдены workersList или workersMessage');
@@ -189,11 +211,15 @@ async function loadWorkers() {
       <strong>Города:</strong> ${(worker.travel_cities || []).join(', ') || '-'}<br>
       <strong>Радиус:</strong> ${worker.travel_radius_km || '-'} км<br>
       <strong>О себе:</strong> ${worker.about || '-'}<br>
-      <br>
-      <button type="button">Пригласить на смену</button>
+      <br><button type="button" class="inviteWorkerBtn">Пригласить на смену</button>
     `;
 
     workersList.appendChild(card);
+    const inviteBtn = card.querySelector('.inviteWorkerBtn');
+
+inviteBtn.addEventListener('click', () => {
+  inviteWorker(worker.user_id);
+});
   });
 }
 
