@@ -29,9 +29,7 @@ function showOnly(section) {
   if (supplierCabinet) supplierCabinet.style.display = 'none';
   if (unknownRole) unknownRole.style.display = 'none';
 
-  if (section) {
-    section.style.display = 'block';
-  }
+  if (section) section.style.display = 'block';
 }
 
 function value(id) {
@@ -46,16 +44,12 @@ function checked(id) {
 
 function setValue(id, val) {
   const el = document.getElementById(id);
-  if (el) {
-    el.value = val || '';
-  }
+  if (el) el.value = val || '';
 }
 
 function setChecked(id, val) {
   const el = document.getElementById(id);
-  if (el) {
-    el.checked = Boolean(val);
-  }
+  if (el) el.checked = Boolean(val);
 }
 
 function textToArray(text) {
@@ -73,16 +67,13 @@ function showArray(arr) {
   return arr || '-';
 }
 
-function showBool(value) {
-  return value ? 'да' : 'нет';
+function showBool(val) {
+  return val ? 'да' : 'нет';
 }
 
 async function initCabinet() {
   if (!window.supabaseClient) {
-    if (userInfo) {
-      userInfo.textContent = 'Ошибка: Supabase не подключён.';
-    }
-
+    if (userInfo) userInfo.textContent = 'Ошибка: Supabase не подключён.';
     return;
   }
 
@@ -103,7 +94,7 @@ async function initCabinet() {
 
   if (profileError || !profile) {
     if (userInfo) {
-      userInfo.textContent = 'Профиль пользователя не найден. Проверьте таблицу profiles.';
+      userInfo.textContent = 'Профиль пользователя не найден.';
     }
 
     showOnly(unknownRole);
@@ -125,6 +116,7 @@ async function initCabinet() {
 
   if (profile.role === 'restaurant') {
     showOnly(restaurantCabinet);
+    await loadWorkers();
     return;
   }
 
@@ -137,9 +129,7 @@ async function initCabinet() {
 }
 
 async function loadWorkerProfile() {
-  if (!currentUser) {
-    return;
-  }
+  if (!currentUser) return;
 
   const { data, error } = await window.supabaseClient
     .from('worker_profiles')
@@ -156,20 +146,15 @@ async function loadWorkerProfile() {
     return;
   }
 
-  if (!data) {
-    return;
-  }
+  if (!data) return;
 
   setValue('workerProfessions', showArray(data.professions));
   setValue('workerExperience', data.experience);
   setValue('workerAvailableDays', showArray(data.available_days));
   setValue('workerAvailableTime', data.available_time);
   setValue('workerMinRate', data.min_rate);
-
   setValue('workerPaymentType', data.payment_type || 'per_shift');
-
   setChecked('workerCanTravel', data.can_travel);
-
   setValue('workerTravelCities', showArray(data.travel_cities));
   setValue('workerTravelRadiusKm', data.travel_radius_km);
   setValue('workerAbout', data.about);
@@ -224,9 +209,7 @@ async function saveWorkerProfile() {
 }
 
 async function loadWorkers() {
-  if (!workersList || !workersMessage) {
-    return;
-  }
+  if (!workersList || !workersMessage) return;
 
   workersMessage.textContent = 'Загружаем работников...';
   workersList.innerHTML = '';
@@ -268,12 +251,19 @@ async function loadWorkers() {
       <strong>О себе:</strong> ${worker.about || '-'}<br>
       <br>
       <button type="button" class="inviteWorkerBtn">Пригласить на смену</button>
+      <span class="inviteStatus" style="margin-left: 10px;"></span>
     `;
 
     const inviteBtn = card.querySelector('.inviteWorkerBtn');
+    const inviteStatus = card.querySelector('.inviteStatus');
 
-    inviteBtn.addEventListener('click', () => {
-      inviteWorker(worker.user_id);
+    inviteBtn.addEventListener('click', async () => {
+      inviteBtn.disabled = true;
+      inviteStatus.textContent = 'Отправляем...';
+
+      await inviteWorker(worker.user_id, inviteStatus);
+
+      inviteBtn.disabled = false;
     });
 
     workersList.appendChild(card);
@@ -282,7 +272,7 @@ async function loadWorkers() {
   workersMessage.textContent = 'Найдено работников: ' + data.length;
 }
 
-async function inviteWorker(workerId) {
+async function inviteWorker(workerId, statusEl) {
   if (!currentUser) {
     alert('Сначала войдите в аккаунт заведения');
     return;
@@ -298,18 +288,20 @@ async function inviteWorker(workerId) {
     });
 
   if (error) {
-    alert('Ошибка приглашения: ' + error.message);
+    const text = 'Ошибка приглашения: ' + error.message;
+
+    if (statusEl) statusEl.textContent = text;
+    alert(text);
     console.error(error);
     return;
   }
 
+  if (statusEl) statusEl.textContent = 'Приглашение отправлено';
   alert('Приглашение отправлено');
 }
 
 async function loadWorkerInvites() {
-  if (!workerInvitesList || !workerInvitesMessage) {
-    return;
-  }
+  if (!workerInvitesList || !workerInvitesMessage) return;
 
   if (!currentUser) {
     workerInvitesMessage.textContent = 'Сначала войдите в аккаунт работника';
