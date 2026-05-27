@@ -16,6 +16,10 @@ const loadWorkersBtn = document.getElementById('loadWorkersBtn');
 const workersList = document.getElementById('workersList');
 const workersMessage = document.getElementById('workersMessage');
 
+const loadWorkerInvitesBtn = document.getElementById('loadWorkerInvitesBtn');
+const workerInvitesList = document.getElementById('workerInvitesList');
+const workerInvitesMessage = document.getElementById('workerInvitesMessage');
+
 let currentUser = null;
 let currentProfile = null;
 
@@ -25,7 +29,9 @@ function showOnly(section) {
   if (supplierCabinet) supplierCabinet.style.display = 'none';
   if (unknownRole) unknownRole.style.display = 'none';
 
-  if (section) section.style.display = 'block';
+  if (section) {
+    section.style.display = 'block';
+  }
 }
 
 function value(id) {
@@ -38,9 +44,45 @@ function checked(id) {
   return el ? el.checked : false;
 }
 
+function setValue(id, val) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.value = val || '';
+  }
+}
+
+function setChecked(id, val) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.checked = Boolean(val);
+  }
+}
+
+function textToArray(text) {
+  return String(text || '')
+    .split(',')
+    .map(item => item.trim())
+    .filter(item => item.length > 0);
+}
+
+function showArray(arr) {
+  if (Array.isArray(arr)) {
+    return arr.length ? arr.join(', ') : '-';
+  }
+
+  return arr || '-';
+}
+
+function showBool(value) {
+  return value ? 'да' : 'нет';
+}
+
 async function initCabinet() {
   if (!window.supabaseClient) {
-    if (userInfo) userInfo.textContent = 'Ошибка: Supabase не подключён.';
+    if (userInfo) {
+      userInfo.textContent = 'Ошибка: Supabase не подключён.';
+    }
+
     return;
   }
 
@@ -63,6 +105,7 @@ async function initCabinet() {
     if (userInfo) {
       userInfo.textContent = 'Профиль пользователя не найден. Проверьте таблицу profiles.';
     }
+
     showOnly(unknownRole);
     return;
   }
@@ -75,54 +118,103 @@ async function initCabinet() {
 
   if (profile.role === 'worker') {
     showOnly(workerCabinet);
-  } else if (profile.role === 'restaurant') {
-    showOnly(restaurantCabinet);
-  } else if (profile.role === 'supplier') {
-    showOnly(supplierCabinet);
-  } else {
-    showOnly(unknownRole);
+    await loadWorkerProfile();
+    await loadWorkerInvites();
+    return;
   }
+
+  if (profile.role === 'restaurant') {
+    showOnly(restaurantCabinet);
+    return;
+  }
+
+  if (profile.role === 'supplier') {
+    showOnly(supplierCabinet);
+    return;
+  }
+
+  showOnly(unknownRole);
+}
+
+async function loadWorkerProfile() {
+  if (!currentUser) {
+    return;
+  }
+
+  const { data, error } = await window.supabaseClient
+    .from('worker_profiles')
+    .select('*')
+    .eq('user_id', currentUser.id)
+    .maybeSingle();
+
+  if (error) {
+    if (workerProfileMessage) {
+      workerProfileMessage.textContent = 'Ошибка загрузки профиля: ' + error.message;
+    }
+
+    console.error(error);
+    return;
+  }
+
+  if (!data) {
+    return;
+  }
+
+  setValue('workerProfessions', showArray(data.professions));
+  setValue('workerExperience', data.experience);
+  setValue('workerAvailableDays', showArray(data.available_days));
+  setValue('workerAvailableTime', data.available_time);
+  setValue('workerMinRate', data.min_rate);
+
+  setValue('workerPaymentType', data.payment_type || 'per_shift');
+
+  setChecked('workerCanTravel', data.can_travel);
+
+  setValue('workerTravelCities', showArray(data.travel_cities));
+  setValue('workerTravelRadiusKm', data.travel_radius_km);
+  setValue('workerAbout', data.about);
 }
 
 async function saveWorkerProfile() {
-  if (!currentUser) return;
+  if (!currentUser) {
+    alert('Сначала войдите в аккаунт');
+    return;
+  }
 
   if (workerProfileMessage) {
     workerProfileMessage.textContent = 'Сохраняем профиль...';
   }
 
+  const minRateRaw = value('workerMinRate');
+  const radiusRaw = value('workerTravelRadiusKm');
+
   const payload = {
     user_id: currentUser.id,
-    professions: value('workerProfessions')
-      .split(',')
-      .map(item => item.trim())
-      .filter(Boolean),
-    experience: value('workerExperience'),
-    available_days: value('workerAvailableDays')
-      .split(',')
-      .map(item => item.trim())
-      .filter(Boolean),
-    available_time: value('workerAvailableTime'),
-    min_rate: Number(value('workerMinRate')) || null,
-    payment_type: value('workerPaymentType'),
+    professions: textToArray(value('workerProfessions')),
+    experience: value('workerExperience') || null,
+    available_days: textToArray(value('workerAvailableDays')),
+    available_time: value('workerAvailableTime') || null,
+    min_rate: minRateRaw ? Number(minRateRaw) : null,
+    payment_type: value('workerPaymentType') || 'per_shift',
     can_travel: checked('workerCanTravel'),
-    travel_cities: value('workerTravelCities')
-      .split(',')
-      .map(item => item.trim())
-      .filter(Boolean),
-    travel_radius_km: Number(value('workerTravelRadiusKm')) || null,
-    about: value('workerAbout'),
+    travel_cities: textToArray(value('workerTravelCities')),
+    travel_radius_km: radiusRaw ? Number(radiusRaw) : null,
+    about: value('workerAbout') || null,
     updated_at: new Date().toISOString()
   };
 
   const { error } = await window.supabaseClient
     .from('worker_profiles')
-    .upsert(payload, { onConflict: 'user_id' });
+    .upsert(payload, {
+      onConflict: 'user_id'
+    });
 
   if (error) {
     if (workerProfileMessage) {
       workerProfileMessage.textContent = 'Ошибка сохранения: ' + error.message;
     }
+
+    console.error(error);
     return;
   }
 
@@ -130,6 +222,66 @@ async function saveWorkerProfile() {
     workerProfileMessage.textContent = 'Профиль работника сохранён.';
   }
 }
+
+async function loadWorkers() {
+  if (!workersList || !workersMessage) {
+    return;
+  }
+
+  workersMessage.textContent = 'Загружаем работников...';
+  workersList.innerHTML = '';
+
+  const { data, error } = await window.supabaseClient
+    .from('worker_profiles')
+    .select('*')
+    .order('updated_at', { ascending: false });
+
+  if (error) {
+    workersMessage.textContent = 'Ошибка загрузки работников: ' + error.message;
+    console.error(error);
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    workersMessage.textContent = 'Работников пока нет';
+    return;
+  }
+
+  data.forEach(worker => {
+    const card = document.createElement('div');
+
+    card.style.border = '1px solid #ddd';
+    card.style.borderRadius = '10px';
+    card.style.padding = '14px';
+    card.style.background = '#fff';
+
+    card.innerHTML = `
+      <strong>Профессии:</strong> ${showArray(worker.professions)}<br>
+      <strong>Опыт:</strong> ${worker.experience || '-'}<br>
+      <strong>Дни:</strong> ${showArray(worker.available_days)}<br>
+      <strong>Время:</strong> ${worker.available_time || '-'}<br>
+      <strong>Ставка:</strong> ${worker.min_rate || '-'}<br>
+      <strong>Оплата:</strong> ${worker.payment_type || '-'}<br>
+      <strong>Готов ехать:</strong> ${showBool(worker.can_travel)}<br>
+      <strong>Города:</strong> ${showArray(worker.travel_cities)}<br>
+      <strong>Радиус:</strong> ${worker.travel_radius_km || '-'} км<br>
+      <strong>О себе:</strong> ${worker.about || '-'}<br>
+      <br>
+      <button type="button" class="inviteWorkerBtn">Пригласить на смену</button>
+    `;
+
+    const inviteBtn = card.querySelector('.inviteWorkerBtn');
+
+    inviteBtn.addEventListener('click', () => {
+      inviteWorker(worker.user_id);
+    });
+
+    workersList.appendChild(card);
+  });
+
+  workersMessage.textContent = 'Найдено работников: ' + data.length;
+}
+
 async function inviteWorker(workerId) {
   if (!currentUser) {
     alert('Сначала войдите в аккаунт заведения');
@@ -153,74 +305,94 @@ async function inviteWorker(workerId) {
 
   alert('Приглашение отправлено');
 }
-async function loadWorkers() {
-  if (!workersList || !workersMessage) {
-    alert('Ошибка: на странице не найдены workersList или workersMessage');
+
+async function loadWorkerInvites() {
+  if (!workerInvitesList || !workerInvitesMessage) {
     return;
   }
 
-  workersMessage.textContent = 'Загружаем работников...';
-  workersList.innerHTML = '';
+  if (!currentUser) {
+    workerInvitesMessage.textContent = 'Сначала войдите в аккаунт работника';
+    return;
+  }
 
-  const { data, error } = await window.supabaseClient
-    .from('worker_profiles')
-    .select(`
-      user_id,
-      professions,
-      experience,
-      available_days,
-      available_time,
-      min_rate,
-      payment_type,
-      can_travel,
-      travel_cities,
-      travel_radius_km,
-      about,
-      updated_at
-    `)
-    .order('updated_at', { ascending: false });
+  workerInvitesMessage.textContent = 'Загружаем приглашения...';
+  workerInvitesList.innerHTML = '';
+
+  const { data: invites, error } = await window.supabaseClient
+    .from('shift_invites')
+    .select('*')
+    .eq('worker_id', currentUser.id)
+    .order('created_at', { ascending: false });
 
   if (error) {
-    workersMessage.textContent = 'Ошибка загрузки работников: ' + error.message;
+    workerInvitesMessage.textContent = 'Ошибка загрузки приглашений: ' + error.message;
+    console.error(error);
     return;
   }
 
-  if (!data || data.length === 0) {
-    workersMessage.textContent = 'Работников пока нет.';
+  if (!invites || invites.length === 0) {
+    workerInvitesMessage.textContent = 'Приглашений пока нет';
     return;
   }
 
-  workersMessage.textContent = `Найдено работников: ${data.length}`;
-
-  data.forEach(worker => {
+  invites.forEach(invite => {
     const card = document.createElement('div');
+
     card.style.border = '1px solid #ddd';
-    card.style.borderRadius = '12px';
+    card.style.borderRadius = '10px';
     card.style.padding = '14px';
-    card.style.marginTop = '12px';
     card.style.background = '#fff';
 
     card.innerHTML = `
-      <strong>Профессии:</strong> ${(worker.professions || []).join(', ') || '-'}<br>
-      <strong>Опыт:</strong> ${worker.experience || '-'}<br>
-      <strong>Дни:</strong> ${(worker.available_days || []).join(', ') || '-'}<br>
-      <strong>Время:</strong> ${worker.available_time || '-'}<br>
-      <strong>Ставка:</strong> ${worker.min_rate || '-'}<br>
-      <strong>Оплата:</strong> ${worker.payment_type || '-'}<br>
-      <strong>Готов ехать:</strong> ${worker.can_travel ? 'да' : 'нет'}<br>
-      <strong>Города:</strong> ${(worker.travel_cities || []).join(', ') || '-'}<br>
-      <strong>Радиус:</strong> ${worker.travel_radius_km || '-'} км<br>
-      <strong>О себе:</strong> ${worker.about || '-'}<br>
-      <br><button type="button" class="inviteWorkerBtn">Пригласить на смену</button>
+      <strong>Приглашение на смену</strong><br>
+      <strong>Статус:</strong> ${invite.status}<br>
+      <strong>Сообщение:</strong> ${invite.message || '-'}<br>
+      <br>
+      <button type="button" class="acceptInviteBtn">Принять</button>
+      <button type="button" class="declineInviteBtn">Отклонить</button>
     `;
 
-    workersList.appendChild(card);
-    const inviteBtn = card.querySelector('.inviteWorkerBtn');
+    const acceptBtn = card.querySelector('.acceptInviteBtn');
+    const declineBtn = card.querySelector('.declineInviteBtn');
 
-inviteBtn.addEventListener('click', () => {
-  inviteWorker(worker.user_id);
-});
+    if (invite.status !== 'pending') {
+      acceptBtn.disabled = true;
+      declineBtn.disabled = true;
+    }
+
+    acceptBtn.addEventListener('click', () => {
+      updateInviteStatus(invite.id, 'accepted');
+    });
+
+    declineBtn.addEventListener('click', () => {
+      updateInviteStatus(invite.id, 'declined');
+    });
+
+    workerInvitesList.appendChild(card);
   });
+
+  workerInvitesMessage.textContent = 'Найдено приглашений: ' + invites.length;
+}
+
+async function updateInviteStatus(inviteId, status) {
+  const { error } = await window.supabaseClient
+    .from('shift_invites')
+    .update({
+      status: status,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', inviteId);
+
+  if (error) {
+    alert('Ошибка обновления приглашения: ' + error.message);
+    console.error(error);
+    return;
+  }
+
+  alert(status === 'accepted' ? 'Приглашение принято' : 'Приглашение отклонено');
+
+  await loadWorkerInvites();
 }
 
 if (logoutBtn) {
@@ -236,10 +408,14 @@ if (saveWorkerProfileBtn) {
 
 if (loadWorkersBtn) {
   loadWorkersBtn.addEventListener('click', loadWorkers);
-} else {
-  console.error('Кнопка loadWorkersBtn не найдена в HTML');
+}
+
+if (loadWorkerInvitesBtn) {
+  loadWorkerInvitesBtn.addEventListener('click', loadWorkerInvites);
 }
 
 window.loadWorkers = loadWorkers;
+window.inviteWorker = inviteWorker;
+window.loadWorkerInvites = loadWorkerInvites;
 
 initCabinet();
