@@ -44,7 +44,7 @@ function checked(id) {
 
 function setValue(id, val) {
   const el = document.getElementById(id);
-  if (el) el.value = val || '';
+  if (el) el.value = val ?? '';
 }
 
 function setChecked(id, val) {
@@ -59,16 +59,40 @@ function textToArray(text) {
     .filter(item => item.length > 0);
 }
 
-function showArray(arr) {
-  if (Array.isArray(arr)) {
-    return arr.length ? arr.join(', ') : '-';
+function showArray(value) {
+  if (Array.isArray(value)) {
+    return value.length ? value.join(', ') : '-';
   }
 
-  return arr || '-';
+  if (value === null || value === undefined || value === '') {
+    return '-';
+  }
+
+  return String(value);
 }
 
-function showBool(val) {
-  return val ? 'да' : 'нет';
+function showBool(value) {
+  return value ? 'да' : 'нет';
+}
+
+function escapeHtml(text) {
+  return String(text ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
+function paymentText(value) {
+  const map = {
+    per_shift: 'За смену',
+    per_hour: 'За час',
+    per_day: 'За день',
+    per_month: 'За месяц'
+  };
+
+  return map[value] || value || '-';
 }
 
 async function initCabinet() {
@@ -77,9 +101,10 @@ async function initCabinet() {
     return;
   }
 
-  const { data: sessionData, error: sessionError } = await window.supabaseClient.auth.getSession();
+  const { data: sessionData, error: sessionError } =
+    await window.supabaseClient.auth.getSession();
 
-  if (sessionError || !sessionData.session) {
+  if (sessionError || !sessionData || !sessionData.session) {
     window.location.href = 'auth.html';
     return;
   }
@@ -90,11 +115,11 @@ async function initCabinet() {
     .from('profiles')
     .select('*')
     .eq('id', currentUser.id)
-    .single();
+    .maybeSingle();
 
   if (profileError || !profile) {
     if (userInfo) {
-      userInfo.textContent = 'Профиль пользователя не найден.';
+      userInfo.textContent = 'Профиль пользователя не найден. Проверьте таблицу profiles.';
     }
 
     showOnly(unknownRole);
@@ -190,9 +215,7 @@ async function saveWorkerProfile() {
 
   const { error } = await window.supabaseClient
     .from('worker_profiles')
-    .upsert(payload, {
-      onConflict: 'user_id'
-    });
+    .upsert(payload, { onConflict: 'user_id' });
 
   if (error) {
     if (workerProfileMessage) {
@@ -216,7 +239,20 @@ async function loadWorkers() {
 
   const { data, error } = await window.supabaseClient
     .from('worker_profiles')
-    .select('*')
+    .select(`
+      user_id,
+      professions,
+      experience,
+      available_days,
+      available_time,
+      min_rate,
+      payment_type,
+      can_travel,
+      travel_cities,
+      travel_radius_km,
+      about,
+      updated_at
+    `)
     .order('updated_at', { ascending: false });
 
   if (error) {
@@ -232,39 +268,45 @@ async function loadWorkers() {
 
   data.forEach(worker => {
     const card = document.createElement('div');
-
     card.style.border = '1px solid #ddd';
     card.style.borderRadius = '10px';
     card.style.padding = '14px';
     card.style.background = '#fff';
 
+    const workerId = worker.user_id;
+
     card.innerHTML = `
-      <strong>Профессии:</strong> ${showArray(worker.professions)}<br>
-      <strong>Опыт:</strong> ${worker.experience || '-'}<br>
-      <strong>Дни:</strong> ${showArray(worker.available_days)}<br>
-      <strong>Время:</strong> ${worker.available_time || '-'}<br>
-      <strong>Ставка:</strong> ${worker.min_rate || '-'}<br>
-      <strong>Оплата:</strong> ${worker.payment_type || '-'}<br>
-      <strong>Готов ехать:</strong> ${showBool(worker.can_travel)}<br>
-      <strong>Города:</strong> ${showArray(worker.travel_cities)}<br>
-      <strong>Радиус:</strong> ${worker.travel_radius_km || '-'} км<br>
-      <strong>О себе:</strong> ${worker.about || '-'}<br>
-      <br>
+      <p><strong>Профессии:</strong> ${escapeHtml(showArray(worker.professions))}</p>
+      <p><strong>Опыт:</strong> ${escapeHtml(worker.experience || '-')}</p>
+      <p><strong>Дни:</strong> ${escapeHtml(showArray(worker.available_days))}</p>
+      <p><strong>Время:</strong> ${escapeHtml(worker.available_time || '-')}</p>
+      <p><strong>Ставка:</strong> ${escapeHtml(worker.min_rate || '-')}</p>
+      <p><strong>Оплата:</strong> ${escapeHtml(paymentText(worker.payment_type))}</p>
+      <p><strong>Готов ехать:</strong> ${escapeHtml(showBool(worker.can_travel))}</p>
+      <p><strong>Города:</strong> ${escapeHtml(showArray(worker.travel_cities))}</p>
+      <p><strong>Радиус:</strong> ${escapeHtml(worker.travel_radius_km || '-')} км</p>
+      <p><strong>О себе:</strong> ${escapeHtml(worker.about || '-')}</p>
+
       <button type="button" class="inviteWorkerBtn">Пригласить на смену</button>
-      <span class="inviteStatus" style="margin-left: 10px;"></span>
+      <p class="inviteStatus"></p>
     `;
 
     const inviteBtn = card.querySelector('.inviteWorkerBtn');
     const inviteStatus = card.querySelector('.inviteStatus');
 
-    inviteBtn.addEventListener('click', async () => {
+    if (!workerId) {
       inviteBtn.disabled = true;
-      inviteStatus.textContent = 'Отправляем...';
+      inviteStatus.textContent = 'Ошибка: у работника нет user_id';
+    } else {
+      inviteBtn.addEventListener('click', async () => {
+        inviteBtn.disabled = true;
+        inviteStatus.textContent = 'Отправляем приглашение...';
 
-      await inviteWorker(worker.user_id, inviteStatus);
+        await inviteWorker(workerId, inviteStatus);
 
-      inviteBtn.disabled = false;
-    });
+        inviteBtn.disabled = false;
+      });
+    }
 
     workersList.appendChild(card);
   });
@@ -284,19 +326,22 @@ async function inviteWorker(workerId, statusEl) {
       restaurant_id: currentUser.id,
       worker_id: workerId,
       status: 'pending',
-      message: 'Приглашение на смену'
+      message: 'Приглашение на смену',
+      updated_at: new Date().toISOString()
     });
 
   if (error) {
     const text = 'Ошибка приглашения: ' + error.message;
 
     if (statusEl) statusEl.textContent = text;
+
     alert(text);
     console.error(error);
     return;
   }
 
   if (statusEl) statusEl.textContent = 'Приглашение отправлено';
+
   alert('Приглашение отправлено');
 }
 
@@ -330,35 +375,48 @@ async function loadWorkerInvites() {
 
   invites.forEach(invite => {
     const card = document.createElement('div');
-
     card.style.border = '1px solid #ddd';
     card.style.borderRadius = '10px';
     card.style.padding = '14px';
     card.style.background = '#fff';
 
     card.innerHTML = `
-      <strong>Приглашение на смену</strong><br>
-      <strong>Статус:</strong> ${invite.status}<br>
-      <strong>Сообщение:</strong> ${invite.message || '-'}<br>
-      <br>
+      <h4>Приглашение на смену</h4>
+      <p><strong>Статус:</strong> ${escapeHtml(invite.status || '-')}</p>
+      <p><strong>Сообщение:</strong> ${escapeHtml(invite.message || '-')}</p>
+
       <button type="button" class="acceptInviteBtn">Принять</button>
       <button type="button" class="declineInviteBtn">Отклонить</button>
+      <p class="inviteUpdateStatus"></p>
     `;
 
     const acceptBtn = card.querySelector('.acceptInviteBtn');
     const declineBtn = card.querySelector('.declineInviteBtn');
+    const inviteUpdateStatus = card.querySelector('.inviteUpdateStatus');
 
     if (invite.status !== 'pending') {
       acceptBtn.disabled = true;
       declineBtn.disabled = true;
     }
 
-    acceptBtn.addEventListener('click', () => {
-      updateInviteStatus(invite.id, 'accepted');
+    acceptBtn.addEventListener('click', async () => {
+      acceptBtn.disabled = true;
+      declineBtn.disabled = true;
+      inviteUpdateStatus.textContent = 'Сохраняем...';
+
+      await updateInviteStatus(invite.id, 'accepted');
+
+      inviteUpdateStatus.textContent = 'Принято';
     });
 
-    declineBtn.addEventListener('click', () => {
-      updateInviteStatus(invite.id, 'declined');
+    declineBtn.addEventListener('click', async () => {
+      acceptBtn.disabled = true;
+      declineBtn.disabled = true;
+      inviteUpdateStatus.textContent = 'Сохраняем...';
+
+      await updateInviteStatus(invite.id, 'declined');
+
+      inviteUpdateStatus.textContent = 'Отклонено';
     });
 
     workerInvitesList.appendChild(card);
@@ -368,21 +426,22 @@ async function loadWorkerInvites() {
 }
 
 async function updateInviteStatus(inviteId, status) {
+  if (!currentUser) return;
+
   const { error } = await window.supabaseClient
     .from('shift_invites')
     .update({
       status: status,
       updated_at: new Date().toISOString()
     })
-    .eq('id', inviteId);
+    .eq('id', inviteId)
+    .eq('worker_id', currentUser.id);
 
   if (error) {
     alert('Ошибка обновления приглашения: ' + error.message);
     console.error(error);
     return;
   }
-
-  alert(status === 'accepted' ? 'Приглашение принято' : 'Приглашение отклонено');
 
   await loadWorkerInvites();
 }
