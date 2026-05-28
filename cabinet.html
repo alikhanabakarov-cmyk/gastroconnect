@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Кабинет — GastroConnect</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=300" />
 </head>
 <body>
 
@@ -13,10 +13,8 @@
 
   <p id="userInfo">Проверяем вход...</p>
 
-  <!-- Кабинет работника -->
   <section id="workerCabinet" style="display: none;">
     <h2>Кабинет работника</h2>
-
     <p>Заполните профиль, чтобы заведения понимали, кого они приглашают на смену.</p>
 
     <div style="display: grid; gap: 14px; max-width: 640px; margin-top: 20px;">
@@ -27,12 +25,12 @@
 
       <label>
         Опыт
-        <textarea id="workerExperience" placeholder="Например: 3 года поваром в ресторане"></textarea>
+        <textarea id="workerExperience" placeholder="например: 3 года поваром в ресторане"></textarea>
       </label>
 
       <label>
         Доступные дни
-        <input id="workerAvailableDays" type="text" placeholder="пн, вт, ср" />
+        <input id="workerAvailableDays" type="text" placeholder="пн, вт, сб" />
       </label>
 
       <label>
@@ -55,14 +53,14 @@
         </select>
       </label>
 
-      <label>
-        <input id="workerCanTravel" type="checkbox" />
+      <label style="display: flex; gap: 10px; align-items: center;">
+        <input id="workerCanTravel" type="checkbox" style="width: auto;" />
         Готов ехать в другой город
       </label>
 
       <label>
         Города, куда готов ехать
-        <input id="workerTravelCities" type="text" placeholder="Москва, Казань, Сочи" />
+        <input id="workerTravelCities" type="text" placeholder="москва, химки, одинцово" />
       </label>
 
       <label>
@@ -72,58 +70,48 @@
 
       <label>
         О себе
-        <textarea id="workerAbout" placeholder="Коротко о себе, навыках и пожеланиях"></textarea>
+        <textarea id="workerAbout" placeholder="коротко о себе, навыки и пожелания"></textarea>
       </label>
 
       <button id="saveWorkerProfileBtn" type="button">Сохранить профиль работника</button>
-
       <p id="workerProfileMessage"></p>
     </div>
 
-    <hr style="margin: 30px 0;" />
+    <hr style="margin: 40px 0;" />
 
     <h3>Приглашения на смены</h3>
-
     <button id="loadWorkerInvitesBtn" type="button">Показать приглашения</button>
-
     <div id="workerInvitesList" style="display: grid; gap: 14px; margin-top: 20px;"></div>
-
     <p id="workerInvitesMessage"></p>
   </section>
 
-  <!-- Кабинет заведения -->
   <section id="restaurantCabinet" style="display: none;">
     <h2>Кабинет заведения</h2>
-
     <p>Здесь заведение сможет смотреть анкеты работников и приглашать их на смену.</p>
 
     <h3>Работники</h3>
-
     <button id="loadWorkersBtn" type="button">Показать работников</button>
 
     <div id="workersList" style="display: grid; gap: 14px; margin-top: 20px;"></div>
-
     <p id="workersMessage"></p>
   </section>
 
-  <!-- Кабинет поставщика -->
   <section id="supplierCabinet" style="display: none;">
     <h2>Кабинет поставщика</h2>
     <p>Здесь поставщик будет добавлять предложения и получать запросы от заведений.</p>
   </section>
 
-  <!-- Неизвестная роль -->
   <section id="unknownRole" style="display: none;">
     <h2>Роль не найдена</h2>
     <p>Профиль пользователя пока не настроен.</p>
   </section>
 
-  <button id="logoutBtn" style="margin-top: 30px;">Выйти</button>
+  <button id="logoutBtn" type="button" style="margin-top: 30px;">Выйти</button>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase.js?v=10"></script>
-<script src="cabinet.js?v=21"></script>
+<script src="supabase.js?v=300"></script>
+<script src="cabinet.js?v=300"></script>
 
 </body>
 </html>
