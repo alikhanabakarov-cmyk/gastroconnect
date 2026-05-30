@@ -688,3 +688,58 @@ textarea:focus {
     max-height: none !important;
   }
 }
+/* FIX HERO IMAGES ALL PAGES 30.05 */
+
+.poster-visual,
+.hero-visual,
+.page-visual {
+  position: relative !important;
+  width: 100% !important;
+  min-height: 520px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: visible !important;
+  background: transparent !important;
+}
+
+.poster-visual::before,
+.hero-visual::before,
+.page-visual::before {
+  display: none !important;
+  content: none !important;
+}
+
+.poster-visual img,
+.hero-visual img,
+.page-visual img,
+.poster-img,
+.hero-img {
+  display: block !important;
+  width: 100% !important;
+  max-width: 820px !important;
+  height: 520px !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  border-radius: 42px !important;
+  box-shadow: 0 28px 80px rgba(35, 25, 10, 0.18) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+@media (max-width: 1000px) {
+  .poster-visual,
+  .hero-visual,
+  .page-visual {
+    min-height: auto !important;
+  }
+
+  .poster-visual img,
+  .hero-visual img,
+  .page-visual img,
+  .poster-img,
+  .hero-img {
+    height: auto !important;
+    max-height: none !important;
+  }
+}
