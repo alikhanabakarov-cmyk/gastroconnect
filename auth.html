@@ -4,104 +4,110 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Вход и регистрация — GastroConnect</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="favicon.ico" sizes="any" />
+  <link rel="manifest" href="site.webmanifest" />
+  <link rel="stylesheet" href="style.css?v=500" />
 </head>
 <body>
+<div class="page-shell">
+  <header class="site-header">
+    <a class="brand" href="index.html" aria-label="GastroConnect">
+      <span class="brand-mark" aria-hidden="true">GC</span>
+      <span class="brand-text">GastroConnect</span>
+    </a>
+    <nav class="main-nav" aria-label="Главное меню">
+      <a href="workers.html">Сотрудникам</a>
+      <a href="restaurants.html">Заведениям</a>
+      <a href="suppliers.html">Поставщикам</a>
+      <a href="index.html#contacts">Контакты</a>
+    </nav>
+    <a class="header-cta" href="index.html">На главную</a>
+  </header>
 
-  <main style="max-width: 520px; margin: 60px auto; padding: 20px;">
-    <h1>Вход и регистрация</h1>
+  <main class="auth-page">
+    <section class="auth-card">
+      <h1>Вход и регистрация</h1>
+      <p>Выберите роль и создайте аккаунт. После входа вы попадете в кабинет.</p>
 
-    <p>
-      Выберите роль и создайте аккаунт. После входа вы попадёте в кабинет.
-    </p>
+      <label>Email<input id="email" type="email" placeholder="example@mail.ru" autocomplete="email" /></label>
+      <label>Пароль<input id="password" type="password" placeholder="Минимум 6 символов" autocomplete="current-password" /></label>
+      <label>Роль
+        <select id="role">
+          <option value="worker">Работник</option>
+          <option value="restaurant">Заведение</option>
+          <option value="supplier">Поставщик</option>
+        </select>
+      </label>
 
-    <label>Email</label>
-    <input id="email" type="email" placeholder="example@mail.ru" />
+      <div class="cabinet-actions" style="margin-top:20px;">
+        <button id="registerBtn" type="button">Зарегистрироваться</button>
+        <button id="loginBtn" class="btn" type="button">Войти</button>
+      </div>
 
-    <label>Пароль</label>
-    <input id="password" type="password" placeholder="Минимум 6 символов" />
-
-    <label>Роль</label>
-    <select id="role">
-      <option value="worker">Работник</option>
-      <option value="restaurant">Заведение</option>
-      <option value="supplier">Поставщик</option>
-    </select>
-
-    <div style="display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap;">
-      <button id="registerBtn">Зарегистрироваться</button>
-      <button id="loginBtn">Войти</button>
-    </div>
-
-    <p id="authMessage" style="margin-top: 20px;"></p>
+      <p id="authMessage" class="message" style="margin-top:20px;"></p>
+    </section>
   </main>
+</div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase.js?v=10"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js?v=500"></script>
+<script>
+  const emailInput = document.getElementById('email');
+  const passwordInput = document.getElementById('password');
+  const roleInput = document.getElementById('role');
+  const message = document.getElementById('authMessage');
+  const registerBtn = document.getElementById('registerBtn');
+  const loginBtn = document.getElementById('loginBtn');
 
-  <script>
-    const emailInput = document.getElementById('email');
-    const passwordInput = document.getElementById('password');
-    const roleInput = document.getElementById('role');
-    const message = document.getElementById('authMessage');
+  registerBtn.addEventListener('click', async () => {
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+    const role = roleInput.value;
 
-    const registerBtn = document.getElementById('registerBtn');
-    const loginBtn = document.getElementById('loginBtn');
+    if (!email || !password) {
+      message.textContent = 'Введите email и пароль.';
+      return;
+    }
 
-    registerBtn.addEventListener('click', async () => {
-      const email = emailInput.value.trim();
-      const password = passwordInput.value;
-      const role = roleInput.value;
+    message.textContent = 'Регистрируем...';
 
-      if (!email || !password) {
-        message.textContent = 'Введите email и пароль.';
-        return;
-      }
-
-      message.textContent = 'Регистрируем...';
-
-      const { error } = await window.supabaseClient.auth.signUp({
-        email: email,
-        password: password,
-        options: {
-          data: {
-            role: role
-          }
-        }
-      });
-
-      if (error) {
-        message.textContent = 'Ошибка регистрации: ' + error.message;
-        return;
-      }
-
-      message.textContent = 'Регистрация успешна. Теперь попробуйте войти.';
+    const { error } = await window.supabaseClient.auth.signUp({
+      email,
+      password,
+      options: { data: { role } }
     });
 
-    loginBtn.addEventListener('click', async () => {
-      const email = emailInput.value.trim();
-      const password = passwordInput.value;
+    if (error) {
+      message.textContent = 'Ошибка регистрации: ' + error.message;
+      return;
+    }
 
-      if (!email || !password) {
-        message.textContent = 'Введите email и пароль.';
-        return;
-      }
+    message.textContent = 'Регистрация успешна. Теперь попробуйте войти.';
+  });
 
-      message.textContent = 'Входим...';
+  loginBtn.addEventListener('click', async () => {
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
 
-      const { error } = await window.supabaseClient.auth.signInWithPassword({
-        email: email,
-        password: password
-      });
+    if (!email || !password) {
+      message.textContent = 'Введите email и пароль.';
+      return;
+    }
 
-      if (error) {
-        message.textContent = 'Ошибка входа: ' + error.message;
-        return;
-      }
+    message.textContent = 'Входим...';
 
-      window.location.href = 'cabinet.html?v=11';
+    const { error } = await window.supabaseClient.auth.signInWithPassword({
+      email,
+      password
     });
-  </script>
 
+    if (error) {
+      message.textContent = 'Ошибка входа: ' + error.message;
+      return;
+    }
+
+    window.location.href = 'cabinet.html?v=500';
+  });
+</script>
 </body>
 </html>

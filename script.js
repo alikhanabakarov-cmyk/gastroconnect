@@ -1,209 +1,169 @@
+(function () {
+  const KEY = 'gc_public_submissions';
 
-  const SUPABASE_URL = 'https://fqxbtojjhpkibixvnbnn.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_0F-CDySnOiJYUdAr8khcJA_QiZc6J2y';
-(function(){
-  const KEY='gc_submissions';
-  const get=()=>JSON.parse(localStorage.getItem(KEY)||'[]');
-  const set=(v)=>localStorage.setItem(KEY,JSON.stringify(v));
-
-  document.querySelectorAll('form[data-form-type]').forEach(form=>{
-    form.addEventListener('submit', e=>{
-      e.preventDefault();
-
-      const data=Object.fromEntries(new FormData(form).entries());
-      const formType = form.dataset.formType;
-
-      const entry={
-        id:Date.now(),
-        created_at:new Date().toLocaleString('ru-RU'),
-        type:formType,
-        data
-      };
-
-const tableName =
-  formType === 'restaurant' ? 'restaurants' :
-  formType === 'worker' ? 'workers' :
-  'suppliers';
-const payload = formType === 'restaurant'
-  ? {
-      business_name: data.business_name || data.company_name || '',
-      contact_name: data.contact_name || '',
-      phone: data.phone || '',
-      telegram: data.telegram || '',
-      city: data.city || '',
-      format: data.format || '',
-      description: data.description || ''
+  function readRows() {
+    try {
+      return JSON.parse(localStorage.getItem(KEY) || '[]');
+    } catch {
+      return [];
     }
-  : formType === 'worker'
-  ? {
-      name: data.name || '',
+  }
+
+  function writeRows(rows) {
+    localStorage.setItem(KEY, JSON.stringify(rows));
+  }
+
+  function getFormTitle(type, data) {
+    if (type === 'worker') return data.name || 'Работник';
+    if (type === 'restaurant') return data.business_name || 'Заведение';
+    return data.company_name || 'Поставщик';
+  }
+
+  function saveSubmission(type, data) {
+    const rows = readRows();
+    rows.unshift({
+      id: crypto.randomUUID(),
+      type,
+      title: getFormTitle(type, data),
       phone: data.phone || '',
       telegram: data.telegram || '',
       city: data.city || '',
-      position: data.position || '',
-      experience: data.experience || '',
-      description: data.description || ''
-    }
-  : {
-      company_name: data.company_name || '',
-      contact_name: data.contact_name || '',
-      phone: data.phone || '',
-      telegram: data.telegram || '',
-      city: data.city || '',
-      category: data.category || '',
-      website: data.website || '',
-      description: data.description || ''
-    };
+      data,
+      created_at: new Date().toISOString()
+    });
+    writeRows(rows);
+  }
 
-      fetch(`${SUPABASE_URL}/rest/v1/${tableName}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`
-        },
-        body: JSON.stringify(payload)
-      });
+  document.querySelectorAll('form[data-form-type]').forEach(form => {
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      const type = form.dataset.formType;
+      const data = Object.fromEntries(new FormData(form).entries());
+      saveSubmission(type, data);
 
-      const all=get();
-      all.unshift(entry);
-      set(all);
-
-      const box=form.querySelector('.success');
-      if(box){
-        box.textContent='Заявка сохранена и отправлена в базу данных.';
-        box.style.display='block';
+      const box = form.querySelector('.success');
+      if (box) {
+        box.textContent = 'Заявка сохранена. Для работы с приглашениями войдите в личный кабинет.';
+        box.style.display = 'block';
       }
-
       form.reset();
     });
   });
-  function toCsv(rows){
-    const esc=s=>'"'+String(s??'').replace(/"/g,'""')+'"';
-    return rows.map(r=>[r.created_at,r.type,r.data.name||r.data.business_name||r.data.company_name||'',r.data.phone||'',r.data.telegram||'',JSON.stringify(r.data)].map(esc).join(',')).join('\n');
-  }
-  function download(name, text, type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();URL.revokeObjectURL(a.href)}
- function renderAdmin(){
-  const tbody=document.querySelector('#adminTable tbody');
-  if(!tbody) return;
 
-  const rows=[];
-const typeLabel = {
-  supplier: 'Поставщик',
-  restaurant: 'Заведение',
-  worker: 'Работник'
-};
-
-const formatDate = (value) => {
-  if (!value) return '-';
-  const date = new Date(value);
-  if (isNaN(date)) return value;
-  return date.toLocaleString('ru-RU');
-};
-const detailsText = (r) => {
-  if (r.type === 'worker') {
-    return [
-      `<strong>Город:</strong> ${r.city || '-'}`,
-      `<strong>Должность:</strong> ${r.position || '-'}`,
-      `<strong>Опыт:</strong> ${r.experience || '-'}`,
-      `<strong>Описание:</strong> ${r.description || '-'}`
-    ].join('<br>');
-  }
-
-  if (r.type === 'restaurant') {
-    return [
-      `<strong>Город:</strong> ${r.city || '-'}`,
-      `<strong>Формат:</strong> ${r.format || '-'}`,
-      `<strong>Описание:</strong> ${r.description || '-'}`
-    ].join('<br>');
-  }
-
-  return [
-    `<strong>Город:</strong> ${r.city || '-'}`,
-    `<strong>Категория:</strong> ${r.category || '-'}`,
-    `<strong>Сайт:</strong> ${r.website || '-'}`,
-    `<strong>Описание:</strong> ${r.description || '-'}`
-  ].join('<br>');
-};
-  const headers={
-    'apikey': SUPABASE_KEY,
-    'Authorization': `Bearer ${SUPABASE_KEY}`
-  };
-
-  const loadTable=(table,type)=>{
-    return fetch(`${SUPABASE_URL}/rest/v1/${table}?select=*`, {headers})
-      .then(res=>res.json())
-      .then(data=>Array.isArray(data) ? data.map(r=>({...r,type})) : [])
-      .catch(()=>[]);
-  };
-
- Promise.all([
-  loadTable('suppliers','supplier'),
-  loadTable('restaurants','restaurant'),
-  loadTable('workers','worker')
-])
-.then(([suppliers,restaurants,workers])=>{
-  rows.push(...suppliers,...restaurants,...workers);
-  rows.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-  const searchInput = document.getElementById('adminSearch');
-  if (searchInput && !searchInput.dataset.ready) {
-  searchInput.dataset.ready = '1';
-  searchInput.addEventListener('input', renderAdmin);
-}
-const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
-const visibleRows = query
-  ? rows.filter(r => JSON.stringify(r).toLowerCase().includes(query))
-  : rows;
-  const counts={all:visibleRows.length,worker:0,restaurant:0,supplier:0};
-visibleRows.forEach(r=>counts[r.type]=(counts[r.type]||0)+1);
-
-    document.getElementById('adminStats').innerHTML=
-      `<div class="stat">Всего: ${counts.all}</div>
-       <div class="stat">Работники: ${counts.worker}</div>
-       <div class="stat">Заведения: ${counts.restaurant}</div>
-       <div class="stat">Поставщики: ${counts.supplier}</div>`;
-
-  tbody.innerHTML=visibleRows.map(r=>`
-   <tr>
-    <td>${formatDate(r.created_at)}</td>
-    <td><span class="type-badge type-${r.type || 'unknown'}">${typeLabel[r.type] || r.type || '-'}</span></td>
-    <td>${r.company_name || r.business_name || r.name || ''}</td>
-    <td>${r.phone ? '<a href="tel:' + r.phone + '">' + r.phone + '</a>' : '-'}</td>
-    <td>${r.telegram ? '<a href="https://t.me/' + String(r.telegram).replace('@','') + '" target="_blank">' + r.telegram + '</a>' : '-'}</td>
-    <td>${detailsText(r)}</td>
-   </tr>
-  `).join('');
-
-    document.getElementById('exportJson').onclick=()=>download(
-      'gastroconnect-submissions.json',
-      JSON.stringify(rows,null,2),
-      'application/json'
-    );
-
-    document.getElementById('exportCsv').onclick=()=>download(
-      'gastroconnect-submissions.csv',
-      'Дата,Тип,Название,Телефон,Telegram,Город,Категория/Формат,Сайт,Описание\n' +
-      rows.map(r=>[
-        r.created_at || '',
-        r.type || '',
-r.company_name || r.business_name || r.name || '',
-        r.phone || '',
-        r.telegram || '',
-        r.city || '',
-        r.category || r.format || '',
-        r.website || '',
-        r.description || ''
-      ].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n'),
-      'text/csv;charset=utf-8'
-    );
-
-    document.getElementById('clearData').onclick=()=>{
-      if(confirm('Очистить локальные заявки?')){
-        set([]);
-        renderAdmin();
-      }
+  function typeText(type) {
+    const map = {
+      worker: 'Работник',
+      restaurant: 'Заведение',
+      supplier: 'Поставщик'
     };
-  })
+    return map[type] || type || '-';
   }
+
+  function formatDate(value) {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '-';
+    return date.toLocaleString('ru-RU');
+  }
+
+  function escapeHtml(text) {
+    return String(text ?? '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+  }
+
+  function download(name, text, type) {
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(new Blob([text], { type }));
+    link.download = name;
+    link.click();
+    URL.revokeObjectURL(link.href);
+  }
+
+  function renderAdmin() {
+    const tbody = document.querySelector('#adminTable tbody');
+    if (!tbody) return;
+
+    const searchInput = document.getElementById('adminSearch');
+    const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+    const rows = readRows();
+    const visibleRows = query
+      ? rows.filter(row => JSON.stringify(row).toLowerCase().includes(query))
+      : rows;
+
+    const stats = document.getElementById('adminStats');
+    if (stats) {
+      const counts = visibleRows.reduce((acc, row) => {
+        acc.all += 1;
+        acc[row.type] = (acc[row.type] || 0) + 1;
+        return acc;
+      }, { all: 0, worker: 0, restaurant: 0, supplier: 0 });
+
+      stats.innerHTML = `
+        <div class="stat">Всего: ${counts.all}</div>
+        <div class="stat">Работники: ${counts.worker}</div>
+        <div class="stat">Заведения: ${counts.restaurant}</div>
+        <div class="stat">Поставщики: ${counts.supplier}</div>
+      `;
+    }
+
+    tbody.innerHTML = visibleRows.map(row => `
+      <tr>
+        <td>${escapeHtml(formatDate(row.created_at))}</td>
+        <td>${escapeHtml(typeText(row.type))}</td>
+        <td>${escapeHtml(row.title)}</td>
+        <td>${row.phone ? `<a href="tel:${escapeHtml(row.phone)}">${escapeHtml(row.phone)}</a>` : '-'}</td>
+        <td>${row.telegram ? escapeHtml(row.telegram) : '-'}</td>
+        <td>${escapeHtml(JSON.stringify(row.data))}</td>
+      </tr>
+    `).join('');
+
+    const exportJson = document.getElementById('exportJson');
+    const exportCsv = document.getElementById('exportCsv');
+    const clearData = document.getElementById('clearData');
+
+    if (exportJson && !exportJson.dataset.ready) {
+      exportJson.dataset.ready = '1';
+      exportJson.addEventListener('click', () => {
+        download('gastroconnect-submissions.json', JSON.stringify(readRows(), null, 2), 'application/json');
+      });
+    }
+
+    if (exportCsv && !exportCsv.dataset.ready) {
+      exportCsv.dataset.ready = '1';
+      exportCsv.addEventListener('click', () => {
+        const csv = [
+          'Дата,Тип,Название,Телефон,Telegram,Город',
+          ...readRows().map(row => [
+            formatDate(row.created_at),
+            typeText(row.type),
+            row.title || '',
+            row.phone || '',
+            row.telegram || '',
+            row.city || ''
+          ].map(value => `"${String(value).replaceAll('"', '""')}"`).join(','))
+        ].join('\n');
+        download('gastroconnect-submissions.csv', csv, 'text/csv;charset=utf-8');
+      });
+    }
+
+    if (clearData && !clearData.dataset.ready) {
+      clearData.dataset.ready = '1';
+      clearData.addEventListener('click', () => {
+        if (confirm('Очистить локальные заявки?')) {
+          writeRows([]);
+          renderAdmin();
+        }
+      });
+    }
+
+    if (searchInput && !searchInput.dataset.ready) {
+      searchInput.dataset.ready = '1';
+      searchInput.addEventListener('input', renderAdmin);
+    }
+  }
+
   renderAdmin();
 })();

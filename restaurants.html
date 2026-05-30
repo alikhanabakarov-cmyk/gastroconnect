@@ -1,62 +1,87 @@
-<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8" />
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="description" content="GastroConnect для заведений HoReCa — заявки на персонал, поиск работников, смены, подработки и контакты для ресторанов, кафе и кофеен." />  <link rel="icon" href="favicon.ico" sizes="any" />
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png" />
-  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png" />
-  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+  <title>Заведения HoReCa — поиск персонала | GastroConnect</title>
+  <meta name="description" content="Поиск работников HoReCa, анкеты и приглашения на смены для ресторанов, кафе и баров." />
+  <link rel="icon" href="favicon.ico" sizes="any" />
   <link rel="manifest" href="site.webmanifest" />
-  <link rel="stylesheet" href="style.css" />
-<title>Заведения HoReCa — поиск персонала и заявки на смены | GastroConnect</title></head><body><div class="page-shell">
-<header class="site-header">
-  <a class="brand" href="index.html" aria-label="GastroConnect">
-    <img src="assets/logo-mark.png" alt="" class="brand-mark" />
-    <span>GastroConnect</span>
-  </a>
+  <link rel="stylesheet" href="style.css?v=500" />
+</head>
+<body>
+<div class="page-shell">
+  <header class="site-header">
+    <a class="brand" href="index.html" aria-label="GastroConnect">
+      <span class="brand-mark" aria-hidden="true">GC</span>
+      <span class="brand-text">GastroConnect</span>
+    </a>
+    <nav class="main-nav" aria-label="Главное меню">
+      <a href="workers.html">Сотрудникам</a>
+      <a href="restaurants.html">Заведениям</a>
+      <a href="suppliers.html">Поставщикам</a>
+      <a href="#contacts">Контакты</a>
+    </nav>
+    <a class="header-cta" href="auth.html">Войти / регистрация</a>
+  </header>
 
-  <nav class="main-nav" aria-label="Главное меню">
-    <a href="workers.html">Сотрудникам</a>
-    <a href="restaurants.html">Заведениям</a>
-    <a href="suppliers.html">Поставщикам</a>
-    <a href="#contacts">Контакты</a>
-  </nav>
+  <main>
+    <section class="poster-hero poster-hero-restaurants">
+      <div class="poster-copy">
+        <div class="eyebrow">Заведениям HoReCa</div>
+        <h1>Персонал для HoReCa без хаоса в чатах</h1>
+        <p>Смотрите анкеты работников, приглашайте людей на смены и закрывайте потребность в персонале быстрее.</p>
+        <div class="hero-actions">
+          <a class="btn primary" href="auth.html">Найти персонал</a>
+          <a class="btn" href="#request">Оставить заявку</a>
+        </div>
+        <div class="hero-benefits">
+          <span>Анкеты работников</span>
+          <span>Приглашения</span>
+          <span>Быстрый подбор</span>
+        </div>
+      </div>
+      <div class="poster-visual poster-visual-restaurants" role="img" aria-label="Быстрый подбор персонала для заведений"></div>
+    </section>
 
-  <a class="header-cta" href="#request">Оставить заявку</a>
-</header>
+    <section class="form-section" id="request">
+      <div class="form-intro">
+        <h2>Заявка заведения</h2>
+        <p>Заполните короткую заявку или зарегистрируйтесь, чтобы смотреть анкеты работников в кабинете.</p>
+      </div>
+      <form class="form-card" data-form-type="restaurant">
+        <div class="form-grid">
+          <label>Название заведения<input name="business_name" required placeholder="Ресторан / кафе / бар" /></label>
+          <label>Контактное лицо<input name="contact_person" required placeholder="Имя" /></label>
+          <label>Телефон<input name="phone" required placeholder="+7..." /></label>
+          <label>Telegram<input name="telegram" placeholder="@username" /></label>
+          <label>Город<input name="city" placeholder="Москва" /></label>
+          <label>Адрес<input name="address" placeholder="Улица, метро" /></label>
+          <label>Кто нужен
+            <select name="needed_role" required>
+              <option value="">Выберите вариант</option>
+              <option>Официант</option><option>Бармен</option><option>Повар</option><option>Бариста</option><option>Хостес</option><option>Администратор</option><option>Другое</option>
+            </select>
+          </label>
+          <label>Дата<input type="date" name="date" /></label>
+          <label>Время<input name="time" placeholder="18:00-02:00" /></label>
+          <label>Оплата<input name="payment" placeholder="4000 ₽ / 350 ₽ час" /></label>
+          <label class="full">Требования и условия<textarea name="requirements" placeholder="Форма, питание, опыт, задачи на смену..."></textarea></label>
+        </div>
+        <button type="submit">Оставить заявку</button>
+        <div class="success"></div>
+      </form>
+    </section>
+  </main>
 
-<main>
-<section class="poster-hero poster-hero-restaurants">
-  <div class="poster-copy">
-    <div class="eyebrow">Заведениям HoReCa</div>
-    <h1>Персонал для HoReCa без хаоса в чатах</h1>
-    <p>Оставляйте заявки на смены, находите кандидатов и закрывайте персонал быстрее.</p>
-
-    <div class="hero-actions">
-      <a class="btn primary" href="#request">Оставить заявку</a>
-      <a class="btn" href="#request">Найти персонал</a>
-    </div>
-
-    <div class="hero-benefits">
-      <span>Срочные заявки</span>
-      <span>Проверенные анкеты</span>
-      <span>Быстрый подбор</span>
-    </div>
-  </div>
-
-  <div class="poster-visual">
-    <img src="assets/hero-restaurants.webp" alt="Быстрый подбор персонала для заведений" />
-  </div>
-</section>
-
-<section class="section form-section" id="request">
-  <div class="form-intro">
-    <h2>Заявка заведения</h2>
-    <p>Оставьте заявку на персонал. В первой версии заявки сохраняются в локальную панель управления.</p>
-  </div>
-<form class="form-card" data-form-type="restaurant"><div class="form-grid">
-<label>Название заведения<input name="business_name" required placeholder="Ресторан / кафе / бар"></label><label>Контактное лицо<input name="contact_person" required placeholder="Имя"></label><label>Телефон<input name="phone" required placeholder="+7..."></label><label>Telegram<input name="telegram" placeholder="@username"></label><label>Город<input name="city" placeholder="Москва"></label><label>Адрес<input name="address" placeholder="Улица, метро"></label><label>Кто нужен<select name="needed_role" required><option value="">Выберите вариант</option><option>Официант</option><option>Бармен</option><option>Повар</option><option>Повар горячего цеха</option><option>Повар холодного цеха</option><option>Су-шеф</option><option>Шеф-повар</option><option>Бариста</option><option>Хостес</option><option>Администратор</option><option>Кальянщик</option><option>Посудомойщик</option><option>Курьер</option><option>Раннер</option><option>Уборщик</option><option>Метрдотель</option><option>Сомелье</option><option>Кондитер</option><option>Пекарь</option><option>Заготовщик</option><option>Разнорабочий</option><option>Несколько сотрудников</option><option>Другое</option></select></label><label>Дата<input type="date" name="date"></label><label>Время<input name="time" placeholder="18:00–02:00"></label><label>Оплата<input name="payment" placeholder="4000 ₽ / 350 ₽ час"></label><label>Срочность<select name="urgency"><option>Сегодня</option><option>Завтра</option><option>На этой неделе</option><option>Постоянная вакансия</option></select></label><label class="full">Требования и условия<textarea name="requirements" placeholder="Форма, питание, опыт, задачи на смену..."></textarea></label></div><button class="btn primary" type="submit">Оставить заявку</button><div class="success"></div></form></section></main><footer class="footer" id="contacts">
-    <div class="footer-brand"><img src="assets/logo-mark.png" alt="" /> <strong>GastroConnect</strong></div>
+  <footer class="footer" id="contacts">
+    <div class="footer-brand"><span class="brand-mark" aria-hidden="true">GC</span> <strong>GastroConnect</strong></div>
     <div class="footer-links">
       <span>Telegram: @GastroConnect_bot</span>
       <span>Email: info@gastroconnect.ru</span>
     </div>
-  </footer></div><script src="script.js"></script></body></html>
+  </footer>
+</div>
+<script src="script.js?v=500"></script>
+</body>
+</html>

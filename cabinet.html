@@ -4,114 +4,190 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Кабинет — GastroConnect</title>
-  <link rel="stylesheet" href="style.css?v=300" />
+  <link rel="icon" href="favicon.ico" sizes="any" />
+  <link rel="manifest" href="site.webmanifest" />
+  <link rel="stylesheet" href="style.css?v=500" />
 </head>
 <body>
+<div class="page-shell">
+  <header class="site-header">
+    <a class="brand" href="index.html" aria-label="GastroConnect">
+      <span class="brand-mark" aria-hidden="true">GC</span>
+      <span class="brand-text">GastroConnect</span>
+    </a>
+    <nav class="main-nav" aria-label="Главное меню">
+      <a href="workers.html">Сотрудникам</a>
+      <a href="restaurants.html">Заведениям</a>
+      <a href="suppliers.html">Поставщикам</a>
+      <a href="index.html#contacts">Контакты</a>
+    </nav>
+    <button id="logoutBtn" type="button">Выйти</button>
+  </header>
 
-<main style="max-width: 900px; margin: 40px auto; padding: 20px;">
-  <h1>Кабинет GastroConnect</h1>
+  <main class="cabinet-page">
+    <h1>Кабинет GastroConnect</h1>
+    <p id="userInfo" class="message">Проверяем вход...</p>
 
-  <p id="userInfo">Проверяем вход...</p>
+    <section id="workerCabinet" style="display:none;">
+      <h2>Кабинет работника</h2>
+      <p>Заполните профиль, чтобы заведения понимали, кого они приглашают на смену.</p>
 
-  <section id="workerCabinet" style="display: none;">
-    <h2>Кабинет работника</h2>
-    <p>Заполните профиль, чтобы заведения понимали, кого они приглашают на смену.</p>
+      <div class="cabinet-grid">
+        <label>Профессии
+          <input id="workerProfessions" type="text" placeholder="повар, официант, бариста" />
+        </label>
+        <label>Доступные дни
+          <input id="workerAvailableDays" type="text" placeholder="пн, вт, сб" />
+        </label>
+        <label class="full">Опыт
+          <textarea id="workerExperience" placeholder="например: 3 года поваром в ресторане"></textarea>
+        </label>
+        <label>Доступное время
+          <input id="workerAvailableTime" type="text" placeholder="10:00-22:00" />
+        </label>
+        <label>Минимальная ставка
+          <input id="workerMinRate" type="number" placeholder="3500" />
+        </label>
+        <label>Тип оплаты
+          <select id="workerPaymentType">
+            <option value="per_shift">За смену</option>
+            <option value="per_hour">За час</option>
+            <option value="per_day">За день</option>
+          </select>
+        </label>
+        <label style="display:flex; gap:10px; align-items:center;">
+          <input id="workerCanTravel" type="checkbox" style="width:auto; min-height:auto;" />
+          Готов ехать в другой город
+        </label>
+        <label>Города, куда готов ехать
+          <input id="workerTravelCities" type="text" placeholder="Москва, Химки, Одинцово" />
+        </label>
+        <label>Радиус поездки, км
+          <input id="workerTravelRadiusKm" type="number" placeholder="30" />
+        </label>
+        <label class="full">О себе
+          <textarea id="workerAbout" placeholder="коротко о себе, навыки и пожелания"></textarea>
+        </label>
+      </div>
 
-    <div style="display: grid; gap: 14px; max-width: 640px; margin-top: 20px;">
-      <label>
-        Профессии
-        <input id="workerProfessions" type="text" placeholder="повар, официант, бариста" />
+      <div class="cabinet-actions" style="margin-top:20px;">
+        <button id="saveWorkerProfileBtn" type="button">Сохранить профиль работника</button>
+      </div>
+      <p id="workerProfileMessage" class="message"></p>
+
+      <hr style="margin:34px 0; border:0; border-top:1px solid rgba(201,154,63,.28);" />
+
+      <h3>Приглашения на смены</h3>
+      <div class="cabinet-actions">
+        <button id="loadInvitesBtn" type="button">Показать приглашения</button>
+      </div>
+      <div id="invitesList" class="list-grid"></div>
+      <p id="invitesMessage" class="message"></p>
+    </section>
+
+    <section id="restaurantCabinet" style="display:none;">
+      <h2>Кабинет заведения</h2>
+      <p>Здесь заведение смотрит анкеты работников и приглашает их на смену.</p>
+
+      <h3>Работники</h3>
+      <label style="margin-bottom:14px;">Фильтр работников
+        <input id="workerSearchInput" type="search" placeholder="Профессия, опыт, город, ставка..." />
       </label>
+      <div class="cabinet-actions">
+        <button id="loadWorkersBtn" type="button">Показать работников</button>
+      </div>
+      <div id="workersList" class="list-grid"></div>
+      <p id="workersMessage" class="message"></p>
 
-      <label>
-        Опыт
-        <textarea id="workerExperience" placeholder="например: 3 года поваром в ресторане"></textarea>
+      <hr style="margin:34px 0; border:0; border-top:1px solid rgba(201,154,63,.28);" />
+
+      <h3>Запрос поставщику</h3>
+      <div class="cabinet-grid">
+        <label>Что нужно
+          <input id="supplyRequestTitle" type="text" placeholder="Сахар, 5 кг" />
+        </label>
+        <label>Категория
+          <input id="supplyRequestCategory" type="text" placeholder="Продукты" />
+        </label>
+        <label>Количество
+          <input id="supplyRequestQuantity" type="text" placeholder="5 кг" />
+        </label>
+        <label>Бюджет
+          <input id="supplyRequestBudget" type="text" placeholder="до 1000 ₽" />
+        </label>
+        <label>Город
+          <input id="supplyRequestCity" type="text" placeholder="Москва" />
+        </label>
+        <label class="full">Комментарий
+          <textarea id="supplyRequestMessage" placeholder="Срок, доставка, требования..."></textarea>
+        </label>
+      </div>
+      <div class="cabinet-actions" style="margin-top:20px;">
+        <button id="createSupplyRequestBtn" type="button">Опубликовать запрос</button>
+        <button id="loadSupplierOffersBtn" class="btn" type="button">Показать предложения поставщиков</button>
+      </div>
+      <label style="margin-top:16px;">Фильтр предложений
+        <input id="supplierOffersSearchInput" type="search" placeholder="Сыр, сахар, город, цена..." />
       </label>
+      <p id="supplyRequestMessageBox" class="message"></p>
+      <div id="supplierOffersList" class="list-grid"></div>
+    </section>
 
-      <label>
-        Доступные дни
-        <input id="workerAvailableDays" type="text" placeholder="пн, вт, сб" />
+    <section id="supplierCabinet" style="display:none;">
+      <h2>Кабинет поставщика</h2>
+      <p>Здесь поставщик публикует предложения и видит запросы заведений.</p>
+
+      <h3>Мое предложение</h3>
+      <div class="cabinet-grid">
+        <label>Товар или услуга
+          <input id="supplierOfferTitle" type="text" placeholder="Сыр, сахар, кофе, клининг" />
+        </label>
+        <label>Категория
+          <input id="supplierOfferCategory" type="text" placeholder="Продукты" />
+        </label>
+        <label>Цена
+          <input id="supplierOfferPrice" type="text" placeholder="150 ₽ / кг" />
+        </label>
+        <label>Количество / условия
+          <input id="supplierOfferQuantity" type="text" placeholder="от 5 кг" />
+        </label>
+        <label>Город
+          <input id="supplierOfferCity" type="text" placeholder="Москва" />
+        </label>
+        <label class="full">Описание
+          <textarea id="supplierOfferMessage" placeholder="Доставка, сроки, остатки, условия..."></textarea>
+        </label>
+      </div>
+      <div class="cabinet-actions" style="margin-top:20px;">
+        <button id="createSupplierOfferBtn" type="button">Опубликовать предложение</button>
+        <button id="loadSupplyRequestsBtn" class="btn" type="button">Показать запросы заведений</button>
+      </div>
+      <label style="margin-top:16px;">Фильтр запросов
+        <input id="supplyRequestsSearchInput" type="search" placeholder="Сахар, продукты, город, бюджет..." />
       </label>
+      <p id="supplierOfferMessageBox" class="message"></p>
+      <div id="supplyRequestsList" class="list-grid"></div>
+    </section>
 
-      <label>
-        Доступное время
-        <input id="workerAvailableTime" type="text" placeholder="10:00-22:00" />
-      </label>
+    <section id="adminCabinet" style="display:none;">
+      <h2>Кабинет админа</h2>
+      <p>Обзор данных платформы: работники, приглашения, запросы заведений и предложения поставщиков.</p>
+      <div class="cabinet-actions">
+        <button id="loadAdminDataBtn" type="button">Обновить данные</button>
+      </div>
+      <p id="adminMessage" class="message"></p>
+      <div id="adminDataList" class="list-grid"></div>
+    </section>
 
-      <label>
-        Минимальная ставка
-        <input id="workerMinRate" type="number" placeholder="3500" />
-      </label>
-
-      <label>
-        Тип оплаты
-        <select id="workerPaymentType">
-          <option value="per_shift">За смену</option>
-          <option value="per_hour">За час</option>
-          <option value="per_day">За день</option>
-          <option value="per_month">За месяц</option>
-        </select>
-      </label>
-
-      <label style="display: flex; gap: 10px; align-items: center;">
-        <input id="workerCanTravel" type="checkbox" style="width: auto;" />
-        Готов ехать в другой город
-      </label>
-
-      <label>
-        Города, куда готов ехать
-        <input id="workerTravelCities" type="text" placeholder="москва, химки, одинцово" />
-      </label>
-
-      <label>
-        Радиус поездки, км
-        <input id="workerTravelRadiusKm" type="number" placeholder="30" />
-      </label>
-
-      <label>
-        О себе
-        <textarea id="workerAbout" placeholder="коротко о себе, навыки и пожелания"></textarea>
-      </label>
-
-      <button id="saveWorkerProfileBtn" type="button">Сохранить профиль работника</button>
-      <p id="workerProfileMessage"></p>
-    </div>
-
-    <hr style="margin: 40px 0;" />
-
-    <h3>Приглашения на смены</h3>
-    <button id="loadWorkerInvitesBtn" type="button">Показать приглашения</button>
-    <div id="workerInvitesList" style="display: grid; gap: 14px; margin-top: 20px;"></div>
-    <p id="workerInvitesMessage"></p>
-  </section>
-
-  <section id="restaurantCabinet" style="display: none;">
-    <h2>Кабинет заведения</h2>
-    <p>Здесь заведение сможет смотреть анкеты работников и приглашать их на смену.</p>
-
-    <h3>Работники</h3>
-    <button id="loadWorkersBtn" type="button">Показать работников</button>
-
-    <div id="workersList" style="display: grid; gap: 14px; margin-top: 20px;"></div>
-    <p id="workersMessage"></p>
-  </section>
-
-  <section id="supplierCabinet" style="display: none;">
-    <h2>Кабинет поставщика</h2>
-    <p>Здесь поставщик будет добавлять предложения и получать запросы от заведений.</p>
-  </section>
-
-  <section id="unknownRole" style="display: none;">
-    <h2>Роль не найдена</h2>
-    <p>Профиль пользователя пока не настроен.</p>
-  </section>
-
-  <button id="logoutBtn" type="button" style="margin-top: 30px;">Выйти</button>
-</main>
+    <section id="unknownRole" style="display:none;">
+      <h2>Роль не найдена</h2>
+      <p>Профиль пользователя пока не настроен. Проверьте таблицу profiles.</p>
+    </section>
+  </main>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase.js?v=300"></script>
-<script src="cabinet.js?v=300"></script>
-
+<script src="supabase.js?v=500"></script>
+<script src="cabinet.js?v=500"></script>
 </body>
 </html>
