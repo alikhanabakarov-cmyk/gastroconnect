@@ -743,3 +743,60 @@ textarea:focus {
     max-height: none !important;
   }
 }
+/* FINAL FIX HERO PHOTOS */
+
+.poster-visual {
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+  min-height: 520px !important;
+  border-radius: 44px !important;
+  overflow: hidden !important;
+  background-image: url("assets/hero-home.webp") !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  box-shadow: 0 30px 90px rgba(35, 25, 10, 0.18) !important;
+}
+
+.poster-visual-workers {
+  background-image: url("assets/hero-workers.webp") !important;
+}
+
+.poster-visual-restaurants {
+  background-image: url("assets/hero-restaurants.webp") !important;
+}
+
+.poster-visual-suppliers {
+  background-image: url("assets/hero-suppliers.webp") !important;
+}
+
+.poster-visual::before,
+.poster-visual::after {
+  display: none !important;
+  content: none !important;
+}
+
+.poster-visual .visual-card {
+  display: none !important;
+}
+
+.poster-visual img,
+.poster-img {
+  display: none !important;
+}
+
+.poster-hero {
+  grid-template-columns: minmax(420px, 0.8fr) minmax(520px, 1.2fr) !important;
+  gap: 56px !important;
+}
+
+@media (max-width: 1000px) {
+  .poster-hero {
+    grid-template-columns: 1fr !important;
+  }
+
+  .poster-visual {
+    min-height: 360px !important;
+  }
+}
