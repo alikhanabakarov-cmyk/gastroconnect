@@ -531,3 +531,33 @@ textarea:focus {
     align-items: flex-start;
   }
 }
+.poster-visual {
+  position: relative;
+  min-height: 540px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.poster-visual::before {
+  content: "";
+  position: absolute;
+  width: 92%;
+  height: 66%;
+  right: 0;
+  top: 16%;
+  border-radius: 42px;
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 24px 70px rgba(35, 25, 10, 0.14);
+}
+
+.poster-img {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 760px;
+  max-height: 560px;
+  object-fit: contain;
+  object-position: center;
+  display: block;
+}
