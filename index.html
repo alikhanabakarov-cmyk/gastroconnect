@@ -1,16 +1,20 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>GastroConnect — платформа для HoReCa</title>
   <meta name="description" content="GastroConnect соединяет сотрудников, заведения и поставщиков HoReCa в одной системе." />
+
   <link rel="icon" href="favicon.ico" sizes="any" />
   <link rel="manifest" href="site.webmanifest" />
-  <link rel="stylesheet" href="style.css?v=1003" />
+  <link rel="stylesheet" href="style.css?v=2001" />
 </head>
+
 <body>
 <div class="page-shell">
+
   <header class="site-header">
     <a class="brand" href="index.html" aria-label="GastroConnect">
       <span class="brand-mark" aria-hidden="true">GC</span>
@@ -18,10 +22,10 @@
     </a>
 
     <nav class="main-nav" aria-label="Главное меню">
-      <a href="#business">Заведениям</a>
-      <a href="#workers">Сотрудникам</a>
-      <a href="#suppliers">Поставщикам</a>
-      <a href="#workflow">Как работает</a>
+      <a href="workers.html">Сотрудникам</a>
+      <a href="restaurants.html">Заведениям</a>
+      <a href="suppliers.html">Поставщикам</a>
+      <a href="#contacts">Контакты</a>
     </nav>
 
     <a class="header-cta" href="auth.html">Войти / регистрация</a>
@@ -30,175 +34,89 @@
   <main>
     <section class="poster-hero">
       <div class="poster-copy">
-        <div class="eyebrow">Российская платформа гибкой занятости для HoReCa</div>
-        <h1>Смены, персонал и поставки без хаоса в чатах</h1>
-        <p>GastroConnect помогает заведениям быстро закрывать смены, работникам находить подработку, а поставщикам получать реальные запросы от ресторанов и кафе.</p>
+        <div class="eyebrow">Платформа для HoReCa</div>
+
+        <h1>Работа, персонал и поставки для HoReCa в одном месте</h1>
+
+        <p>
+          GastroConnect соединяет сотрудников, заведения и поставщиков
+          в одной простой системе без хаоса в чатах.
+        </p>
 
         <div class="hero-actions">
-          <a class="btn primary" href="auth.html?role=restaurant">Запустить подбор</a>
-          <a class="btn" href="auth.html?role=worker">Найти смену</a>
+          <a class="btn primary" href="restaurants.html">Найти персонал</a>
+          <a class="btn" href="workers.html">Найти смену</a>
         </div>
 
         <div class="hero-benefits">
-          <span>Смены за 24 часа</span>
-          <span>Профили и отклики</span>
-          <span>Поставщики рядом</span>
+          <span>Смены</span>
+          <span>Заявки</span>
+          <span>Поставщики</span>
         </div>
       </div>
 
-      <div class="poster-visual poster-visual-with-dashboard" aria-label="GastroConnect для HoReCa">
-        <img class="poster-image poster-image-home" src="assets/hero-home.webp" alt="GastroConnect для HoReCa" loading="eager" decoding="async" fetchpriority="high" />
-        <div class="hero-dashboard">
-          <div class="dash-card dash-card-main">
-            <span>Сегодня</span>
-            <strong>18 смен</strong>
-            <p>повара, официанты, бариста</p>
-          </div>
-          <div class="dash-card">
-            <span>Заполнено</span>
-            <strong>82%</strong>
-            <p>по активным заявкам</p>
-          </div>
-          <div class="dash-card">
-            <span>Поставки</span>
-            <strong>47 офферов</strong>
-            <p>продукты, клининг, оборудование</p>
-          </div>
-        </div>
+      <div class="poster-visual">
+        <img
+          class="poster-image"
+          src="assets/hero-home.webp"
+          alt="GastroConnect для HoReCa"
+          loading="eager"
+          decoding="async"
+          fetchpriority="high"
+        />
       </div>
     </section>
 
-    <section class="metrics-band" aria-label="Показатели платформы">
-      <article><strong>24/7</strong><span>публикация смен и заявок</span></article>
-      <article><strong>3 роли</strong><span>работник, заведение, поставщик</span></article>
-      <article><strong>1 кабинет</strong><span>профили, отклики, приглашения</span></article>
-      <article><strong>HoReCa</strong><span>фокус на кафе, рестораны и кухни</span></article>
-    </section>
-
-    <section class="live-board-section" aria-label="Превью рабочей платформы">
+    <section class="direction-section">
       <div class="section-head">
-        <h2>Внутри не лендинг, а рабочая лента</h2>
-        <p>Заведение публикует смену, работник откликается, поставщик получает запрос. Всё это собрано в кабинетах по ролям.</p>
-      </div>
-
-      <div class="live-board">
-        <div class="board-column">
-          <div class="board-title">
-            <span>Смены сегодня</span>
-            <strong>работникам</strong>
-          </div>
-          <article class="board-card">
-            <b>Повар горячего цеха</b>
-            <p>Москва, Арбат · сегодня 17:00-23:00</p>
-            <div><span>4 800 ₽</span><em>Открыта</em></div>
-          </article>
-          <article class="board-card">
-            <b>Бариста на утро</b>
-            <p>Кофейня · завтра 08:00-14:00</p>
-            <div><span>2 700 ₽</span><em>3 отклика</em></div>
-          </article>
-        </div>
-
-        <div class="board-column">
-          <div class="board-title">
-            <span>Отклики и приглашения</span>
-            <strong>заведениям</strong>
-          </div>
-          <article class="board-card">
-            <b>Официант с опытом 2 года</b>
-            <p>Готов выйти сегодня, ставка от 350 ₽/час</p>
-            <div><span>Профиль заполнен</span><em>Пригласить</em></div>
-          </article>
-          <article class="board-card">
-            <b>Отклик на смену повара</b>
-            <p>Работник ждёт ответа заведения</p>
-            <div><span>Pending</span><em>Принять</em></div>
-          </article>
-        </div>
-
-        <div class="board-column">
-          <div class="board-title">
-            <span>Поставки</span>
-            <strong>поставщикам</strong>
-          </div>
-          <article class="board-card">
-            <b>Сыр моцарелла</b>
-            <p>от 5 кг · доставка по Москве</p>
-            <div><span>150 ₽ / кг</span><em>Запросить</em></div>
-          </article>
-          <article class="board-card">
-            <b>Запрос: сахар 5 кг</b>
-            <p>Заведение отправило заявку поставщику</p>
-            <div><span>Новая заявка</span><em>Ответить</em></div>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section class="direction-section" id="business">
-      <div class="section-head">
-        <h2>Платформа работает как операционный штаб</h2>
-        <p>Заведение видит работников, публикует смены, получает отклики и держит поставщиков в одном месте.</p>
+        <h2>Выберите направление</h2>
+        <p>Три отдельные страницы для сотрудников, заведений и поставщиков.</p>
       </div>
 
       <div class="direction-grid">
+        <a class="direction-card" href="workers.html">
+          <span>01</span>
+          <h3>Сотрудникам</h3>
+          <p>Смены, подработки, анкета работника и приглашения от заведений.</p>
+        </a>
+
         <a class="direction-card" href="restaurants.html">
-          <span>Для заведений</span>
-          <h3>Закрывайте смены быстрее</h3>
-          <p>Публикуйте заявки, приглашайте работников из базы, фильтруйте по профессии, ставке, графику и готовности к выезду.</p>
+          <span>02</span>
+          <h3>Заведениям</h3>
+          <p>Поиск работников, публикация смен и быстрый подбор персонала.</p>
         </a>
 
-        <a class="direction-card" id="workers" href="workers.html">
-          <span>Для сотрудников</span>
-          <h3>Берите понятные смены</h3>
-          <p>Заполните профиль, смотрите доступные смены, откликайтесь и принимайте приглашения от заведений.</p>
+        <a class="direction-card" href="suppliers.html">
+          <span>03</span>
+          <h3>Поставщикам</h3>
+          <p>Предложения поставщиков, заявки заведений и работа по категориям.</p>
         </a>
-
-        <a class="direction-card" id="suppliers" href="suppliers.html">
-          <span>Для поставщиков</span>
-          <h3>Получайте входящие запросы</h3>
-          <p>Публикуйте предложения по товарам и услугам, а заведения отправляют заявки прямо в кабинет поставщика.</p>
-        </a>
-      </div>
-    </section>
-
-    <section class="market-section" id="workflow">
-      <div class="market-copy">
-        <div class="eyebrow">как Coople, Instawork и VentraGo, но под российскую HoReCa</div>
-        <h2>Не доска объявлений, а рабочий процесс</h2>
-        <p>Система собирает смены, профили, отклики, приглашения и поставки в одну цепочку. Минимальный MVP уже работает на статическом фронте, Supabase и локальном fallback.</p>
-      </div>
-      <div class="workflow-list">
-        <article><b>01</b><span>Заведение публикует смену или выбирает работника из базы.</span></article>
-        <article><b>02</b><span>Работник откликается или принимает приглашение на смену.</span></article>
-        <article><b>03</b><span>Поставщик публикует оффер, заведение отправляет запрос в кабинет.</span></article>
-        <article><b>04</b><span>Админ видит общий контур данных и контролирует наполнение платформы.</span></article>
       </div>
     </section>
 
     <section class="function-section">
       <div class="section-head">
-        <h2>Что уже заложено в MVP</h2>
-        <p>Функции, которые нужны, чтобы сайт перестал быть “витриной” и начал работать как сервис.</p>
+        <h2>Как работает GastroConnect</h2>
+        <p>Минимум лишних переписок. Все заявки, анкеты и приглашения собираются в одном месте.</p>
       </div>
 
       <div class="function-grid">
         <article>
-          <span>Смены</span>
-          <h3>Публикация и отклики</h3>
-          <p>Заведение создаёт смену, работник видит её в кабинете и отправляет отклик.</p>
+          <span>01</span>
+          <h3>Регистрация</h3>
+          <p>Пользователь выбирает роль: работник, заведение или поставщик.</p>
         </article>
 
         <article>
-          <span>Профили</span>
-          <h3>Профили всех ролей</h3>
-          <p>Работники, заведения и поставщики ведут отдельные профили, чтобы заявки были понятными и проверяемыми.</p>
+          <span>02</span>
+          <h3>Кабинет</h3>
+          <p>После входа открывается личный кабинет с функциями под выбранную роль.</p>
         </article>
 
         <article>
-          <span>Поставки</span>
-          <h3>Офферы и заявки</h3>
-          <p>Поставщики публикуют предложения, заведения отправляют запросы по нужным позициям.</p>
+          <span>03</span>
+          <h3>Связь</h3>
+          <p>Заведения, сотрудники и поставщики быстрее находят друг друга.</p>
         </article>
       </div>
     </section>
@@ -206,7 +124,7 @@
     <section class="form-section" id="contacts">
       <div class="form-info">
         <h2>Начните с регистрации</h2>
-        <p>Создайте аккаунт и откройте кабинет для своей роли.</p>
+        <p>Создайте аккаунт и выберите роль. После входа вы попадёте в кабинет.</p>
       </div>
 
       <div class="form-card">
@@ -220,15 +138,13 @@
       <span class="brand-mark" aria-hidden="true">GC</span>
       <strong>GastroConnect</strong>
     </div>
+
     <div class="footer-links">
       <span>Telegram: @GastroConnect_bot</span>
       <span>Email: info@gastroconnect.ru</span>
     </div>
   </footer>
+
 </div>
 </body>
 </html>
-
-
-
-
