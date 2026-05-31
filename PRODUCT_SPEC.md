@@ -1,4 +1,4 @@
-﻿# GastroConnect product spec v1002
+﻿# GastroConnect product spec v1003
 
 GastroConnect is a Russian HoReCa marketplace inspired by Coople, VentraGo and Instawork, scoped to three roles only: establishments, workers and suppliers.
 
@@ -23,11 +23,12 @@ GastroConnect is a Russian HoReCa marketplace inspired by Coople, VentraGo and I
 
 ## Release checks
 
-- `index.html` contains `live-board`, `hero-dashboard`, `style.css?v=1002`.
+- `index.html` contains `live-board`, `hero-dashboard`, `style.css?v=1003`.
 - `supabase.js` contains `sb_publishable_` and does not contain `.join('.')`.
 - `cabinet.html` contains `restaurantBusinessName` and `supplierCompanyName`.
 - `cabinet.html` contains `loadSupplyResponsesBtn`.
 - `cabinet.js` passes syntax check and all `getElementById(...)` ids exist in `cabinet.html`.
-- Live `https://gastroconnect.ru/index.html?v=1002` must contain `live-board`.
-- Live `https://gastroconnect.ru/supabase.js?v=1002` must contain `sb_publishable_`.
+- Live `https://gastroconnect.ru/index.html?v=1003` must contain `live-board`.
+- Live `https://gastroconnect.ru/supabase.js?v=1003` must contain `sb_publishable_`.
+
 

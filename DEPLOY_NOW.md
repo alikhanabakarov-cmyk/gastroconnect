@@ -1,4 +1,4 @@
-﻿# GastroConnect: публикация версии v1002
+﻿# GastroConnect: публикация версии v1003
 
 Эта версия превращает сайт в MVP под 3 роли:
 
@@ -33,7 +33,7 @@ supabase-full-schema.sql
 Commit message:
 
 ```text
-Publish GastroConnect MVP v1002
+Publish GastroConnect MVP v1003
 ```
 
 Не загружай служебные папки, архивы, профили браузера и временные файлы.
@@ -44,11 +44,11 @@ Publish GastroConnect MVP v1002
 Открой:
 
 ```text
-https://gastroconnect.ru/index.html?v=1002
-https://gastroconnect.ru/supabase.js?v=1002
+https://gastroconnect.ru/index.html?v=1003
+https://gastroconnect.ru/supabase.js?v=1003
 ```
 
-В `supabase.js?v=1002` должно быть:
+В `supabase.js?v=1003` должно быть:
 
 ```js
 const SUPABASE_ANON_KEY = 'sb_publishable_0F-CDySnOiJYUdAr8khcJA_QiZc6J2y';
@@ -105,4 +105,5 @@ supabase-full-schema.sql
 8. В кабинете заведения проверь кнопки “Принять” и “Отклонить” у откликов.
 9. В кабинете поставщика проверь кнопки “Принять” и “Отклонить” у входящих заявок.
 10. Войди поставщиком, откликнись на общий запрос заведения, затем войди заведением и проверь “Отклики поставщиков на запросы”.
+
 

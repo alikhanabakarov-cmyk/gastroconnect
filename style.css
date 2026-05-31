@@ -261,33 +261,48 @@ button:disabled{
   border-radius:26px;
   border:1px solid rgba(201,154,63,.24);
   box-shadow:var(--shadow);
-  background-color:#eadfce;
-  background-repeat:no-repeat;
-  background-position:center;
-  background-size:cover;
+  background:
+    linear-gradient(135deg, rgba(255,250,242,.95), rgba(219,209,190,.86)),
+    #eadfce;
+}
+
+.poster-image{
+  position:absolute;
+  inset:0;
+  z-index:0;
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
+  object-position:center;
+}
+
+.poster-image-home{
+  object-position:right center;
 }
 
 .poster-visual::after{
   content:"";
   position:absolute;
   inset:0;
-  background:linear-gradient(90deg,rgba(255,250,242,.05),rgba(6,76,59,.08));
+  z-index:1;
+  background:linear-gradient(90deg,rgba(255,250,242,.02),rgba(6,76,59,.04));
   pointer-events:none;
 }
-
-.poster-visual-home{background-image:url("/assets/hero-home.webp")}
-.poster-visual-workers{background-image:url("/assets/hero-workers.webp")}
-.poster-visual-restaurants{background-image:url("/assets/hero-restaurants.webp")}
-.poster-visual-suppliers{background-image:url("/assets/hero-suppliers.webp")}
 
 .hero-dashboard{
   position:absolute;
   right:28px;
   bottom:28px;
-  z-index:2;
+  z-index:3;
   width:min(360px,calc(100% - 56px));
   display:grid;
   gap:12px;
+}
+
+.poster-visual-with-dashboard .hero-dashboard{
+  left:28px;
+  right:auto;
 }
 
 .dash-card{
@@ -928,6 +943,7 @@ th{
 
   .hero-dashboard{
     position:relative;
+    left:auto;
     right:auto;
     bottom:auto;
     width:100%;
