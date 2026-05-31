@@ -1,0 +1,1176 @@
+// cabinet.js
+
+const userInfo = document.getElementById('userInfo');
+const workerCabinet = document.getElementById('workerCabinet');
+const restaurantCabinet = document.getElementById('restaurantCabinet');
+const supplierCabinet = document.getElementById('supplierCabinet');
+const adminCabinet = document.getElementById('adminCabinet');
+const unknownRole = document.getElementById('unknownRole');
+const logoutBtn = document.getElementById('logoutBtn');
+
+const saveWorkerProfileBtn = document.getElementById('saveWorkerProfileBtn');
+const workerProfileMessage = document.getElementById('workerProfileMessage');
+const loadWorkersBtn = document.getElementById('loadWorkersBtn');
+const workersList = document.getElementById('workersList');
+const workersMessage = document.getElementById('workersMessage');
+const workerSearchInput = document.getElementById('workerSearchInput');
+
+const loadInvitesBtn = document.getElementById('loadInvitesBtn');
+const invitesList = document.getElementById('invitesList');
+const invitesMessage = document.getElementById('invitesMessage');
+
+const loadShiftPostsBtn = document.getElementById('loadShiftPostsBtn');
+const shiftPostsList = document.getElementById('shiftPostsList');
+const shiftPostsMessage = document.getElementById('shiftPostsMessage');
+const shiftSearchInput = document.getElementById('shiftSearchInput');
+
+const createShiftPostBtn = document.getElementById('createShiftPostBtn');
+const loadRestaurantShiftPostsBtn = document.getElementById('loadRestaurantShiftPostsBtn');
+const loadShiftApplicationsBtn = document.getElementById('loadShiftApplicationsBtn');
+const shiftPostMessage = document.getElementById('shiftPostMessage');
+const restaurantShiftPostsList = document.getElementById('restaurantShiftPostsList');
+const shiftApplicationsList = document.getElementById('shiftApplicationsList');
+const saveRestaurantProfileBtn = document.getElementById('saveRestaurantProfileBtn');
+const restaurantProfileMessage = document.getElementById('restaurantProfileMessage');
+
+const createSupplyRequestBtn = document.getElementById('createSupplyRequestBtn');
+const loadSupplierOffersBtn = document.getElementById('loadSupplierOffersBtn');
+const supplyRequestMessageBox = document.getElementById('supplyRequestMessageBox');
+const supplierOffersList = document.getElementById('supplierOffersList');
+const supplierOffersSearchInput = document.getElementById('supplierOffersSearchInput');
+const loadSupplyResponsesBtn = document.getElementById('loadSupplyResponsesBtn');
+const supplyResponsesMessage = document.getElementById('supplyResponsesMessage');
+const supplyResponsesList = document.getElementById('supplyResponsesList');
+
+const createSupplierOfferBtn = document.getElementById('createSupplierOfferBtn');
+const loadSupplyRequestsBtn = document.getElementById('loadSupplyRequestsBtn');
+const supplierOfferMessageBox = document.getElementById('supplierOfferMessageBox');
+const supplyRequestsList = document.getElementById('supplyRequestsList');
+const supplyRequestsSearchInput = document.getElementById('supplyRequestsSearchInput');
+const loadSupplierInquiriesBtn = document.getElementById('loadSupplierInquiriesBtn');
+const supplierInquiriesMessage = document.getElementById('supplierInquiriesMessage');
+const supplierInquiriesList = document.getElementById('supplierInquiriesList');
+const saveSupplierProfileBtn = document.getElementById('saveSupplierProfileBtn');
+const supplierProfileMessage = document.getElementById('supplierProfileMessage');
+
+const loadAdminDataBtn = document.getElementById('loadAdminDataBtn');
+const adminMessage = document.getElementById('adminMessage');
+const adminDataList = document.getElementById('adminDataList');
+
+let currentUser = null;
+let currentProfile = null;
+let storageMode = 'Supabase';
+let lastWorkers = [];
+let lastSupplierOffers = [];
+let lastSupplyRequests = [];
+let lastSupplyResponses = [];
+let lastShiftPosts = [];
+let lastRestaurantShiftPosts = [];
+
+function showOnly(section) {
+  [workerCabinet, restaurantCabinet, supplierCabinet, adminCabinet, unknownRole].forEach(item => {
+    if (item) item.style.display = 'none';
+  });
+  if (section) section.style.display = 'block';
+}
+
+function el(id) {
+  return document.getElementById(id);
+}
+
+function value(id) {
+  const node = el(id);
+  return node ? node.value.trim() : '';
+}
+
+function numberOrNull(nextValue) {
+  const cleaned = String(nextValue || '').replace(',', '.').replace(/[^\d.]/g, '');
+  if (!cleaned) return null;
+  const parsed = Number(cleaned);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function checked(id) {
+  const node = el(id);
+  return node ? Boolean(node.checked) : false;
+}
+
+function setValue(id, nextValue) {
+  const node = el(id);
+  if (node) node.value = nextValue ?? '';
+}
+
+function setChecked(id, nextValue) {
+  const node = el(id);
+  if (node) node.checked = Boolean(nextValue);
+}
+
+function setMessage(node, text) {
+  if (node) node.textContent = text;
+}
+
+function escapeHtml(text) {
+  return String(text ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
+function textToArray(text) {
+  return String(text || '')
+    .split(',')
+    .map(item => item.trim())
+    .filter(Boolean);
+}
+
+function showArray(nextValue) {
+  if (Array.isArray(nextValue)) return nextValue.length ? nextValue.join(', ') : '-';
+  if (nextValue === null || nextValue === undefined || nextValue === '') return '-';
+  return String(nextValue);
+}
+
+function paymentText(nextValue) {
+  const map = {
+    per_shift: 'За смену',
+    per_hour: 'За час',
+    per_day: 'За день',
+    per_month: 'За месяц'
+  };
+  return map[nextValue] || nextValue || '-';
+}
+
+function statusText(status) {
+  const map = {
+    pending: 'Ожидает ответа',
+    accepted: 'Принято',
+    declined: 'Отклонено',
+    new: 'Новая',
+    sent: 'Отправлено',
+    done: 'Завершено',
+    cancelled: 'Отменено',
+    open: 'Открыта',
+    active: 'Активно'
+  };
+  return map[status] || status || '-';
+}
+
+function isDbUnavailable(error) {
+  const text = String(error?.message || '').toLowerCase();
+  return error?.code === '42P01' ||
+    error?.code === '42703' ||
+    text.includes('not found') ||
+    text.includes('schema cache') ||
+    text.includes('could not find') ||
+    text.includes('relation') ||
+    text.includes('404');
+}
+
+function localKey(table) {
+  return `gc_${table}`;
+}
+
+function readLocal(table) {
+  try {
+    return JSON.parse(localStorage.getItem(localKey(table)) || '[]');
+  } catch {
+    return [];
+  }
+}
+
+function writeLocal(table, rows) {
+  localStorage.setItem(localKey(table), JSON.stringify(rows));
+}
+
+function localInsert(table, payload) {
+  const row = {
+    id: payload.id || crypto.randomUUID(),
+    created_at: payload.created_at || new Date().toISOString(),
+    updated_at: payload.updated_at || new Date().toISOString(),
+    ...payload
+  };
+  const rows = readLocal(table);
+  rows.unshift(row);
+  writeLocal(table, rows);
+  return { data: [row], error: null, local: true };
+}
+
+function localUpsert(table, payload, conflictKey) {
+  const rows = readLocal(table);
+  const index = rows.findIndex(row => row[conflictKey] === payload[conflictKey]);
+  const row = {
+    id: payload.id || rows[index]?.id || crypto.randomUUID(),
+    created_at: rows[index]?.created_at || payload.created_at || new Date().toISOString(),
+    updated_at: payload.updated_at || new Date().toISOString(),
+    ...rows[index],
+    ...payload
+  };
+  if (index >= 0) rows[index] = row;
+  else rows.unshift(row);
+  writeLocal(table, rows);
+  return { data: [row], error: null, local: true };
+}
+
+function localUpdate(table, filters, patch) {
+  const rows = readLocal(table);
+  let changed = 0;
+  const nextRows = rows.map(row => {
+    const match = Object.entries(filters).every(([key, nextValue]) => row[key] === nextValue);
+    if (!match) return row;
+    changed += 1;
+    return { ...row, ...patch, updated_at: new Date().toISOString() };
+  });
+  writeLocal(table, nextRows);
+  return { data: nextRows.filter(row => Object.entries(filters).every(([key, nextValue]) => row[key] === nextValue)), error: null, count: changed, local: true };
+}
+
+function localSelect(table, filters = {}) {
+  let rows = readLocal(table);
+  rows = rows.filter(row => Object.entries(filters).every(([key, nextValue]) => row[key] === nextValue));
+  rows.sort((a, b) => new Date(b.created_at || b.updated_at || 0) - new Date(a.created_at || a.updated_at || 0));
+  return { data: rows, error: null, local: true };
+}
+
+function noteLocalMode(result, messageNode) {
+  if (result?.local) {
+    storageMode = 'локальный режим';
+    if (messageNode) {
+      messageNode.textContent = `${messageNode.textContent ? messageNode.textContent + ' ' : ''}Внимание: Supabase-таблица недоступна, данные сейчас сохранены локально в этом браузере.`;
+    }
+  }
+}
+
+async function dbSelect(table, filters = {}, messageNode = null) {
+  if (!window.supabaseClient) return localSelect(table, filters);
+  try {
+    let query = window.supabaseClient.from(table).select('*');
+    Object.entries(filters).forEach(([key, nextValue]) => {
+      query = query.eq(key, nextValue);
+    });
+    const result = await query.order('created_at', { ascending: false });
+    if (!result.error) return result;
+    if (!isDbUnavailable(result.error)) return result;
+  } catch (error) {
+    if (!isDbUnavailable(error)) return { data: null, error };
+  }
+  const local = localSelect(table, filters);
+  noteLocalMode(local, messageNode);
+  return local;
+}
+
+async function dbInsert(table, payload, messageNode = null) {
+  if (!window.supabaseClient) return localInsert(table, payload);
+  try {
+    const result = await window.supabaseClient.from(table).insert(payload).select('*');
+    if (!result.error) return result;
+    if (!isDbUnavailable(result.error)) return result;
+  } catch (error) {
+    if (!isDbUnavailable(error)) return { data: null, error };
+  }
+  const local = localInsert(table, payload);
+  noteLocalMode(local, messageNode);
+  return local;
+}
+
+async function dbUpsert(table, payload, conflictKey, messageNode = null) {
+  if (!window.supabaseClient) return localUpsert(table, payload, conflictKey);
+  try {
+    const result = await window.supabaseClient.from(table).upsert(payload, { onConflict: conflictKey }).select('*');
+    if (!result.error) return result;
+    if (!isDbUnavailable(result.error)) return result;
+  } catch (error) {
+    if (!isDbUnavailable(error)) return { data: null, error };
+  }
+  const local = localUpsert(table, payload, conflictKey);
+  noteLocalMode(local, messageNode);
+  return local;
+}
+
+async function dbUpdate(table, filters, patch, messageNode = null) {
+  if (!window.supabaseClient) return localUpdate(table, filters, patch);
+  try {
+    let query = window.supabaseClient.from(table).update(patch);
+    Object.entries(filters).forEach(([key, nextValue]) => {
+      query = query.eq(key, nextValue);
+    });
+    const result = await query.select('*');
+    if (!result.error) return result;
+    if (!isDbUnavailable(result.error)) return result;
+  } catch (error) {
+    if (!isDbUnavailable(error)) return { data: null, error };
+  }
+  const local = localUpdate(table, filters, patch);
+  noteLocalMode(local, messageNode);
+  return local;
+}
+
+async function getSessionUser() {
+  const { data, error } = await window.supabaseClient.auth.getSession();
+  if (error || !data?.session?.user) return null;
+  return data.session.user;
+}
+
+async function loadProfile(user) {
+  const result = await dbSelect('profiles', { id: user.id });
+  if (result.data?.[0]) return result.data[0];
+  const fallbackProfile = {
+    id: user.id,
+    role: user.user_metadata?.role || 'worker',
+    name: user.email,
+    city: '',
+    status: 'active',
+    is_verified: false,
+    updated_at: new Date().toISOString()
+  };
+  const created = await dbUpsert('profiles', fallbackProfile, 'id');
+  return created.data?.[0] || fallbackProfile;
+}
+
+async function initCabinet() {
+  if (!window.supabaseClient) {
+    setMessage(userInfo, 'Ошибка: Supabase не подключён.');
+    showOnly(unknownRole);
+    return;
+  }
+
+  currentUser = await getSessionUser();
+  if (!currentUser) {
+    window.location.href = 'auth.html';
+    return;
+  }
+
+  currentProfile = await loadProfile(currentUser);
+  setMessage(userInfo, `Вы вошли как: ${currentUser.email}. Роль: ${currentProfile.role}. Хранилище: ${storageMode}.`);
+
+  if (currentProfile.role === 'worker') {
+    showOnly(workerCabinet);
+    await loadWorkerProfile();
+    await loadInvites();
+    await loadShiftPosts();
+  } else if (currentProfile.role === 'restaurant') {
+    showOnly(restaurantCabinet);
+    await loadRestaurantProfile();
+    setMessage(workersMessage, 'Нажмите “Показать работников”, чтобы загрузить анкеты.');
+    setMessage(shiftPostMessage, 'Создайте смену или загрузите ваши активные заявки.');
+  } else if (currentProfile.role === 'supplier') {
+    showOnly(supplierCabinet);
+    await loadSupplierProfile();
+    setMessage(supplierOfferMessageBox, 'Опубликуйте предложение или загрузите запросы заведений.');
+    await loadSupplierInquiries();
+  } else if (currentProfile.role === 'admin') {
+    showOnly(adminCabinet);
+    await loadAdminData();
+  } else {
+    showOnly(unknownRole);
+  }
+}
+
+async function loadWorkerProfile() {
+  const result = await dbSelect('worker_profiles', { user_id: currentUser.id }, workerProfileMessage);
+  if (result.error) {
+    setMessage(workerProfileMessage, 'Ошибка загрузки профиля: ' + result.error.message);
+    return;
+  }
+  const data = result.data?.[0];
+  if (!data) {
+    setMessage(workerProfileMessage, 'Заполните профиль и нажмите “Сохранить”.');
+    return;
+  }
+  setValue('workerProfessions', showArray(data.professions));
+  setValue('workerExperience', data.experience || '');
+  setValue('workerAvailableDays', showArray(data.available_days));
+  setValue('workerAvailableTime', data.available_time || '');
+  setValue('workerMinRate', data.min_rate ?? '');
+  setValue('workerPaymentType', data.payment_type || 'per_shift');
+  setChecked('workerCanTravel', data.can_travel);
+  setValue('workerTravelCities', showArray(data.travel_cities));
+  setValue('workerTravelRadiusKm', data.travel_radius_km ?? '');
+  setValue('workerAbout', data.about || '');
+  setMessage(workerProfileMessage, 'Профиль загружен.');
+}
+
+async function saveWorkerProfile() {
+  const minRate = value('workerMinRate');
+  const radius = value('workerTravelRadiusKm');
+  const payload = {
+    user_id: currentUser.id,
+    professions: textToArray(value('workerProfessions')),
+    experience: value('workerExperience') || null,
+    available_days: textToArray(value('workerAvailableDays')),
+    available_time: value('workerAvailableTime') || null,
+    min_rate: minRate ? Number(minRate) : null,
+    payment_type: value('workerPaymentType') || 'per_shift',
+    can_travel: checked('workerCanTravel'),
+    travel_cities: textToArray(value('workerTravelCities')),
+    travel_radius_km: radius ? Number(radius) : null,
+    about: value('workerAbout') || null,
+    updated_at: new Date().toISOString()
+  };
+  setMessage(workerProfileMessage, 'Сохраняем профиль...');
+  const result = await dbUpsert('worker_profiles', payload, 'user_id', workerProfileMessage);
+  if (result.error) {
+    setMessage(workerProfileMessage, 'Ошибка сохранения: ' + result.error.message);
+    return;
+  }
+  setMessage(workerProfileMessage, `Профиль работника сохранён. Хранилище: ${result.local ? 'локально' : 'Supabase'}.`);
+}
+
+async function loadRestaurantProfile() {
+  const result = await dbSelect('restaurant_profiles', { user_id: currentUser.id }, restaurantProfileMessage);
+  if (result.error) {
+    setMessage(restaurantProfileMessage, 'Ошибка загрузки профиля заведения: ' + result.error.message);
+    return;
+  }
+  const data = result.data?.[0];
+  if (!data) {
+    setMessage(restaurantProfileMessage, 'Заполните профиль заведения, чтобы работники и поставщики понимали, с кем работают.');
+    return;
+  }
+  setValue('restaurantBusinessName', data.business_name || '');
+  setValue('restaurantBusinessType', data.business_type || '');
+  setValue('restaurantContactPerson', data.contact_person || '');
+  setValue('restaurantCity', data.city || '');
+  setValue('restaurantAddress', data.address || '');
+  setValue('restaurantAbout', data.about || '');
+  setMessage(restaurantProfileMessage, 'Профиль заведения загружен.');
+}
+
+async function saveRestaurantProfile() {
+  const businessName = value('restaurantBusinessName');
+  const city = value('restaurantCity');
+  const payload = {
+    user_id: currentUser.id,
+    business_name: businessName || currentUser.email,
+    business_type: value('restaurantBusinessType') || null,
+    contact_person: value('restaurantContactPerson') || null,
+    city: city || null,
+    address: value('restaurantAddress') || null,
+    about: value('restaurantAbout') || null,
+    updated_at: new Date().toISOString()
+  };
+  setMessage(restaurantProfileMessage, 'Сохраняем профиль заведения...');
+  const result = await dbUpsert('restaurant_profiles', payload, 'user_id', restaurantProfileMessage);
+  if (result.error) {
+    setMessage(restaurantProfileMessage, 'Ошибка сохранения профиля заведения: ' + result.error.message);
+    return;
+  }
+  const profilePatch = {
+    name: payload.business_name,
+    city: payload.city || '',
+    updated_at: new Date().toISOString()
+  };
+  await dbUpdate('profiles', { id: currentUser.id }, profilePatch);
+  currentProfile = { ...currentProfile, ...profilePatch };
+  setMessage(restaurantProfileMessage, `Профиль заведения сохранён. Хранилище: ${result.local ? 'локально' : 'Supabase'}.`);
+}
+
+async function loadSupplierProfile() {
+  const result = await dbSelect('supplier_profiles', { user_id: currentUser.id }, supplierProfileMessage);
+  if (result.error) {
+    setMessage(supplierProfileMessage, 'Ошибка загрузки профиля поставщика: ' + result.error.message);
+    return;
+  }
+  const data = result.data?.[0];
+  if (!data) {
+    setMessage(supplierProfileMessage, 'Заполните профиль поставщика, чтобы заведения понимали категорию, город и условия доставки.');
+    return;
+  }
+  setValue('supplierCompanyName', data.company_name || '');
+  setValue('supplierProfileCategory', data.category || '');
+  setValue('supplierContactPerson', data.contact_person || '');
+  setValue('supplierProfileCity', data.city || '');
+  setValue('supplierDeliveryCities', showArray(data.delivery_cities));
+  setValue('supplierProfileAbout', data.about || '');
+  setMessage(supplierProfileMessage, 'Профиль поставщика загружен.');
+}
+
+async function saveSupplierProfile() {
+  const companyName = value('supplierCompanyName');
+  const city = value('supplierProfileCity');
+  const payload = {
+    user_id: currentUser.id,
+    company_name: companyName || currentUser.email,
+    contact_person: value('supplierContactPerson') || null,
+    city: city || null,
+    delivery_cities: textToArray(value('supplierDeliveryCities')),
+    category: value('supplierProfileCategory') || null,
+    about: value('supplierProfileAbout') || null,
+    updated_at: new Date().toISOString()
+  };
+  setMessage(supplierProfileMessage, 'Сохраняем профиль поставщика...');
+  const result = await dbUpsert('supplier_profiles', payload, 'user_id', supplierProfileMessage);
+  if (result.error) {
+    setMessage(supplierProfileMessage, 'Ошибка сохранения профиля поставщика: ' + result.error.message);
+    return;
+  }
+  const profilePatch = {
+    name: payload.company_name,
+    city: payload.city || '',
+    updated_at: new Date().toISOString()
+  };
+  await dbUpdate('profiles', { id: currentUser.id }, profilePatch);
+  currentProfile = { ...currentProfile, ...profilePatch };
+  setMessage(supplierProfileMessage, `Профиль поставщика сохранён. Хранилище: ${result.local ? 'локально' : 'Supabase'}.`);
+}
+
+function matchesSearch(row, search) {
+  if (!search) return true;
+  return JSON.stringify(row).toLowerCase().includes(search.toLowerCase());
+}
+
+async function loadWorkers() {
+  workersList.innerHTML = '';
+  setMessage(workersMessage, 'Загружаем работников...');
+  const result = await dbSelect('worker_profiles', {}, workersMessage);
+  if (result.error) {
+    setMessage(workersMessage, 'Ошибка загрузки работников: ' + result.error.message);
+    return;
+  }
+  lastWorkers = result.data || [];
+  renderWorkers();
+}
+
+function renderWorkers() {
+  const search = workerSearchInput?.value.trim() || '';
+  const rows = lastWorkers.filter(row => matchesSearch(row, search));
+  workersList.innerHTML = '';
+  rows.forEach(worker => workersList.appendChild(renderWorkerCard(worker)));
+  setMessage(workersMessage, rows.length ? `Найдено работников: ${rows.length}` : 'Работники не найдены.');
+}
+
+function renderWorkerCard(worker) {
+  const card = document.createElement('article');
+  card.className = 'data-card';
+  card.innerHTML = `
+    <h4>${escapeHtml(showArray(worker.professions))}</h4>
+    <p><strong>Опыт:</strong> ${escapeHtml(worker.experience || '-')}</p>
+    <p><strong>Дни:</strong> ${escapeHtml(showArray(worker.available_days))}</p>
+    <p><strong>Время:</strong> ${escapeHtml(worker.available_time || '-')}</p>
+    <p><strong>Ставка:</strong> ${escapeHtml(worker.min_rate ?? '-')}</p>
+    <p><strong>Оплата:</strong> ${escapeHtml(paymentText(worker.payment_type))}</p>
+    <p><strong>Готов ехать:</strong> ${worker.can_travel ? 'да' : 'нет'}</p>
+    <p><strong>Города:</strong> ${escapeHtml(showArray(worker.travel_cities))}</p>
+    <p><strong>О себе:</strong> ${escapeHtml(worker.about || '-')}</p>
+    <div class="card-actions" style="margin-top:14px;">
+      <button type="button" class="inviteWorkerBtn">Пригласить на смену</button>
+    </div>
+    <p class="inviteStatus message"></p>
+  `;
+  const btn = card.querySelector('.inviteWorkerBtn');
+  const status = card.querySelector('.inviteStatus');
+  if (!worker.user_id) {
+    btn.disabled = true;
+    status.textContent = 'У анкеты нет user_id.';
+  } else {
+    btn.addEventListener('click', async () => {
+      btn.disabled = true;
+      status.textContent = 'Отправляем приглашение...';
+      const ok = await inviteWorker(worker.user_id, status);
+      if (ok) btn.textContent = 'Приглашение отправлено';
+      else btn.disabled = false;
+    });
+  }
+  return card;
+}
+
+async function inviteWorker(workerId, statusNode) {
+  const payload = {
+    restaurant_id: currentUser.id,
+    worker_id: workerId,
+    status: 'pending',
+    message: 'Приглашение на смену',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+  const result = await dbInsert('shift_invites', payload, statusNode);
+  if (result.error) {
+    setMessage(statusNode, 'Ошибка приглашения: ' + result.error.message);
+    return false;
+  }
+  setMessage(statusNode, `Приглашение отправлено. Хранилище: ${result.local ? 'локально' : 'Supabase'}.`);
+  return true;
+}
+
+async function loadInvites() {
+  invitesList.innerHTML = '';
+  setMessage(invitesMessage, 'Загружаем приглашения...');
+  const result = await dbSelect('shift_invites', { worker_id: currentUser.id }, invitesMessage);
+  if (result.error) {
+    setMessage(invitesMessage, 'Ошибка загрузки приглашений: ' + result.error.message);
+    return;
+  }
+  const rows = result.data || [];
+  rows.forEach(invite => invitesList.appendChild(renderInviteCard(invite)));
+  setMessage(invitesMessage, rows.length ? `Найдено приглашений: ${rows.length}` : 'Приглашений пока нет.');
+}
+
+function renderInviteCard(invite) {
+  const card = document.createElement('article');
+  card.className = 'data-card';
+  const pending = invite.status === 'pending';
+  card.innerHTML = `
+    <h4>Приглашение на смену</h4>
+    <p><strong>Статус:</strong> <span class="status-pill">${escapeHtml(statusText(invite.status))}</span></p>
+    <p><strong>Сообщение:</strong> ${escapeHtml(invite.message || '-')}</p>
+    <div class="card-actions" style="margin-top:14px;">
+      <button type="button" class="acceptInviteBtn">Принять</button>
+      <button type="button" class="declineInviteBtn">Отклонить</button>
+    </div>
+  `;
+  const accept = card.querySelector('.acceptInviteBtn');
+  const decline = card.querySelector('.declineInviteBtn');
+  accept.disabled = !pending;
+  decline.disabled = !pending;
+  accept.addEventListener('click', () => updateInviteStatus(invite.id, 'accepted'));
+  decline.addEventListener('click', () => updateInviteStatus(invite.id, 'declined'));
+  return card;
+}
+
+async function updateInviteStatus(inviteId, status) {
+  const result = await dbUpdate('shift_invites', { id: inviteId, worker_id: currentUser.id }, {
+    status,
+    updated_at: new Date().toISOString()
+  }, invitesMessage);
+  if (result.error) {
+    alert('Ошибка обновления приглашения: ' + result.error.message);
+    return;
+  }
+  await loadInvites();
+}
+
+function shiftDateText(row) {
+  const date = row.date_from || row.date_to || '-';
+  const time = [row.time_from, row.time_to].filter(Boolean).join('–');
+  return time ? `${date}, ${time}` : date;
+}
+
+async function createShiftPost() {
+  const title = value('shiftTitle');
+  const profession = value('shiftProfession');
+  if (!title || !profession) {
+    setMessage(shiftPostMessage, 'Укажите название смены и профессию.');
+    return;
+  }
+  const payload = {
+    restaurant_id: currentUser.id,
+    title,
+    profession,
+    city: value('shiftCity') || currentProfile.city || null,
+    district: value('shiftDistrict') || null,
+    address: value('shiftAddress') || null,
+    date_from: value('shiftDateFrom') || null,
+    date_to: value('shiftDateFrom') || null,
+    time_from: value('shiftTimeFrom') || null,
+    time_to: value('shiftTimeTo') || null,
+    rate: numberOrNull(value('shiftRate')),
+    payment_type: 'per_shift',
+    travel_bonus: false,
+    accepts_other_city: true,
+    requirements: value('shiftRequirements') || null,
+    status: 'open',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+  setMessage(shiftPostMessage, 'Публикуем смену...');
+  const result = await dbInsert('shift_posts', payload, shiftPostMessage);
+  if (result.error) {
+    setMessage(shiftPostMessage, 'Ошибка публикации смены: ' + result.error.message);
+    return;
+  }
+  setMessage(shiftPostMessage, `Смена опубликована. Хранилище: ${result.local ? 'локально' : 'Supabase'}.`);
+  await loadRestaurantShiftPosts();
+}
+
+async function loadShiftPosts() {
+  if (!shiftPostsList) return;
+  shiftPostsList.innerHTML = '';
+  setMessage(shiftPostsMessage, 'Загружаем смены...');
+  const result = await dbSelect('shift_posts', {}, shiftPostsMessage);
+  if (result.error) {
+    setMessage(shiftPostsMessage, 'Ошибка загрузки смен: ' + result.error.message);
+    return;
+  }
+  lastShiftPosts = (result.data || []).filter(row => (row.status || 'open') === 'open');
+  renderShiftPosts();
+}
+
+function renderShiftPosts() {
+  if (!shiftPostsList) return;
+  const search = shiftSearchInput?.value.trim() || '';
+  const rows = lastShiftPosts.filter(row => matchesSearch(row, search));
+  shiftPostsList.innerHTML = '';
+  rows.forEach(post => shiftPostsList.appendChild(renderShiftPostCard(post, true)));
+  setMessage(shiftPostsMessage, rows.length ? `Найдено смен: ${rows.length}` : 'Открытых смен пока нет.');
+}
+
+function renderShiftPostCard(post, canApply = false) {
+  const card = document.createElement('article');
+  card.className = 'data-card';
+  card.innerHTML = `
+    <h4>${escapeHtml(post.title || post.profession || 'Смена')}</h4>
+    <p><strong>Профессия:</strong> ${escapeHtml(post.profession || '-')}</p>
+    <p><strong>Город:</strong> ${escapeHtml([post.city, post.district].filter(Boolean).join(', ') || '-')}</p>
+    <p><strong>Когда:</strong> ${escapeHtml(shiftDateText(post))}</p>
+    <p><strong>Ставка:</strong> ${escapeHtml(post.rate ?? '-')} ₽</p>
+    <p><strong>Требования:</strong> ${escapeHtml(post.requirements || '-')}</p>
+    <p><strong>Статус:</strong> <span class="status-pill">${escapeHtml(post.status || 'open')}</span></p>
+    ${canApply ? '<div class="card-actions" style="margin-top:14px;"><button type="button" class="applyShiftBtn">Откликнуться</button></div><p class="applyStatus message"></p>' : ''}
+  `;
+  if (canApply) {
+    const btn = card.querySelector('.applyShiftBtn');
+    const status = card.querySelector('.applyStatus');
+    btn.addEventListener('click', async () => {
+      btn.disabled = true;
+      status.textContent = 'Отправляем отклик...';
+      const ok = await applyToShift(post, status);
+      if (ok) btn.textContent = 'Отклик отправлен';
+      else btn.disabled = false;
+    });
+  }
+  return card;
+}
+
+async function applyToShift(post, statusNode) {
+  const result = await dbInsert('shift_applications', {
+    shift_id: post.id,
+    worker_id: currentUser.id,
+    restaurant_id: post.restaurant_id,
+    message: 'Готов выйти на смену',
+    status: 'pending',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  }, statusNode);
+  if (result.error) {
+    setMessage(statusNode, 'Ошибка отклика: ' + result.error.message);
+    return false;
+  }
+  setMessage(statusNode, `Отклик отправлен. Хранилище: ${result.local ? 'локально' : 'Supabase'}.`);
+  return true;
+}
+
+async function loadRestaurantShiftPosts() {
+  if (!restaurantShiftPostsList) return;
+  restaurantShiftPostsList.innerHTML = '';
+  setMessage(shiftPostMessage, 'Загружаем ваши смены...');
+  const result = await dbSelect('shift_posts', { restaurant_id: currentUser.id }, shiftPostMessage);
+  if (result.error) {
+    setMessage(shiftPostMessage, 'Ошибка загрузки смен: ' + result.error.message);
+    return;
+  }
+  lastRestaurantShiftPosts = result.data || [];
+  lastRestaurantShiftPosts.forEach(post => restaurantShiftPostsList.appendChild(renderShiftPostCard(post, false)));
+  setMessage(shiftPostMessage, lastRestaurantShiftPosts.length ? `Ваших смен: ${lastRestaurantShiftPosts.length}` : 'Вы ещё не публиковали смены.');
+}
+
+async function loadShiftApplications() {
+  if (!shiftApplicationsList) return;
+  shiftApplicationsList.innerHTML = '';
+  setMessage(shiftPostMessage, 'Загружаем отклики...');
+  const result = await dbSelect('shift_applications', { restaurant_id: currentUser.id }, shiftPostMessage);
+  if (result.error) {
+    setMessage(shiftPostMessage, 'Ошибка загрузки откликов: ' + result.error.message);
+    return;
+  }
+  const rows = result.data || [];
+  rows.forEach(application => {
+    const card = document.createElement('article');
+    card.className = 'data-card';
+    const pending = application.status === 'pending';
+    card.innerHTML = `
+      <h4>Отклик на смену</h4>
+      <p><strong>Работник:</strong> ${escapeHtml(application.worker_id || '-')}</p>
+      <p><strong>Смена:</strong> ${escapeHtml(application.shift_id || '-')}</p>
+      <p><strong>Сообщение:</strong> ${escapeHtml(application.message || '-')}</p>
+      <p><strong>Статус:</strong> <span class="status-pill">${escapeHtml(statusText(application.status))}</span></p>
+      <div class="card-actions" style="margin-top:14px;">
+        <button type="button" class="acceptApplicationBtn">Принять</button>
+        <button type="button" class="declineApplicationBtn">Отклонить</button>
+      </div>
+      <p class="applicationStatus message"></p>
+    `;
+    const accept = card.querySelector('.acceptApplicationBtn');
+    const decline = card.querySelector('.declineApplicationBtn');
+    const status = card.querySelector('.applicationStatus');
+    accept.disabled = !pending;
+    decline.disabled = !pending;
+    accept.addEventListener('click', () => updateShiftApplication(application.id, 'accepted', status));
+    decline.addEventListener('click', () => updateShiftApplication(application.id, 'declined', status));
+    shiftApplicationsList.appendChild(card);
+  });
+  setMessage(shiftPostMessage, rows.length ? `Откликов: ${rows.length}` : 'Откликов пока нет.');
+}
+
+async function updateShiftApplication(applicationId, status, statusNode) {
+  const result = await dbUpdate('shift_applications', { id: applicationId, restaurant_id: currentUser.id }, {
+    status,
+    updated_at: new Date().toISOString()
+  }, statusNode);
+  if (result.error) {
+    setMessage(statusNode, 'Ошибка обновления отклика: ' + result.error.message);
+    return;
+  }
+  setMessage(statusNode, `Отклик обновлён: ${statusText(status)}.`);
+  await loadShiftApplications();
+}
+
+async function createSupplyRequest() {
+  const title = value('supplyRequestTitle');
+  if (!title) {
+    setMessage(supplyRequestMessageBox, 'Укажите, что нужно заведению.');
+    return;
+  }
+  const payload = {
+    restaurant_id: currentUser.id,
+    title,
+    category: value('supplyRequestCategory'),
+    quantity: value('supplyRequestQuantity'),
+    budget: value('supplyRequestBudget'),
+    city: value('supplyRequestCity'),
+    message: value('supplyRequestMessage'),
+    status: 'open',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+  const result = await dbInsert('supply_requests', payload, supplyRequestMessageBox);
+  if (result.error) {
+    if (!isDbUnavailable(result.error)) {
+      setMessage(supplyRequestMessageBox, 'Ошибка публикации запроса: ' + result.error.message);
+      return;
+    }
+    const local = localInsert('supply_requests', payload);
+    setMessage(supplyRequestMessageBox, 'Запрос сохранён локально. Для общей ленты поставщиков нужно применить SQL-миграцию supply_requests в Supabase.');
+    noteLocalMode(local, supplyRequestMessageBox);
+    return;
+  }
+  setMessage(supplyRequestMessageBox, `Запрос опубликован. Хранилище: ${result.local ? 'локально' : 'Supabase'}.`);
+}
+
+async function loadSupplierOffers() {
+  supplierOffersList.innerHTML = '';
+  setMessage(supplyRequestMessageBox, 'Загружаем предложения поставщиков...');
+  const result = await dbSelect('supplier_offers', {}, supplyRequestMessageBox);
+  if (result.error) {
+    setMessage(supplyRequestMessageBox, 'Ошибка загрузки предложений: ' + result.error.message);
+    return;
+  }
+  lastSupplierOffers = result.data || [];
+  renderSupplierOffers();
+}
+
+function renderSupplierOffers() {
+  const search = supplierOffersSearchInput?.value.trim() || '';
+  const rows = lastSupplierOffers.filter(row => matchesSearch(row, search));
+  supplierOffersList.innerHTML = '';
+  rows.forEach(offer => supplierOffersList.appendChild(renderSupplierOfferCard(offer)));
+  if (!rows.length) setMessage(supplyRequestMessageBox, 'Предложения поставщиков не найдены.');
+}
+
+function renderSupplierOfferCard(offer) {
+  const card = document.createElement('article');
+  card.className = 'data-card';
+  const deliveryCities = offer.delivery_cities || offer.city || '-';
+  const canRequest = currentProfile?.role === 'restaurant' && offer.id && offer.supplier_id;
+  card.innerHTML = `
+    <h4>${escapeHtml(offer.title || '-')}</h4>
+    <p><strong>Категория:</strong> ${escapeHtml(offer.category || '-')}</p>
+    <p><strong>Товар:</strong> ${escapeHtml(offer.product_name || offer.title || '-')}</p>
+    <p><strong>Цена:</strong> ${escapeHtml(offer.price ?? '-')} ${escapeHtml(offer.unit || '')}</p>
+    <p><strong>Минимальный заказ:</strong> ${escapeHtml(offer.min_order || offer.quantity || '-')}</p>
+    <p><strong>Города доставки:</strong> ${escapeHtml(showArray(deliveryCities))}</p>
+    <p><strong>Описание:</strong> ${escapeHtml(offer.description || offer.message || '-')}</p>
+    ${canRequest ? '<div class="card-actions" style="margin-top:14px;"><button type="button" class="requestSupplierBtn">Отправить запрос</button></div><p class="supplierRequestStatus message"></p>' : ''}
+  `;
+  if (canRequest) {
+    const btn = card.querySelector('.requestSupplierBtn');
+    const status = card.querySelector('.supplierRequestStatus');
+    btn.addEventListener('click', async () => {
+      btn.disabled = true;
+      status.textContent = 'Отправляем запрос поставщику...';
+      const ok = await requestSupplierOffer(offer, status);
+      if (ok) btn.textContent = 'Запрос отправлен';
+      else btn.disabled = false;
+    });
+  }
+  return card;
+}
+
+async function requestSupplierOffer(offer, statusNode) {
+  const message = [
+    value('supplyRequestTitle'),
+    value('supplyRequestQuantity'),
+    value('supplyRequestBudget'),
+    value('supplyRequestCity'),
+    value('supplyRequestMessage')
+  ].filter(Boolean).join(' | ') || 'Интересует поставка по вашему предложению';
+  const result = await dbInsert('supplier_inquiries', {
+    offer_id: offer.id,
+    restaurant_id: currentUser.id,
+    supplier_id: offer.supplier_id,
+    message,
+    status: 'new',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  }, statusNode);
+  if (result.error) {
+    setMessage(statusNode, 'Ошибка запроса поставщику: ' + result.error.message);
+    return false;
+  }
+  setMessage(statusNode, `Запрос отправлен поставщику. Хранилище: ${result.local ? 'локально' : 'Supabase'}.`);
+  return true;
+}
+
+async function createSupplierOffer() {
+  const title = value('supplierOfferTitle');
+  if (!title) {
+    setMessage(supplierOfferMessageBox, 'Укажите товар или услугу.');
+    return;
+  }
+  const payload = {
+    supplier_id: currentUser.id,
+    title,
+    category: value('supplierOfferCategory') || 'Другое',
+    product_name: title,
+    price: numberOrNull(value('supplierOfferPrice')),
+    unit: 'руб.',
+    min_order: value('supplierOfferQuantity'),
+    delivery_cities: textToArray(value('supplierOfferCity')) || [],
+    description: value('supplierOfferMessage'),
+    status: 'active',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+  const result = await dbInsert('supplier_offers', payload, supplierOfferMessageBox);
+  if (result.error) {
+    setMessage(supplierOfferMessageBox, 'Ошибка публикации предложения: ' + result.error.message);
+    return;
+  }
+  setMessage(supplierOfferMessageBox, `Предложение опубликовано. Хранилище: ${result.local ? 'локально' : 'Supabase'}.`);
+}
+
+async function loadSupplyRequests() {
+  supplyRequestsList.innerHTML = '';
+  setMessage(supplierOfferMessageBox, 'Загружаем запросы заведений...');
+  const result = await dbSelect('supply_requests', {}, supplierOfferMessageBox);
+  if (result.error) {
+    setMessage(supplierOfferMessageBox, 'Ошибка загрузки запросов: ' + result.error.message);
+    return;
+  }
+  lastSupplyRequests = result.data || [];
+  renderSupplyRequests();
+}
+
+async function createSupplyResponse(request, statusNode) {
+  const message = [
+    value('supplierOfferTitle'),
+    value('supplierOfferPrice'),
+    value('supplierOfferQuantity'),
+    value('supplierOfferCity'),
+    value('supplierOfferMessage')
+  ].filter(Boolean).join(' | ') || 'Готов обсудить поставку по вашему запросу';
+
+  const result = await dbInsert('supplier_responses', {
+    request_id: request.id,
+    restaurant_id: request.restaurant_id,
+    supplier_id: currentUser.id,
+    category: value('supplierOfferCategory') || request.category || null,
+    message,
+    status: 'new',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  }, statusNode);
+  if (result.error) {
+    setMessage(statusNode, 'Ошибка отклика на запрос: ' + result.error.message);
+    return false;
+  }
+  setMessage(statusNode, `Отклик отправлен заведению. Хранилище: ${result.local ? 'локально' : 'Supabase'}.`);
+  return true;
+}
+
+async function loadSupplierInquiries() {
+  if (!supplierInquiriesList) return;
+  supplierInquiriesList.innerHTML = '';
+  setMessage(supplierInquiriesMessage, 'Загружаем входящие заявки...');
+  const result = await dbSelect('supplier_inquiries', { supplier_id: currentUser.id }, supplierInquiriesMessage);
+  if (result.error) {
+    setMessage(supplierInquiriesMessage, 'Ошибка загрузки заявок: ' + result.error.message);
+    return;
+  }
+  const rows = result.data || [];
+  rows.forEach(inquiry => {
+    const card = document.createElement('article');
+    card.className = 'data-card';
+    const active = inquiry.status === 'new';
+    card.innerHTML = `
+      <h4>Заявка от заведения</h4>
+      <p><strong>Сообщение:</strong> ${escapeHtml(inquiry.message || '-')}</p>
+      <p><strong>Оффер:</strong> ${escapeHtml(inquiry.offer_id || '-')}</p>
+      <p><strong>Статус:</strong> <span class="status-pill">${escapeHtml(statusText(inquiry.status || 'new'))}</span></p>
+      <div class="card-actions" style="margin-top:14px;">
+        <button type="button" class="acceptInquiryBtn">Принять</button>
+        <button type="button" class="declineInquiryBtn">Отклонить</button>
+      </div>
+      <p class="inquiryStatus message"></p>
+    `;
+    const accept = card.querySelector('.acceptInquiryBtn');
+    const decline = card.querySelector('.declineInquiryBtn');
+    const status = card.querySelector('.inquiryStatus');
+    accept.disabled = !active;
+    decline.disabled = !active;
+    accept.addEventListener('click', () => updateSupplierInquiry(inquiry.id, 'accepted', status));
+    decline.addEventListener('click', () => updateSupplierInquiry(inquiry.id, 'declined', status));
+    supplierInquiriesList.appendChild(card);
+  });
+  setMessage(supplierInquiriesMessage, rows.length ? `Входящих заявок: ${rows.length}` : 'Входящих заявок пока нет.');
+}
+
+async function updateSupplierInquiry(inquiryId, status, statusNode) {
+  const result = await dbUpdate('supplier_inquiries', { id: inquiryId, supplier_id: currentUser.id }, {
+    status,
+    updated_at: new Date().toISOString()
+  }, statusNode);
+  if (result.error) {
+    setMessage(statusNode, 'Ошибка обновления заявки: ' + result.error.message);
+    return;
+  }
+  setMessage(statusNode, `Заявка обновлена: ${statusText(status)}.`);
+  await loadSupplierInquiries();
+}
+
+function renderSupplyRequests() {
+  const search = supplyRequestsSearchInput?.value.trim() || '';
+  const rows = lastSupplyRequests.filter(row => matchesSearch(row, search));
+  supplyRequestsList.innerHTML = '';
+  rows.forEach(request => supplyRequestsList.appendChild(renderSupplyRequestCard(request)));
+  if (!rows.length) setMessage(supplierOfferMessageBox, 'Запросы заведений не найдены.');
+}
+
+function renderSupplyRequestCard(request) {
+  const card = document.createElement('article');
+  card.className = 'data-card';
+  const canRespond = currentProfile?.role === 'supplier' && request.id && request.restaurant_id;
+  card.innerHTML = `
+    <h4>${escapeHtml(request.title || '-')}</h4>
+    <p><strong>Категория:</strong> ${escapeHtml(request.category || '-')}</p>
+    <p><strong>Количество:</strong> ${escapeHtml(request.quantity || '-')}</p>
+    <p><strong>Бюджет:</strong> ${escapeHtml(request.budget || '-')}</p>
+    <p><strong>Город:</strong> ${escapeHtml(request.city || '-')}</p>
+    <p><strong>Комментарий:</strong> ${escapeHtml(request.message || '-')}</p>
+    ${canRespond ? '<div class="card-actions" style="margin-top:14px;"><button type="button" class="respondSupplyRequestBtn">Откликнуться</button></div><p class="supplyResponseStatus message"></p>' : ''}
+  `;
+  if (canRespond) {
+    const btn = card.querySelector('.respondSupplyRequestBtn');
+    const status = card.querySelector('.supplyResponseStatus');
+    btn.addEventListener('click', async () => {
+      btn.disabled = true;
+      status.textContent = 'Отправляем отклик заведению...';
+      const ok = await createSupplyResponse(request, status);
+      if (ok) btn.textContent = 'Отклик отправлен';
+      else btn.disabled = false;
+    });
+  }
+  return card;
+}
+
+async function loadSupplyResponses() {
+  if (!supplyResponsesList) return;
+  supplyResponsesList.innerHTML = '';
+  setMessage(supplyResponsesMessage, 'Загружаем отклики поставщиков...');
+  const result = await dbSelect('supplier_responses', { restaurant_id: currentUser.id }, supplyResponsesMessage);
+  if (result.error) {
+    setMessage(supplyResponsesMessage, 'Ошибка загрузки откликов поставщиков: ' + result.error.message);
+    return;
+  }
+  lastSupplyResponses = result.data || [];
+  lastSupplyResponses.forEach(response => supplyResponsesList.appendChild(renderSupplyResponseCard(response)));
+  setMessage(supplyResponsesMessage, lastSupplyResponses.length ? `Откликов поставщиков: ${lastSupplyResponses.length}` : 'Откликов поставщиков пока нет.');
+}
+
+function renderSupplyResponseCard(response) {
+  const card = document.createElement('article');
+  card.className = 'data-card';
+  const active = response.status === 'new' || response.status === 'pending';
+  card.innerHTML = `
+    <h4>Отклик поставщика</h4>
+    <p><strong>Поставщик:</strong> ${escapeHtml(response.supplier_id || '-')}</p>
+    <p><strong>Запрос:</strong> ${escapeHtml(response.request_id || '-')}</p>
+    <p><strong>Категория:</strong> ${escapeHtml(response.category || '-')}</p>
+    <p><strong>Сообщение:</strong> ${escapeHtml(response.message || '-')}</p>
+    <p><strong>Статус:</strong> <span class="status-pill">${escapeHtml(statusText(response.status || 'new'))}</span></p>
+    <div class="card-actions" style="margin-top:14px;">
+      <button type="button" class="acceptSupplyResponseBtn">Принять</button>
+      <button type="button" class="declineSupplyResponseBtn">Отклонить</button>
+    </div>
+    <p class="supplyResponseUpdateStatus message"></p>
+  `;
+  const accept = card.querySelector('.acceptSupplyResponseBtn');
+  const decline = card.querySelector('.declineSupplyResponseBtn');
+  const status = card.querySelector('.supplyResponseUpdateStatus');
+  accept.disabled = !active;
+  decline.disabled = !active;
+  accept.addEventListener('click', () => updateSupplyResponse(response.id, 'accepted', status));
+  decline.addEventListener('click', () => updateSupplyResponse(response.id, 'declined', status));
+  return card;
+}
+
+async function updateSupplyResponse(responseId, status, statusNode) {
+  const result = await dbUpdate('supplier_responses', { id: responseId, restaurant_id: currentUser.id }, {
+    status,
+    updated_at: new Date().toISOString()
+  }, statusNode);
+  if (result.error) {
+    setMessage(statusNode, 'Ошибка обновления отклика поставщика: ' + result.error.message);
+    return;
+  }
+  setMessage(statusNode, `Отклик поставщика обновлён: ${statusText(status)}.`);
+  await loadSupplyResponses();
+}
+
+async function loadAdminData() {
+  adminDataList.innerHTML = '';
+  setMessage(adminMessage, 'Загружаем данные...');
+  const tables = ['worker_profiles', 'shift_posts', 'shift_applications', 'shift_invites', 'supplier_offers', 'supplier_inquiries', 'supply_requests', 'supplier_responses'];
+  for (const table of tables) {
+    const result = await dbSelect(table, {}, adminMessage);
+    const rows = result.data || [];
+    const card = document.createElement('article');
+    card.className = 'data-card';
+    card.innerHTML = `<h4>${escapeHtml(table)}</h4><p>Записей: ${rows.length}</p>`;
+    adminDataList.appendChild(card);
+  }
+  setMessage(adminMessage, 'Данные обновлены.');
+}
+
+if (loadWorkersBtn) loadWorkersBtn.addEventListener('click', loadWorkers);
+if (workerSearchInput) workerSearchInput.addEventListener('input', renderWorkers);
+if (saveWorkerProfileBtn) saveWorkerProfileBtn.addEventListener('click', saveWorkerProfile);
+if (saveRestaurantProfileBtn) saveRestaurantProfileBtn.addEventListener('click', saveRestaurantProfile);
+if (saveSupplierProfileBtn) saveSupplierProfileBtn.addEventListener('click', saveSupplierProfile);
+if (loadInvitesBtn) loadInvitesBtn.addEventListener('click', loadInvites);
+if (loadShiftPostsBtn) loadShiftPostsBtn.addEventListener('click', loadShiftPosts);
+if (shiftSearchInput) shiftSearchInput.addEventListener('input', renderShiftPosts);
+if (createShiftPostBtn) createShiftPostBtn.addEventListener('click', createShiftPost);
+if (loadRestaurantShiftPostsBtn) loadRestaurantShiftPostsBtn.addEventListener('click', loadRestaurantShiftPosts);
+if (loadShiftApplicationsBtn) loadShiftApplicationsBtn.addEventListener('click', loadShiftApplications);
+if (createSupplyRequestBtn) createSupplyRequestBtn.addEventListener('click', createSupplyRequest);
+if (loadSupplierOffersBtn) loadSupplierOffersBtn.addEventListener('click', loadSupplierOffers);
+if (loadSupplyResponsesBtn) loadSupplyResponsesBtn.addEventListener('click', loadSupplyResponses);
+if (supplierOffersSearchInput) supplierOffersSearchInput.addEventListener('input', renderSupplierOffers);
+if (createSupplierOfferBtn) createSupplierOfferBtn.addEventListener('click', createSupplierOffer);
+if (loadSupplyRequestsBtn) loadSupplyRequestsBtn.addEventListener('click', loadSupplyRequests);
+if (supplyRequestsSearchInput) supplyRequestsSearchInput.addEventListener('input', renderSupplyRequests);
+if (loadSupplierInquiriesBtn) loadSupplierInquiriesBtn.addEventListener('click', loadSupplierInquiries);
+if (loadAdminDataBtn) loadAdminDataBtn.addEventListener('click', loadAdminData);
+if (logoutBtn) {
+  logoutBtn.addEventListener('click', async () => {
+    await window.supabaseClient.auth.signOut();
+    window.location.href = 'auth.html';
+  });
+}
+
+window.loadWorkers = loadWorkers;
+window.inviteWorker = inviteWorker;
+window.loadInvites = loadInvites;
+window.updateInviteStatus = updateInviteStatus;
+
+initCabinet();
