@@ -1,0 +1,351 @@
+-- GastroConnect MVP v900 full schema.
+-- Use this only if the Supabase project is empty or missing the core tables.
+-- It does not change Supabase project keys.
+
+create extension if not exists pgcrypto;
+
+create or replace function public.is_admin()
+returns boolean
+language sql
+stable
+as $$
+  select exists (
+    select 1
+    from public.profiles
+    where id = auth.uid()
+      and role = 'admin'
+  );
+$$;
+
+create table if not exists public.profiles (
+  id uuid primary key references auth.users(id) on delete cascade,
+  role text not null check (role in ('worker', 'restaurant', 'supplier', 'admin')),
+  name text not null,
+  city text,
+  district text,
+  status text not null default 'active',
+  is_verified boolean not null default false,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.worker_profiles (
+  user_id uuid primary key references public.profiles(id) on delete cascade,
+  professions text[] not null default '{}',
+  experience text,
+  available_days text[] not null default '{}',
+  available_time text,
+  min_rate numeric,
+  payment_type text,
+  can_travel boolean not null default false,
+  travel_cities text[] not null default '{}',
+  travel_radius_km integer,
+  about text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.restaurant_profiles (
+  user_id uuid primary key references public.profiles(id) on delete cascade,
+  business_name text,
+  business_type text,
+  contact_person text,
+  city text,
+  address text,
+  about text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.supplier_profiles (
+  user_id uuid primary key references public.profiles(id) on delete cascade,
+  company_name text,
+  contact_person text,
+  city text,
+  delivery_cities text[] not null default '{}',
+  category text,
+  about text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.shift_posts (
+  id uuid primary key default gen_random_uuid(),
+  restaurant_id uuid not null references public.profiles(id) on delete cascade,
+  title text not null,
+  profession text not null,
+  city text,
+  district text,
+  address text,
+  date_from date,
+  date_to date,
+  time_from time,
+  time_to time,
+  rate numeric,
+  payment_type text,
+  travel_bonus boolean not null default false,
+  travel_bonus_amount numeric,
+  accepts_other_city boolean not null default false,
+  requirements text,
+  status text not null default 'open' check (status in ('open', 'closed', 'cancelled')),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.shift_applications (
+  id uuid primary key default gen_random_uuid(),
+  shift_id uuid not null references public.shift_posts(id) on delete cascade,
+  worker_id uuid not null references public.profiles(id) on delete cascade,
+  restaurant_id uuid not null references public.profiles(id) on delete cascade,
+  message text,
+  status text not null default 'pending' check (status in ('pending', 'accepted', 'declined', 'cancelled')),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (shift_id, worker_id)
+);
+
+create table if not exists public.shift_invites (
+  id uuid primary key default gen_random_uuid(),
+  restaurant_id uuid not null references auth.users(id) on delete cascade,
+  worker_id uuid not null references auth.users(id) on delete cascade,
+  status text not null default 'pending' check (status in ('pending', 'accepted', 'declined', 'cancelled')),
+  message text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.supplier_offers (
+  id uuid primary key default gen_random_uuid(),
+  supplier_id uuid not null references public.profiles(id) on delete cascade,
+  title text not null,
+  category text not null,
+  product_name text,
+  price numeric,
+  unit text,
+  min_order text,
+  delivery_cities text[] not null default '{}',
+  description text,
+  status text not null default 'active' check (status in ('active', 'paused', 'closed')),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.supplier_inquiries (
+  id uuid primary key default gen_random_uuid(),
+  offer_id uuid not null references public.supplier_offers(id) on delete cascade,
+  restaurant_id uuid not null references public.profiles(id) on delete cascade,
+  supplier_id uuid not null references public.profiles(id) on delete cascade,
+  message text,
+  status text not null default 'new' check (status in ('new', 'accepted', 'declined', 'cancelled', 'done')),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (offer_id, restaurant_id)
+);
+
+create table if not exists public.supply_requests (
+  id uuid primary key default gen_random_uuid(),
+  restaurant_id uuid not null references public.profiles(id) on delete cascade,
+  title text not null,
+  category text,
+  quantity text,
+  budget text,
+  city text,
+  message text,
+  status text not null default 'open',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.supplier_responses (
+  id uuid primary key default gen_random_uuid(),
+  request_id uuid not null references public.supply_requests(id) on delete cascade,
+  restaurant_id uuid not null references public.profiles(id) on delete cascade,
+  supplier_id uuid not null references public.profiles(id) on delete cascade,
+  category text,
+  message text,
+  status text not null default 'new' check (status in ('new', 'accepted', 'declined', 'cancelled', 'done')),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create or replace function public.handle_new_user()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  insert into public.profiles (id, role, name, city, status)
+  values (
+    new.id,
+    coalesce(new.raw_user_meta_data->>'role', 'worker'),
+    coalesce(new.raw_user_meta_data->>'name', new.email, 'Пользователь'),
+    new.raw_user_meta_data->>'city',
+    'active'
+  )
+  on conflict (id) do update set
+    role = excluded.role,
+    name = excluded.name,
+    updated_at = now();
+  return new;
+end;
+$$;
+
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+after insert on auth.users
+for each row execute function public.handle_new_user();
+
+alter table public.profiles enable row level security;
+alter table public.worker_profiles enable row level security;
+alter table public.restaurant_profiles enable row level security;
+alter table public.supplier_profiles enable row level security;
+alter table public.shift_posts enable row level security;
+alter table public.shift_applications enable row level security;
+alter table public.shift_invites enable row level security;
+alter table public.supplier_offers enable row level security;
+alter table public.supplier_inquiries enable row level security;
+alter table public.supply_requests enable row level security;
+alter table public.supplier_responses enable row level security;
+
+grant select, insert, update on all tables in schema public to authenticated;
+
+drop policy if exists profiles_select on public.profiles;
+create policy profiles_select on public.profiles for select to authenticated
+using (id = auth.uid() or status = 'active' or public.is_admin());
+
+drop policy if exists profiles_insert_own on public.profiles;
+create policy profiles_insert_own on public.profiles for insert to authenticated
+with check (id = auth.uid());
+
+drop policy if exists profiles_update_own_or_admin on public.profiles;
+create policy profiles_update_own_or_admin on public.profiles for update to authenticated
+using (id = auth.uid() or public.is_admin())
+with check (id = auth.uid() or public.is_admin());
+
+drop policy if exists worker_profiles_select_authenticated on public.worker_profiles;
+create policy worker_profiles_select_authenticated on public.worker_profiles for select to authenticated using (true);
+
+drop policy if exists worker_profiles_insert_own_or_admin on public.worker_profiles;
+create policy worker_profiles_insert_own_or_admin on public.worker_profiles for insert to authenticated
+with check (user_id = auth.uid() or public.is_admin());
+
+drop policy if exists worker_profiles_update_own_or_admin on public.worker_profiles;
+create policy worker_profiles_update_own_or_admin on public.worker_profiles for update to authenticated
+using (user_id = auth.uid() or public.is_admin())
+with check (user_id = auth.uid() or public.is_admin());
+
+drop policy if exists restaurant_profiles_all_own on public.restaurant_profiles;
+create policy restaurant_profiles_all_own on public.restaurant_profiles for all to authenticated
+using (user_id = auth.uid() or public.is_admin())
+with check (user_id = auth.uid() or public.is_admin());
+
+drop policy if exists supplier_profiles_select_authenticated on public.supplier_profiles;
+create policy supplier_profiles_select_authenticated on public.supplier_profiles for select to authenticated using (true);
+
+drop policy if exists supplier_profiles_all_own on public.supplier_profiles;
+create policy supplier_profiles_all_own on public.supplier_profiles for all to authenticated
+using (user_id = auth.uid() or public.is_admin())
+with check (user_id = auth.uid() or public.is_admin());
+
+drop policy if exists shift_posts_select_authenticated on public.shift_posts;
+create policy shift_posts_select_authenticated on public.shift_posts for select to authenticated using (true);
+
+drop policy if exists shift_posts_insert_restaurant_or_admin on public.shift_posts;
+create policy shift_posts_insert_restaurant_or_admin on public.shift_posts for insert to authenticated
+with check (restaurant_id = auth.uid() or public.is_admin());
+
+drop policy if exists shift_posts_update_restaurant_or_admin on public.shift_posts;
+create policy shift_posts_update_restaurant_or_admin on public.shift_posts for update to authenticated
+using (restaurant_id = auth.uid() or public.is_admin())
+with check (restaurant_id = auth.uid() or public.is_admin());
+
+drop policy if exists shift_applications_select_related on public.shift_applications;
+create policy shift_applications_select_related on public.shift_applications for select to authenticated
+using (worker_id = auth.uid() or restaurant_id = auth.uid() or public.is_admin());
+
+drop policy if exists shift_applications_insert_worker on public.shift_applications;
+create policy shift_applications_insert_worker on public.shift_applications for insert to authenticated
+with check (worker_id = auth.uid());
+
+drop policy if exists shift_applications_update_related on public.shift_applications;
+create policy shift_applications_update_related on public.shift_applications for update to authenticated
+using (worker_id = auth.uid() or restaurant_id = auth.uid() or public.is_admin())
+with check (worker_id = auth.uid() or restaurant_id = auth.uid() or public.is_admin());
+
+drop policy if exists shift_invites_select_own on public.shift_invites;
+create policy shift_invites_select_own on public.shift_invites for select to authenticated
+using (restaurant_id = auth.uid() or worker_id = auth.uid() or public.is_admin());
+
+drop policy if exists shift_invites_insert_own_restaurant on public.shift_invites;
+create policy shift_invites_insert_own_restaurant on public.shift_invites for insert to authenticated
+with check (restaurant_id = auth.uid() or public.is_admin());
+
+drop policy if exists shift_invites_update_own on public.shift_invites;
+create policy shift_invites_update_own on public.shift_invites for update to authenticated
+using (restaurant_id = auth.uid() or worker_id = auth.uid() or public.is_admin())
+with check (restaurant_id = auth.uid() or worker_id = auth.uid() or public.is_admin());
+
+drop policy if exists supplier_offers_select_authenticated on public.supplier_offers;
+create policy supplier_offers_select_authenticated on public.supplier_offers for select to authenticated using (true);
+
+drop policy if exists supplier_offers_insert_supplier_or_admin on public.supplier_offers;
+create policy supplier_offers_insert_supplier_or_admin on public.supplier_offers for insert to authenticated
+with check (supplier_id = auth.uid() or public.is_admin());
+
+drop policy if exists supplier_offers_update_supplier_or_admin on public.supplier_offers;
+create policy supplier_offers_update_supplier_or_admin on public.supplier_offers for update to authenticated
+using (supplier_id = auth.uid() or public.is_admin())
+with check (supplier_id = auth.uid() or public.is_admin());
+
+drop policy if exists supplier_inquiries_select_related on public.supplier_inquiries;
+create policy supplier_inquiries_select_related on public.supplier_inquiries for select to authenticated
+using (restaurant_id = auth.uid() or supplier_id = auth.uid() or public.is_admin());
+
+drop policy if exists supplier_inquiries_insert_restaurant on public.supplier_inquiries;
+create policy supplier_inquiries_insert_restaurant on public.supplier_inquiries for insert to authenticated
+with check (restaurant_id = auth.uid());
+
+drop policy if exists supplier_inquiries_update_supplier_or_admin on public.supplier_inquiries;
+create policy supplier_inquiries_update_supplier_or_admin on public.supplier_inquiries for update to authenticated
+using (supplier_id = auth.uid() or public.is_admin())
+with check (supplier_id = auth.uid() or public.is_admin());
+
+drop policy if exists supply_requests_select_authenticated on public.supply_requests;
+create policy supply_requests_select_authenticated on public.supply_requests for select to authenticated using (true);
+
+drop policy if exists supply_requests_insert_restaurant on public.supply_requests;
+create policy supply_requests_insert_restaurant on public.supply_requests for insert to authenticated
+with check (restaurant_id = auth.uid() or public.is_admin());
+
+drop policy if exists supply_requests_update_restaurant on public.supply_requests;
+create policy supply_requests_update_restaurant on public.supply_requests for update to authenticated
+using (restaurant_id = auth.uid() or public.is_admin())
+with check (restaurant_id = auth.uid() or public.is_admin());
+
+drop policy if exists supplier_responses_select_related on public.supplier_responses;
+create policy supplier_responses_select_related on public.supplier_responses for select to authenticated
+using (restaurant_id = auth.uid() or supplier_id = auth.uid() or public.is_admin());
+
+drop policy if exists supplier_responses_insert_supplier on public.supplier_responses;
+create policy supplier_responses_insert_supplier on public.supplier_responses for insert to authenticated
+with check (supplier_id = auth.uid() or public.is_admin());
+
+drop policy if exists supplier_responses_update_related on public.supplier_responses;
+create policy supplier_responses_update_related on public.supplier_responses for update to authenticated
+using (restaurant_id = auth.uid() or supplier_id = auth.uid() or public.is_admin())
+with check (restaurant_id = auth.uid() or supplier_id = auth.uid() or public.is_admin());
+
+create index if not exists shift_posts_status_idx on public.shift_posts(status);
+create index if not exists shift_posts_city_idx on public.shift_posts(city);
+create index if not exists shift_posts_profession_idx on public.shift_posts(profession);
+create index if not exists shift_applications_restaurant_id_idx on public.shift_applications(restaurant_id);
+create index if not exists shift_applications_worker_id_idx on public.shift_applications(worker_id);
+create index if not exists shift_invites_worker_id_idx on public.shift_invites(worker_id);
+create index if not exists supplier_offers_category_idx on public.supplier_offers(category);
+create index if not exists supplier_inquiries_supplier_id_idx on public.supplier_inquiries(supplier_id);
+create index if not exists supply_requests_status_idx on public.supply_requests(status);
+create index if not exists supplier_responses_request_id_idx on public.supplier_responses(request_id);
+create index if not exists supplier_responses_restaurant_id_idx on public.supplier_responses(restaurant_id);
+create index if not exists supplier_responses_supplier_id_idx on public.supplier_responses(supplier_id);
+create index if not exists supplier_responses_status_idx on public.supplier_responses(status);

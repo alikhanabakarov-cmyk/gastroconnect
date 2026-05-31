@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
@@ -7,7 +7,7 @@
   <meta name="description" content="Анкета работника HoReCa для смен, подработок и приглашений от заведений." />
   <link rel="icon" href="favicon.ico" sizes="any" />
   <link rel="manifest" href="site.webmanifest" />
-  <link rel="stylesheet" href="style.css?v=500" />
+  <link rel="stylesheet" href="style.css?v=1002" />
 </head>
 <body>
 <div class="page-shell">
@@ -22,26 +22,50 @@
       <a href="suppliers.html">Поставщикам</a>
       <a href="#contacts">Контакты</a>
     </nav>
-    <a class="header-cta" href="auth.html">Войти / регистрация</a>
+    <a class="header-cta" href="auth.html?role=worker">Войти / регистрация</a>
   </header>
 
   <main>
     <section class="poster-hero poster-hero-workers">
       <div class="poster-copy">
         <div class="eyebrow">Сотрудникам HoReCa</div>
-        <h1>Смены и подработки для HoReCa рядом</h1>
-        <p>Заполните профиль, укажите профессию, доступность и ставку, чтобы заведения могли приглашать вас на смены.</p>
+        <h1>Смены в ресторанах, кафе и доставке рядом</h1>
+        <p>Заполните профиль, смотрите открытые смены, откликайтесь на задания и принимайте приглашения от заведений.</p>
         <div class="hero-actions">
-          <a class="btn primary" href="auth.html">Создать анкету</a>
-          <a class="btn" href="auth.html">Войти в кабинет</a>
+          <a class="btn primary" href="auth.html?role=worker">Создать анкету</a>
+          <a class="btn" href="auth.html?role=worker">Войти в кабинет</a>
         </div>
         <div class="hero-benefits">
           <span>Смены рядом</span>
-          <span>Профиль работника</span>
-          <span>Приглашения</span>
+          <span>Отклики на задания</span>
+          <span>Приглашения от заведений</span>
         </div>
       </div>
       <div class="poster-visual poster-visual-workers" role="img" aria-label="Смены и подработки для HoReCa"></div>
+    </section>
+
+    <section class="direction-section">
+      <div class="section-head">
+        <h2>Как работнику забирать смены</h2>
+        <p>Логика как у сервисов гибкой занятости: профиль, лента смен, отклик, подтверждение.</p>
+      </div>
+      <div class="direction-grid">
+        <article class="direction-card">
+          <span>Профиль</span>
+          <h3>Укажите профессию и ставку</h3>
+          <p>Повар, бариста, официант, администратор, доступные дни, время и готовность к выезду.</p>
+        </article>
+        <article class="direction-card">
+          <span>Смены</span>
+          <h3>Смотрите открытые задания</h3>
+          <p>В кабинете есть фильтр по профессии, городу, ставке и требованиям заведения.</p>
+        </article>
+        <article class="direction-card">
+          <span>Приглашения</span>
+          <h3>Принимайте или отклоняйте</h3>
+          <p>Заведения могут отправлять прямые приглашения, а работник управляет ответом в кабинете.</p>
+        </article>
+      </div>
     </section>
 
     <section class="form-section" id="request">
@@ -85,6 +109,9 @@
     </div>
   </footer>
 </div>
-<script src="script.js?v=500"></script>
+<script src="script.js?v=1002"></script>
 </body>
 </html>
+
+
+

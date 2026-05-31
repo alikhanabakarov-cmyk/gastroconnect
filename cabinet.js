@@ -19,17 +19,39 @@ const loadInvitesBtn = document.getElementById('loadInvitesBtn');
 const invitesList = document.getElementById('invitesList');
 const invitesMessage = document.getElementById('invitesMessage');
 
+const loadShiftPostsBtn = document.getElementById('loadShiftPostsBtn');
+const shiftPostsList = document.getElementById('shiftPostsList');
+const shiftPostsMessage = document.getElementById('shiftPostsMessage');
+const shiftSearchInput = document.getElementById('shiftSearchInput');
+
+const createShiftPostBtn = document.getElementById('createShiftPostBtn');
+const loadRestaurantShiftPostsBtn = document.getElementById('loadRestaurantShiftPostsBtn');
+const loadShiftApplicationsBtn = document.getElementById('loadShiftApplicationsBtn');
+const shiftPostMessage = document.getElementById('shiftPostMessage');
+const restaurantShiftPostsList = document.getElementById('restaurantShiftPostsList');
+const shiftApplicationsList = document.getElementById('shiftApplicationsList');
+const saveRestaurantProfileBtn = document.getElementById('saveRestaurantProfileBtn');
+const restaurantProfileMessage = document.getElementById('restaurantProfileMessage');
+
 const createSupplyRequestBtn = document.getElementById('createSupplyRequestBtn');
 const loadSupplierOffersBtn = document.getElementById('loadSupplierOffersBtn');
 const supplyRequestMessageBox = document.getElementById('supplyRequestMessageBox');
 const supplierOffersList = document.getElementById('supplierOffersList');
 const supplierOffersSearchInput = document.getElementById('supplierOffersSearchInput');
+const loadSupplyResponsesBtn = document.getElementById('loadSupplyResponsesBtn');
+const supplyResponsesMessage = document.getElementById('supplyResponsesMessage');
+const supplyResponsesList = document.getElementById('supplyResponsesList');
 
 const createSupplierOfferBtn = document.getElementById('createSupplierOfferBtn');
 const loadSupplyRequestsBtn = document.getElementById('loadSupplyRequestsBtn');
 const supplierOfferMessageBox = document.getElementById('supplierOfferMessageBox');
 const supplyRequestsList = document.getElementById('supplyRequestsList');
 const supplyRequestsSearchInput = document.getElementById('supplyRequestsSearchInput');
+const loadSupplierInquiriesBtn = document.getElementById('loadSupplierInquiriesBtn');
+const supplierInquiriesMessage = document.getElementById('supplierInquiriesMessage');
+const supplierInquiriesList = document.getElementById('supplierInquiriesList');
+const saveSupplierProfileBtn = document.getElementById('saveSupplierProfileBtn');
+const supplierProfileMessage = document.getElementById('supplierProfileMessage');
 
 const loadAdminDataBtn = document.getElementById('loadAdminDataBtn');
 const adminMessage = document.getElementById('adminMessage');
@@ -41,6 +63,9 @@ let storageMode = 'Supabase';
 let lastWorkers = [];
 let lastSupplierOffers = [];
 let lastSupplyRequests = [];
+let lastSupplyResponses = [];
+let lastShiftPosts = [];
+let lastRestaurantShiftPosts = [];
 
 function showOnly(section) {
   [workerCabinet, restaurantCabinet, supplierCabinet, adminCabinet, unknownRole].forEach(item => {
@@ -120,7 +145,13 @@ function statusText(status) {
   const map = {
     pending: 'Ожидает ответа',
     accepted: 'Принято',
-    declined: 'Отклонено'
+    declined: 'Отклонено',
+    new: 'Новая',
+    sent: 'Отправлено',
+    done: 'Завершено',
+    cancelled: 'Отменено',
+    open: 'Открыта',
+    active: 'Активно'
   };
   return map[status] || status || '-';
 }
@@ -283,12 +314,17 @@ async function getSessionUser() {
 async function loadProfile(user) {
   const result = await dbSelect('profiles', { id: user.id });
   if (result.data?.[0]) return result.data[0];
-  return {
+  const fallbackProfile = {
     id: user.id,
     role: user.user_metadata?.role || 'worker',
     name: user.email,
-    city: ''
+    city: '',
+    status: 'active',
+    is_verified: false,
+    updated_at: new Date().toISOString()
   };
+  const created = await dbUpsert('profiles', fallbackProfile, 'id');
+  return created.data?.[0] || fallbackProfile;
 }
 
 async function initCabinet() {
@@ -311,12 +347,17 @@ async function initCabinet() {
     showOnly(workerCabinet);
     await loadWorkerProfile();
     await loadInvites();
+    await loadShiftPosts();
   } else if (currentProfile.role === 'restaurant') {
     showOnly(restaurantCabinet);
+    await loadRestaurantProfile();
     setMessage(workersMessage, 'Нажмите “Показать работников”, чтобы загрузить анкеты.');
+    setMessage(shiftPostMessage, 'Создайте смену или загрузите ваши активные заявки.');
   } else if (currentProfile.role === 'supplier') {
     showOnly(supplierCabinet);
+    await loadSupplierProfile();
     setMessage(supplierOfferMessageBox, 'Опубликуйте предложение или загрузите запросы заведений.');
+    await loadSupplierInquiries();
   } else if (currentProfile.role === 'admin') {
     showOnly(adminCabinet);
     await loadAdminData();
@@ -373,6 +414,104 @@ async function saveWorkerProfile() {
     return;
   }
   setMessage(workerProfileMessage, `Профиль работника сохранён. Хранилище: ${result.local ? 'локально' : 'Supabase'}.`);
+}
+
+async function loadRestaurantProfile() {
+  const result = await dbSelect('restaurant_profiles', { user_id: currentUser.id }, restaurantProfileMessage);
+  if (result.error) {
+    setMessage(restaurantProfileMessage, 'Ошибка загрузки профиля заведения: ' + result.error.message);
+    return;
+  }
+  const data = result.data?.[0];
+  if (!data) {
+    setMessage(restaurantProfileMessage, 'Заполните профиль заведения, чтобы работники и поставщики понимали, с кем работают.');
+    return;
+  }
+  setValue('restaurantBusinessName', data.business_name || '');
+  setValue('restaurantBusinessType', data.business_type || '');
+  setValue('restaurantContactPerson', data.contact_person || '');
+  setValue('restaurantCity', data.city || '');
+  setValue('restaurantAddress', data.address || '');
+  setValue('restaurantAbout', data.about || '');
+  setMessage(restaurantProfileMessage, 'Профиль заведения загружен.');
+}
+
+async function saveRestaurantProfile() {
+  const businessName = value('restaurantBusinessName');
+  const city = value('restaurantCity');
+  const payload = {
+    user_id: currentUser.id,
+    business_name: businessName || currentUser.email,
+    business_type: value('restaurantBusinessType') || null,
+    contact_person: value('restaurantContactPerson') || null,
+    city: city || null,
+    address: value('restaurantAddress') || null,
+    about: value('restaurantAbout') || null,
+    updated_at: new Date().toISOString()
+  };
+  setMessage(restaurantProfileMessage, 'Сохраняем профиль заведения...');
+  const result = await dbUpsert('restaurant_profiles', payload, 'user_id', restaurantProfileMessage);
+  if (result.error) {
+    setMessage(restaurantProfileMessage, 'Ошибка сохранения профиля заведения: ' + result.error.message);
+    return;
+  }
+  const profilePatch = {
+    name: payload.business_name,
+    city: payload.city || '',
+    updated_at: new Date().toISOString()
+  };
+  await dbUpdate('profiles', { id: currentUser.id }, profilePatch);
+  currentProfile = { ...currentProfile, ...profilePatch };
+  setMessage(restaurantProfileMessage, `Профиль заведения сохранён. Хранилище: ${result.local ? 'локально' : 'Supabase'}.`);
+}
+
+async function loadSupplierProfile() {
+  const result = await dbSelect('supplier_profiles', { user_id: currentUser.id }, supplierProfileMessage);
+  if (result.error) {
+    setMessage(supplierProfileMessage, 'Ошибка загрузки профиля поставщика: ' + result.error.message);
+    return;
+  }
+  const data = result.data?.[0];
+  if (!data) {
+    setMessage(supplierProfileMessage, 'Заполните профиль поставщика, чтобы заведения понимали категорию, город и условия доставки.');
+    return;
+  }
+  setValue('supplierCompanyName', data.company_name || '');
+  setValue('supplierProfileCategory', data.category || '');
+  setValue('supplierContactPerson', data.contact_person || '');
+  setValue('supplierProfileCity', data.city || '');
+  setValue('supplierDeliveryCities', showArray(data.delivery_cities));
+  setValue('supplierProfileAbout', data.about || '');
+  setMessage(supplierProfileMessage, 'Профиль поставщика загружен.');
+}
+
+async function saveSupplierProfile() {
+  const companyName = value('supplierCompanyName');
+  const city = value('supplierProfileCity');
+  const payload = {
+    user_id: currentUser.id,
+    company_name: companyName || currentUser.email,
+    contact_person: value('supplierContactPerson') || null,
+    city: city || null,
+    delivery_cities: textToArray(value('supplierDeliveryCities')),
+    category: value('supplierProfileCategory') || null,
+    about: value('supplierProfileAbout') || null,
+    updated_at: new Date().toISOString()
+  };
+  setMessage(supplierProfileMessage, 'Сохраняем профиль поставщика...');
+  const result = await dbUpsert('supplier_profiles', payload, 'user_id', supplierProfileMessage);
+  if (result.error) {
+    setMessage(supplierProfileMessage, 'Ошибка сохранения профиля поставщика: ' + result.error.message);
+    return;
+  }
+  const profilePatch = {
+    name: payload.company_name,
+    city: payload.city || '',
+    updated_at: new Date().toISOString()
+  };
+  await dbUpdate('profiles', { id: currentUser.id }, profilePatch);
+  currentProfile = { ...currentProfile, ...profilePatch };
+  setMessage(supplierProfileMessage, `Профиль поставщика сохранён. Хранилище: ${result.local ? 'локально' : 'Supabase'}.`);
 }
 
 function matchesSearch(row, search) {
@@ -500,6 +639,181 @@ async function updateInviteStatus(inviteId, status) {
   await loadInvites();
 }
 
+function shiftDateText(row) {
+  const date = row.date_from || row.date_to || '-';
+  const time = [row.time_from, row.time_to].filter(Boolean).join('–');
+  return time ? `${date}, ${time}` : date;
+}
+
+async function createShiftPost() {
+  const title = value('shiftTitle');
+  const profession = value('shiftProfession');
+  if (!title || !profession) {
+    setMessage(shiftPostMessage, 'Укажите название смены и профессию.');
+    return;
+  }
+  const payload = {
+    restaurant_id: currentUser.id,
+    title,
+    profession,
+    city: value('shiftCity') || currentProfile.city || null,
+    district: value('shiftDistrict') || null,
+    address: value('shiftAddress') || null,
+    date_from: value('shiftDateFrom') || null,
+    date_to: value('shiftDateFrom') || null,
+    time_from: value('shiftTimeFrom') || null,
+    time_to: value('shiftTimeTo') || null,
+    rate: numberOrNull(value('shiftRate')),
+    payment_type: 'per_shift',
+    travel_bonus: false,
+    accepts_other_city: true,
+    requirements: value('shiftRequirements') || null,
+    status: 'open',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+  setMessage(shiftPostMessage, 'Публикуем смену...');
+  const result = await dbInsert('shift_posts', payload, shiftPostMessage);
+  if (result.error) {
+    setMessage(shiftPostMessage, 'Ошибка публикации смены: ' + result.error.message);
+    return;
+  }
+  setMessage(shiftPostMessage, `Смена опубликована. Хранилище: ${result.local ? 'локально' : 'Supabase'}.`);
+  await loadRestaurantShiftPosts();
+}
+
+async function loadShiftPosts() {
+  if (!shiftPostsList) return;
+  shiftPostsList.innerHTML = '';
+  setMessage(shiftPostsMessage, 'Загружаем смены...');
+  const result = await dbSelect('shift_posts', {}, shiftPostsMessage);
+  if (result.error) {
+    setMessage(shiftPostsMessage, 'Ошибка загрузки смен: ' + result.error.message);
+    return;
+  }
+  lastShiftPosts = (result.data || []).filter(row => (row.status || 'open') === 'open');
+  renderShiftPosts();
+}
+
+function renderShiftPosts() {
+  if (!shiftPostsList) return;
+  const search = shiftSearchInput?.value.trim() || '';
+  const rows = lastShiftPosts.filter(row => matchesSearch(row, search));
+  shiftPostsList.innerHTML = '';
+  rows.forEach(post => shiftPostsList.appendChild(renderShiftPostCard(post, true)));
+  setMessage(shiftPostsMessage, rows.length ? `Найдено смен: ${rows.length}` : 'Открытых смен пока нет.');
+}
+
+function renderShiftPostCard(post, canApply = false) {
+  const card = document.createElement('article');
+  card.className = 'data-card';
+  card.innerHTML = `
+    <h4>${escapeHtml(post.title || post.profession || 'Смена')}</h4>
+    <p><strong>Профессия:</strong> ${escapeHtml(post.profession || '-')}</p>
+    <p><strong>Город:</strong> ${escapeHtml([post.city, post.district].filter(Boolean).join(', ') || '-')}</p>
+    <p><strong>Когда:</strong> ${escapeHtml(shiftDateText(post))}</p>
+    <p><strong>Ставка:</strong> ${escapeHtml(post.rate ?? '-')} ₽</p>
+    <p><strong>Требования:</strong> ${escapeHtml(post.requirements || '-')}</p>
+    <p><strong>Статус:</strong> <span class="status-pill">${escapeHtml(post.status || 'open')}</span></p>
+    ${canApply ? '<div class="card-actions" style="margin-top:14px;"><button type="button" class="applyShiftBtn">Откликнуться</button></div><p class="applyStatus message"></p>' : ''}
+  `;
+  if (canApply) {
+    const btn = card.querySelector('.applyShiftBtn');
+    const status = card.querySelector('.applyStatus');
+    btn.addEventListener('click', async () => {
+      btn.disabled = true;
+      status.textContent = 'Отправляем отклик...';
+      const ok = await applyToShift(post, status);
+      if (ok) btn.textContent = 'Отклик отправлен';
+      else btn.disabled = false;
+    });
+  }
+  return card;
+}
+
+async function applyToShift(post, statusNode) {
+  const result = await dbInsert('shift_applications', {
+    shift_id: post.id,
+    worker_id: currentUser.id,
+    restaurant_id: post.restaurant_id,
+    message: 'Готов выйти на смену',
+    status: 'pending',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  }, statusNode);
+  if (result.error) {
+    setMessage(statusNode, 'Ошибка отклика: ' + result.error.message);
+    return false;
+  }
+  setMessage(statusNode, `Отклик отправлен. Хранилище: ${result.local ? 'локально' : 'Supabase'}.`);
+  return true;
+}
+
+async function loadRestaurantShiftPosts() {
+  if (!restaurantShiftPostsList) return;
+  restaurantShiftPostsList.innerHTML = '';
+  setMessage(shiftPostMessage, 'Загружаем ваши смены...');
+  const result = await dbSelect('shift_posts', { restaurant_id: currentUser.id }, shiftPostMessage);
+  if (result.error) {
+    setMessage(shiftPostMessage, 'Ошибка загрузки смен: ' + result.error.message);
+    return;
+  }
+  lastRestaurantShiftPosts = result.data || [];
+  lastRestaurantShiftPosts.forEach(post => restaurantShiftPostsList.appendChild(renderShiftPostCard(post, false)));
+  setMessage(shiftPostMessage, lastRestaurantShiftPosts.length ? `Ваших смен: ${lastRestaurantShiftPosts.length}` : 'Вы ещё не публиковали смены.');
+}
+
+async function loadShiftApplications() {
+  if (!shiftApplicationsList) return;
+  shiftApplicationsList.innerHTML = '';
+  setMessage(shiftPostMessage, 'Загружаем отклики...');
+  const result = await dbSelect('shift_applications', { restaurant_id: currentUser.id }, shiftPostMessage);
+  if (result.error) {
+    setMessage(shiftPostMessage, 'Ошибка загрузки откликов: ' + result.error.message);
+    return;
+  }
+  const rows = result.data || [];
+  rows.forEach(application => {
+    const card = document.createElement('article');
+    card.className = 'data-card';
+    const pending = application.status === 'pending';
+    card.innerHTML = `
+      <h4>Отклик на смену</h4>
+      <p><strong>Работник:</strong> ${escapeHtml(application.worker_id || '-')}</p>
+      <p><strong>Смена:</strong> ${escapeHtml(application.shift_id || '-')}</p>
+      <p><strong>Сообщение:</strong> ${escapeHtml(application.message || '-')}</p>
+      <p><strong>Статус:</strong> <span class="status-pill">${escapeHtml(statusText(application.status))}</span></p>
+      <div class="card-actions" style="margin-top:14px;">
+        <button type="button" class="acceptApplicationBtn">Принять</button>
+        <button type="button" class="declineApplicationBtn">Отклонить</button>
+      </div>
+      <p class="applicationStatus message"></p>
+    `;
+    const accept = card.querySelector('.acceptApplicationBtn');
+    const decline = card.querySelector('.declineApplicationBtn');
+    const status = card.querySelector('.applicationStatus');
+    accept.disabled = !pending;
+    decline.disabled = !pending;
+    accept.addEventListener('click', () => updateShiftApplication(application.id, 'accepted', status));
+    decline.addEventListener('click', () => updateShiftApplication(application.id, 'declined', status));
+    shiftApplicationsList.appendChild(card);
+  });
+  setMessage(shiftPostMessage, rows.length ? `Откликов: ${rows.length}` : 'Откликов пока нет.');
+}
+
+async function updateShiftApplication(applicationId, status, statusNode) {
+  const result = await dbUpdate('shift_applications', { id: applicationId, restaurant_id: currentUser.id }, {
+    status,
+    updated_at: new Date().toISOString()
+  }, statusNode);
+  if (result.error) {
+    setMessage(statusNode, 'Ошибка обновления отклика: ' + result.error.message);
+    return;
+  }
+  setMessage(statusNode, `Отклик обновлён: ${statusText(status)}.`);
+  await loadShiftApplications();
+}
+
 async function createSupplyRequest() {
   const title = value('supplyRequestTitle');
   if (!title) {
@@ -520,7 +834,13 @@ async function createSupplyRequest() {
   };
   const result = await dbInsert('supply_requests', payload, supplyRequestMessageBox);
   if (result.error) {
-    setMessage(supplyRequestMessageBox, 'Ошибка публикации запроса: ' + result.error.message);
+    if (!isDbUnavailable(result.error)) {
+      setMessage(supplyRequestMessageBox, 'Ошибка публикации запроса: ' + result.error.message);
+      return;
+    }
+    const local = localInsert('supply_requests', payload);
+    setMessage(supplyRequestMessageBox, 'Запрос сохранён локально. Для общей ленты поставщиков нужно применить SQL-миграцию supply_requests в Supabase.');
+    noteLocalMode(local, supplyRequestMessageBox);
     return;
   }
   setMessage(supplyRequestMessageBox, `Запрос опубликован. Хранилище: ${result.local ? 'локально' : 'Supabase'}.`);
@@ -550,6 +870,7 @@ function renderSupplierOfferCard(offer) {
   const card = document.createElement('article');
   card.className = 'data-card';
   const deliveryCities = offer.delivery_cities || offer.city || '-';
+  const canRequest = currentProfile?.role === 'restaurant' && offer.id && offer.supplier_id;
   card.innerHTML = `
     <h4>${escapeHtml(offer.title || '-')}</h4>
     <p><strong>Категория:</strong> ${escapeHtml(offer.category || '-')}</p>
@@ -558,8 +879,45 @@ function renderSupplierOfferCard(offer) {
     <p><strong>Минимальный заказ:</strong> ${escapeHtml(offer.min_order || offer.quantity || '-')}</p>
     <p><strong>Города доставки:</strong> ${escapeHtml(showArray(deliveryCities))}</p>
     <p><strong>Описание:</strong> ${escapeHtml(offer.description || offer.message || '-')}</p>
+    ${canRequest ? '<div class="card-actions" style="margin-top:14px;"><button type="button" class="requestSupplierBtn">Отправить запрос</button></div><p class="supplierRequestStatus message"></p>' : ''}
   `;
+  if (canRequest) {
+    const btn = card.querySelector('.requestSupplierBtn');
+    const status = card.querySelector('.supplierRequestStatus');
+    btn.addEventListener('click', async () => {
+      btn.disabled = true;
+      status.textContent = 'Отправляем запрос поставщику...';
+      const ok = await requestSupplierOffer(offer, status);
+      if (ok) btn.textContent = 'Запрос отправлен';
+      else btn.disabled = false;
+    });
+  }
   return card;
+}
+
+async function requestSupplierOffer(offer, statusNode) {
+  const message = [
+    value('supplyRequestTitle'),
+    value('supplyRequestQuantity'),
+    value('supplyRequestBudget'),
+    value('supplyRequestCity'),
+    value('supplyRequestMessage')
+  ].filter(Boolean).join(' | ') || 'Интересует поставка по вашему предложению';
+  const result = await dbInsert('supplier_inquiries', {
+    offer_id: offer.id,
+    restaurant_id: currentUser.id,
+    supplier_id: offer.supplier_id,
+    message,
+    status: 'new',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  }, statusNode);
+  if (result.error) {
+    setMessage(statusNode, 'Ошибка запроса поставщику: ' + result.error.message);
+    return false;
+  }
+  setMessage(statusNode, `Запрос отправлен поставщику. Хранилище: ${result.local ? 'локально' : 'Supabase'}.`);
+  return true;
 }
 
 async function createSupplierOffer() {
@@ -602,6 +960,83 @@ async function loadSupplyRequests() {
   renderSupplyRequests();
 }
 
+async function createSupplyResponse(request, statusNode) {
+  const message = [
+    value('supplierOfferTitle'),
+    value('supplierOfferPrice'),
+    value('supplierOfferQuantity'),
+    value('supplierOfferCity'),
+    value('supplierOfferMessage')
+  ].filter(Boolean).join(' | ') || 'Готов обсудить поставку по вашему запросу';
+
+  const result = await dbInsert('supplier_responses', {
+    request_id: request.id,
+    restaurant_id: request.restaurant_id,
+    supplier_id: currentUser.id,
+    category: value('supplierOfferCategory') || request.category || null,
+    message,
+    status: 'new',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  }, statusNode);
+  if (result.error) {
+    setMessage(statusNode, 'Ошибка отклика на запрос: ' + result.error.message);
+    return false;
+  }
+  setMessage(statusNode, `Отклик отправлен заведению. Хранилище: ${result.local ? 'локально' : 'Supabase'}.`);
+  return true;
+}
+
+async function loadSupplierInquiries() {
+  if (!supplierInquiriesList) return;
+  supplierInquiriesList.innerHTML = '';
+  setMessage(supplierInquiriesMessage, 'Загружаем входящие заявки...');
+  const result = await dbSelect('supplier_inquiries', { supplier_id: currentUser.id }, supplierInquiriesMessage);
+  if (result.error) {
+    setMessage(supplierInquiriesMessage, 'Ошибка загрузки заявок: ' + result.error.message);
+    return;
+  }
+  const rows = result.data || [];
+  rows.forEach(inquiry => {
+    const card = document.createElement('article');
+    card.className = 'data-card';
+    const active = inquiry.status === 'new';
+    card.innerHTML = `
+      <h4>Заявка от заведения</h4>
+      <p><strong>Сообщение:</strong> ${escapeHtml(inquiry.message || '-')}</p>
+      <p><strong>Оффер:</strong> ${escapeHtml(inquiry.offer_id || '-')}</p>
+      <p><strong>Статус:</strong> <span class="status-pill">${escapeHtml(statusText(inquiry.status || 'new'))}</span></p>
+      <div class="card-actions" style="margin-top:14px;">
+        <button type="button" class="acceptInquiryBtn">Принять</button>
+        <button type="button" class="declineInquiryBtn">Отклонить</button>
+      </div>
+      <p class="inquiryStatus message"></p>
+    `;
+    const accept = card.querySelector('.acceptInquiryBtn');
+    const decline = card.querySelector('.declineInquiryBtn');
+    const status = card.querySelector('.inquiryStatus');
+    accept.disabled = !active;
+    decline.disabled = !active;
+    accept.addEventListener('click', () => updateSupplierInquiry(inquiry.id, 'accepted', status));
+    decline.addEventListener('click', () => updateSupplierInquiry(inquiry.id, 'declined', status));
+    supplierInquiriesList.appendChild(card);
+  });
+  setMessage(supplierInquiriesMessage, rows.length ? `Входящих заявок: ${rows.length}` : 'Входящих заявок пока нет.');
+}
+
+async function updateSupplierInquiry(inquiryId, status, statusNode) {
+  const result = await dbUpdate('supplier_inquiries', { id: inquiryId, supplier_id: currentUser.id }, {
+    status,
+    updated_at: new Date().toISOString()
+  }, statusNode);
+  if (result.error) {
+    setMessage(statusNode, 'Ошибка обновления заявки: ' + result.error.message);
+    return;
+  }
+  setMessage(statusNode, `Заявка обновлена: ${statusText(status)}.`);
+  await loadSupplierInquiries();
+}
+
 function renderSupplyRequests() {
   const search = supplyRequestsSearchInput?.value.trim() || '';
   const rows = lastSupplyRequests.filter(row => matchesSearch(row, search));
@@ -613,6 +1048,7 @@ function renderSupplyRequests() {
 function renderSupplyRequestCard(request) {
   const card = document.createElement('article');
   card.className = 'data-card';
+  const canRespond = currentProfile?.role === 'supplier' && request.id && request.restaurant_id;
   card.innerHTML = `
     <h4>${escapeHtml(request.title || '-')}</h4>
     <p><strong>Категория:</strong> ${escapeHtml(request.category || '-')}</p>
@@ -620,14 +1056,80 @@ function renderSupplyRequestCard(request) {
     <p><strong>Бюджет:</strong> ${escapeHtml(request.budget || '-')}</p>
     <p><strong>Город:</strong> ${escapeHtml(request.city || '-')}</p>
     <p><strong>Комментарий:</strong> ${escapeHtml(request.message || '-')}</p>
+    ${canRespond ? '<div class="card-actions" style="margin-top:14px;"><button type="button" class="respondSupplyRequestBtn">Откликнуться</button></div><p class="supplyResponseStatus message"></p>' : ''}
   `;
+  if (canRespond) {
+    const btn = card.querySelector('.respondSupplyRequestBtn');
+    const status = card.querySelector('.supplyResponseStatus');
+    btn.addEventListener('click', async () => {
+      btn.disabled = true;
+      status.textContent = 'Отправляем отклик заведению...';
+      const ok = await createSupplyResponse(request, status);
+      if (ok) btn.textContent = 'Отклик отправлен';
+      else btn.disabled = false;
+    });
+  }
   return card;
+}
+
+async function loadSupplyResponses() {
+  if (!supplyResponsesList) return;
+  supplyResponsesList.innerHTML = '';
+  setMessage(supplyResponsesMessage, 'Загружаем отклики поставщиков...');
+  const result = await dbSelect('supplier_responses', { restaurant_id: currentUser.id }, supplyResponsesMessage);
+  if (result.error) {
+    setMessage(supplyResponsesMessage, 'Ошибка загрузки откликов поставщиков: ' + result.error.message);
+    return;
+  }
+  lastSupplyResponses = result.data || [];
+  lastSupplyResponses.forEach(response => supplyResponsesList.appendChild(renderSupplyResponseCard(response)));
+  setMessage(supplyResponsesMessage, lastSupplyResponses.length ? `Откликов поставщиков: ${lastSupplyResponses.length}` : 'Откликов поставщиков пока нет.');
+}
+
+function renderSupplyResponseCard(response) {
+  const card = document.createElement('article');
+  card.className = 'data-card';
+  const active = response.status === 'new' || response.status === 'pending';
+  card.innerHTML = `
+    <h4>Отклик поставщика</h4>
+    <p><strong>Поставщик:</strong> ${escapeHtml(response.supplier_id || '-')}</p>
+    <p><strong>Запрос:</strong> ${escapeHtml(response.request_id || '-')}</p>
+    <p><strong>Категория:</strong> ${escapeHtml(response.category || '-')}</p>
+    <p><strong>Сообщение:</strong> ${escapeHtml(response.message || '-')}</p>
+    <p><strong>Статус:</strong> <span class="status-pill">${escapeHtml(statusText(response.status || 'new'))}</span></p>
+    <div class="card-actions" style="margin-top:14px;">
+      <button type="button" class="acceptSupplyResponseBtn">Принять</button>
+      <button type="button" class="declineSupplyResponseBtn">Отклонить</button>
+    </div>
+    <p class="supplyResponseUpdateStatus message"></p>
+  `;
+  const accept = card.querySelector('.acceptSupplyResponseBtn');
+  const decline = card.querySelector('.declineSupplyResponseBtn');
+  const status = card.querySelector('.supplyResponseUpdateStatus');
+  accept.disabled = !active;
+  decline.disabled = !active;
+  accept.addEventListener('click', () => updateSupplyResponse(response.id, 'accepted', status));
+  decline.addEventListener('click', () => updateSupplyResponse(response.id, 'declined', status));
+  return card;
+}
+
+async function updateSupplyResponse(responseId, status, statusNode) {
+  const result = await dbUpdate('supplier_responses', { id: responseId, restaurant_id: currentUser.id }, {
+    status,
+    updated_at: new Date().toISOString()
+  }, statusNode);
+  if (result.error) {
+    setMessage(statusNode, 'Ошибка обновления отклика поставщика: ' + result.error.message);
+    return;
+  }
+  setMessage(statusNode, `Отклик поставщика обновлён: ${statusText(status)}.`);
+  await loadSupplyResponses();
 }
 
 async function loadAdminData() {
   adminDataList.innerHTML = '';
   setMessage(adminMessage, 'Загружаем данные...');
-  const tables = ['worker_profiles', 'shift_invites', 'supply_requests', 'supplier_offers'];
+  const tables = ['worker_profiles', 'shift_posts', 'shift_applications', 'shift_invites', 'supplier_offers', 'supplier_inquiries', 'supply_requests', 'supplier_responses'];
   for (const table of tables) {
     const result = await dbSelect(table, {}, adminMessage);
     const rows = result.data || [];
@@ -642,13 +1144,22 @@ async function loadAdminData() {
 if (loadWorkersBtn) loadWorkersBtn.addEventListener('click', loadWorkers);
 if (workerSearchInput) workerSearchInput.addEventListener('input', renderWorkers);
 if (saveWorkerProfileBtn) saveWorkerProfileBtn.addEventListener('click', saveWorkerProfile);
+if (saveRestaurantProfileBtn) saveRestaurantProfileBtn.addEventListener('click', saveRestaurantProfile);
+if (saveSupplierProfileBtn) saveSupplierProfileBtn.addEventListener('click', saveSupplierProfile);
 if (loadInvitesBtn) loadInvitesBtn.addEventListener('click', loadInvites);
+if (loadShiftPostsBtn) loadShiftPostsBtn.addEventListener('click', loadShiftPosts);
+if (shiftSearchInput) shiftSearchInput.addEventListener('input', renderShiftPosts);
+if (createShiftPostBtn) createShiftPostBtn.addEventListener('click', createShiftPost);
+if (loadRestaurantShiftPostsBtn) loadRestaurantShiftPostsBtn.addEventListener('click', loadRestaurantShiftPosts);
+if (loadShiftApplicationsBtn) loadShiftApplicationsBtn.addEventListener('click', loadShiftApplications);
 if (createSupplyRequestBtn) createSupplyRequestBtn.addEventListener('click', createSupplyRequest);
 if (loadSupplierOffersBtn) loadSupplierOffersBtn.addEventListener('click', loadSupplierOffers);
+if (loadSupplyResponsesBtn) loadSupplyResponsesBtn.addEventListener('click', loadSupplyResponses);
 if (supplierOffersSearchInput) supplierOffersSearchInput.addEventListener('input', renderSupplierOffers);
 if (createSupplierOfferBtn) createSupplierOfferBtn.addEventListener('click', createSupplierOffer);
 if (loadSupplyRequestsBtn) loadSupplyRequestsBtn.addEventListener('click', loadSupplyRequests);
 if (supplyRequestsSearchInput) supplyRequestsSearchInput.addEventListener('input', renderSupplyRequests);
+if (loadSupplierInquiriesBtn) loadSupplierInquiriesBtn.addEventListener('click', loadSupplierInquiries);
 if (loadAdminDataBtn) loadAdminDataBtn.addEventListener('click', loadAdminData);
 if (logoutBtn) {
   logoutBtn.addEventListener('click', async () => {

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
@@ -7,7 +7,7 @@
   <meta name="description" content="Раздел для поставщиков HoReCa: продукты, оборудование, услуги и контакты заведений." />
   <link rel="icon" href="favicon.ico" sizes="any" />
   <link rel="manifest" href="site.webmanifest" />
-  <link rel="stylesheet" href="style.css?v=500" />
+  <link rel="stylesheet" href="style.css?v=1002" />
 </head>
 <body>
 <div class="page-shell">
@@ -22,26 +22,50 @@
       <a href="suppliers.html">Поставщикам</a>
       <a href="#contacts">Контакты</a>
     </nav>
-    <a class="header-cta" href="auth.html">Войти / регистрация</a>
+    <a class="header-cta" href="auth.html?role=supplier">Войти / регистрация</a>
   </header>
 
   <main>
     <section class="poster-hero poster-hero-suppliers">
       <div class="poster-copy">
         <div class="eyebrow">Поставщикам HoReCa</div>
-        <h1>Поставки и заявки для HoReCa в одном месте</h1>
-        <p>Добавьте компанию в базу поставщиков и получайте доступ к заведениям HoReCa.</p>
+        <h1>Поставщики для HoReCa с входящими заявками</h1>
+        <p>Публикуйте предложения по товарам и услугам, получайте запросы заведений и ведите коммуникацию в кабинете.</p>
         <div class="hero-actions">
-          <a class="btn primary" href="#request">Стать поставщиком</a>
-          <a class="btn" href="auth.html">Войти</a>
+          <a class="btn primary" href="auth.html?role=supplier">Стать поставщиком</a>
+          <a class="btn" href="auth.html?role=supplier">Войти</a>
         </div>
         <div class="hero-benefits">
-          <span>Новые заявки</span>
-          <span>Контакты заведений</span>
-          <span>Продвижение</span>
+          <span>Офферы поставщиков</span>
+          <span>Заявки заведений</span>
+          <span>Фильтр по категориям</span>
         </div>
       </div>
       <div class="poster-visual poster-visual-suppliers" role="img" aria-label="Поставщики для HoReCa"></div>
+    </section>
+
+    <section class="direction-section">
+      <div class="section-head">
+        <h2>Поставщик видит спрос, а не случайные сообщения</h2>
+        <p>Сервис соединяет заведения и поставщиков внутри одного HoReCa-контура.</p>
+      </div>
+      <div class="direction-grid">
+        <article class="direction-card">
+          <span>Каталог</span>
+          <h3>Публикуйте офферы</h3>
+          <p>Сыр, сахар, кофе, клининг, оборудование, посуда, униформа и услуги для заведений.</p>
+        </article>
+        <article class="direction-card">
+          <span>Заявки</span>
+          <h3>Получайте входящие</h3>
+          <p>Заведение выбирает предложение и отправляет поставщику запрос с количеством, городом и бюджетом.</p>
+        </article>
+        <article class="direction-card">
+          <span>Фильтры</span>
+          <h3>Работайте по категориям</h3>
+          <p>В кабинете поставщика можно смотреть запросы заведений и быстро находить нужные позиции.</p>
+        </article>
+      </div>
     </section>
 
     <section class="form-section" id="request">
@@ -84,6 +108,9 @@
     </div>
   </footer>
 </div>
-<script src="script.js?v=500"></script>
+<script src="script.js?v=1002"></script>
 </body>
 </html>
+
+
+

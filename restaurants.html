@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
@@ -7,7 +7,7 @@
   <meta name="description" content="Поиск работников HoReCa, анкеты и приглашения на смены для ресторанов, кафе и баров." />
   <link rel="icon" href="favicon.ico" sizes="any" />
   <link rel="manifest" href="site.webmanifest" />
-  <link rel="stylesheet" href="style.css?v=500" />
+  <link rel="stylesheet" href="style.css?v=1002" />
 </head>
 <body>
 <div class="page-shell">
@@ -22,26 +22,50 @@
       <a href="suppliers.html">Поставщикам</a>
       <a href="#contacts">Контакты</a>
     </nav>
-    <a class="header-cta" href="auth.html">Войти / регистрация</a>
+    <a class="header-cta" href="auth.html?role=restaurant">Войти / регистрация</a>
   </header>
 
   <main>
     <section class="poster-hero poster-hero-restaurants">
       <div class="poster-copy">
         <div class="eyebrow">Заведениям HoReCa</div>
-        <h1>Персонал для HoReCa без хаоса в чатах</h1>
-        <p>Смотрите анкеты работников, приглашайте людей на смены и закрывайте потребность в персонале быстрее.</p>
+        <h1>Закрывайте смены без бесконечных чатов</h1>
+        <p>Публикуйте смены, получайте отклики, смотрите анкеты работников и отправляйте прямые приглашения.</p>
         <div class="hero-actions">
-          <a class="btn primary" href="auth.html">Найти персонал</a>
+          <a class="btn primary" href="auth.html?role=restaurant">Найти персонал</a>
           <a class="btn" href="#request">Оставить заявку</a>
         </div>
         <div class="hero-benefits">
-          <span>Анкеты работников</span>
-          <span>Приглашения</span>
-          <span>Быстрый подбор</span>
+          <span>Публикация смен</span>
+          <span>Отклики работников</span>
+          <span>База анкет</span>
         </div>
       </div>
       <div class="poster-visual poster-visual-restaurants" role="img" aria-label="Быстрый подбор персонала для заведений"></div>
+    </section>
+
+    <section class="direction-section">
+      <div class="section-head">
+        <h2>Что получает заведение</h2>
+        <p>Операционный экран для управляющего, шефа или HR: смены, анкеты, отклики и поставщики.</p>
+      </div>
+      <div class="direction-grid">
+        <article class="direction-card">
+          <span>Смены</span>
+          <h3>Создавайте задания</h3>
+          <p>Дата, время, ставка, профессия, район, адрес и требования попадают в ленту работников.</p>
+        </article>
+        <article class="direction-card">
+          <span>Работники</span>
+          <h3>Ищите по базе</h3>
+          <p>Фильтруйте анкеты по профессии, опыту, графику, ставке и готовности приехать.</p>
+        </article>
+        <article class="direction-card">
+          <span>Поставки</span>
+          <h3>Отправляйте запросы</h3>
+          <p>Смотрите предложения поставщиков и отправляйте заявку прямо из кабинета заведения.</p>
+        </article>
+      </div>
     </section>
 
     <section class="form-section" id="request">
@@ -82,6 +106,9 @@
     </div>
   </footer>
 </div>
-<script src="script.js?v=500"></script>
+<script src="script.js?v=1002"></script>
 </body>
 </html>
+
+
+

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
@@ -6,7 +6,7 @@
   <title>Вход и регистрация — GastroConnect</title>
   <link rel="icon" href="favicon.ico" sizes="any" />
   <link rel="manifest" href="site.webmanifest" />
-  <link rel="stylesheet" href="style.css?v=500" />
+  <link rel="stylesheet" href="style.css?v=1002" />
 </head>
 <body>
 <div class="page-shell">
@@ -26,8 +26,8 @@
 
   <main class="auth-page">
     <section class="auth-card">
-      <h1>Вход и регистрация</h1>
-      <p>Выберите роль и создайте аккаунт. После входа вы попадете в кабинет.</p>
+      <h1 id="authTitle">Вход и регистрация</h1>
+      <p id="authLead">Выберите роль и создайте аккаунт. После входа вы попадете в кабинет.</p>
 
       <label>Email<input id="email" type="email" placeholder="example@mail.ru" autocomplete="email" /></label>
       <label>Пароль<input id="password" type="password" placeholder="Минимум 6 символов" autocomplete="current-password" /></label>
@@ -50,7 +50,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase.js?v=500"></script>
+<script src="supabase.js?v=1002"></script>
 <script>
   const emailInput = document.getElementById('email');
   const passwordInput = document.getElementById('password');
@@ -58,6 +58,37 @@
   const message = document.getElementById('authMessage');
   const registerBtn = document.getElementById('registerBtn');
   const loginBtn = document.getElementById('loginBtn');
+  const authTitle = document.getElementById('authTitle');
+  const authLead = document.getElementById('authLead');
+
+  const roleCopy = {
+    worker: {
+      title: 'Регистрация работника',
+      lead: 'Создайте аккаунт работника, заполните профиль и откликайтесь на смены в кабинете.'
+    },
+    restaurant: {
+      title: 'Регистрация заведения',
+      lead: 'Создайте аккаунт заведения, публикуйте смены, смотрите работников и заявки поставщикам.'
+    },
+    supplier: {
+      title: 'Регистрация поставщика',
+      lead: 'Создайте аккаунт поставщика, публикуйте предложения и принимайте заявки от заведений.'
+    }
+  };
+
+  const requestedRole = new URLSearchParams(window.location.search).get('role');
+  if (roleCopy[requestedRole]) {
+    roleInput.value = requestedRole;
+  }
+
+  function updateRoleText() {
+    const copy = roleCopy[roleInput.value] || roleCopy.worker;
+    authTitle.textContent = copy.title;
+    authLead.textContent = copy.lead;
+  }
+
+  roleInput.addEventListener('change', updateRoleText);
+  updateRoleText();
 
   registerBtn.addEventListener('click', async () => {
     const email = emailInput.value.trim();
@@ -106,8 +137,11 @@
       return;
     }
 
-    window.location.href = 'cabinet.html?v=500';
+    window.location.href = 'cabinet.html?v=1002';
   });
 </script>
 </body>
 </html>
+
+
+

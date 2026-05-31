@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
@@ -6,7 +6,7 @@
   <title>Кабинет — GastroConnect</title>
   <link rel="icon" href="favicon.ico" sizes="any" />
   <link rel="manifest" href="site.webmanifest" />
-  <link rel="stylesheet" href="style.css?v=500" />
+  <link rel="stylesheet" href="style.css?v=1002" />
 </head>
 <body>
 <div class="page-shell">
@@ -83,11 +83,93 @@
       </div>
       <div id="invitesList" class="list-grid"></div>
       <p id="invitesMessage" class="message"></p>
+
+      <hr style="margin:34px 0; border:0; border-top:1px solid rgba(201,154,63,.28);" />
+
+      <h3>Доступные смены</h3>
+      <label style="margin-bottom:14px;">Фильтр смен
+        <input id="shiftSearchInput" type="search" placeholder="Повар, бариста, Москва, ставка..." />
+      </label>
+      <div class="cabinet-actions">
+        <button id="loadShiftPostsBtn" type="button">Показать смены</button>
+      </div>
+      <div id="shiftPostsList" class="list-grid"></div>
+      <p id="shiftPostsMessage" class="message"></p>
     </section>
 
     <section id="restaurantCabinet" style="display:none;">
       <h2>Кабинет заведения</h2>
-      <p>Здесь заведение смотрит анкеты работников и приглашает их на смену.</p>
+      <p>Здесь заведение ведет профиль, публикует смены, смотрит анкеты работников и отправляет заявки поставщикам.</p>
+
+      <h3>Профиль заведения</h3>
+      <div class="cabinet-grid">
+        <label>Название заведения
+          <input id="restaurantBusinessName" type="text" placeholder="Ресторан / кафе / бар" />
+        </label>
+        <label>Тип заведения
+          <input id="restaurantBusinessType" type="text" placeholder="Ресторан, кофейня, dark kitchen" />
+        </label>
+        <label>Контактное лицо
+          <input id="restaurantContactPerson" type="text" placeholder="Имя управляющего" />
+        </label>
+        <label>Город
+          <input id="restaurantCity" type="text" placeholder="Москва" />
+        </label>
+        <label class="full">Адрес
+          <input id="restaurantAddress" type="text" placeholder="Улица, дом, район" />
+        </label>
+        <label class="full">О заведении
+          <textarea id="restaurantAbout" placeholder="Формат кухни, условия смен, питание, форма, особенности объекта"></textarea>
+        </label>
+      </div>
+      <div class="cabinet-actions" style="margin-top:20px;">
+        <button id="saveRestaurantProfileBtn" type="button">Сохранить профиль заведения</button>
+      </div>
+      <p id="restaurantProfileMessage" class="message"></p>
+
+      <hr style="margin:34px 0; border:0; border-top:1px solid rgba(201,154,63,.28);" />
+
+      <h3>Создать смену</h3>
+      <div class="cabinet-grid">
+        <label>Название смены
+          <input id="shiftTitle" type="text" placeholder="Повар на вечернюю смену" />
+        </label>
+        <label>Профессия
+          <input id="shiftProfession" type="text" placeholder="Повар, официант, бариста" />
+        </label>
+        <label>Город
+          <input id="shiftCity" type="text" placeholder="Москва" />
+        </label>
+        <label>Район
+          <input id="shiftDistrict" type="text" placeholder="ЦАО, Арбат, Хамовники" />
+        </label>
+        <label>Адрес
+          <input id="shiftAddress" type="text" placeholder="улица, дом" />
+        </label>
+        <label>Дата
+          <input id="shiftDateFrom" type="date" />
+        </label>
+        <label>Начало
+          <input id="shiftTimeFrom" type="time" />
+        </label>
+        <label>Конец
+          <input id="shiftTimeTo" type="time" />
+        </label>
+        <label>Ставка
+          <input id="shiftRate" type="number" placeholder="4500" />
+        </label>
+        <label class="full">Требования
+          <textarea id="shiftRequirements" placeholder="Форма, опыт, обязанности, питание, оплата..."></textarea>
+        </label>
+      </div>
+      <div class="cabinet-actions" style="margin-top:20px;">
+        <button id="createShiftPostBtn" type="button">Опубликовать смену</button>
+        <button id="loadRestaurantShiftPostsBtn" class="btn" type="button">Мои смены</button>
+        <button id="loadShiftApplicationsBtn" class="btn" type="button">Отклики работников</button>
+      </div>
+      <p id="shiftPostMessage" class="message"></p>
+      <div id="restaurantShiftPostsList" class="list-grid"></div>
+      <div id="shiftApplicationsList" class="list-grid"></div>
 
       <h3>Работники</h3>
       <label style="margin-bottom:14px;">Фильтр работников
@@ -131,11 +213,48 @@
       </label>
       <p id="supplyRequestMessageBox" class="message"></p>
       <div id="supplierOffersList" class="list-grid"></div>
+
+      <hr style="margin:34px 0; border:0; border-top:1px solid rgba(201,154,63,.28);" />
+
+      <h3>Отклики поставщиков на запросы</h3>
+      <div class="cabinet-actions">
+        <button id="loadSupplyResponsesBtn" type="button">Показать отклики поставщиков</button>
+      </div>
+      <p id="supplyResponsesMessage" class="message"></p>
+      <div id="supplyResponsesList" class="list-grid"></div>
     </section>
 
     <section id="supplierCabinet" style="display:none;">
       <h2>Кабинет поставщика</h2>
-      <p>Здесь поставщик публикует предложения и видит запросы заведений.</p>
+      <p>Здесь поставщик ведет профиль, публикует предложения и видит запросы заведений.</p>
+
+      <h3>Профиль поставщика</h3>
+      <div class="cabinet-grid">
+        <label>Компания
+          <input id="supplierCompanyName" type="text" placeholder="ООО / ИП / бренд" />
+        </label>
+        <label>Категория
+          <input id="supplierProfileCategory" type="text" placeholder="Продукты, оборудование, услуги" />
+        </label>
+        <label>Контактное лицо
+          <input id="supplierContactPerson" type="text" placeholder="Имя менеджера" />
+        </label>
+        <label>Город
+          <input id="supplierProfileCity" type="text" placeholder="Москва" />
+        </label>
+        <label class="full">Города доставки
+          <input id="supplierDeliveryCities" type="text" placeholder="Москва, Химки, Одинцово" />
+        </label>
+        <label class="full">О компании
+          <textarea id="supplierProfileAbout" placeholder="Ассортимент, минимальный заказ, доставка, документы, условия"></textarea>
+        </label>
+      </div>
+      <div class="cabinet-actions" style="margin-top:20px;">
+        <button id="saveSupplierProfileBtn" type="button">Сохранить профиль поставщика</button>
+      </div>
+      <p id="supplierProfileMessage" class="message"></p>
+
+      <hr style="margin:34px 0; border:0; border-top:1px solid rgba(201,154,63,.28);" />
 
       <h3>Мое предложение</h3>
       <div class="cabinet-grid">
@@ -167,6 +286,15 @@
       </label>
       <p id="supplierOfferMessageBox" class="message"></p>
       <div id="supplyRequestsList" class="list-grid"></div>
+
+      <hr style="margin:34px 0; border:0; border-top:1px solid rgba(201,154,63,.28);" />
+
+      <h3>Входящие заявки от заведений</h3>
+      <div class="cabinet-actions">
+        <button id="loadSupplierInquiriesBtn" type="button">Показать заявки</button>
+      </div>
+      <p id="supplierInquiriesMessage" class="message"></p>
+      <div id="supplierInquiriesList" class="list-grid"></div>
     </section>
 
     <section id="adminCabinet" style="display:none;">
@@ -187,7 +315,10 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase.js?v=500"></script>
-<script src="cabinet.js?v=500"></script>
+<script src="supabase.js?v=1002"></script>
+<script src="cabinet.js?v=1002"></script>
 </body>
 </html>
+
+
+
