@@ -1,74 +1,196 @@
-﻿<!DOCTYPE html>
+﻿<!doctype html>
 <html lang="ru">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Панель управления — GastroConnect</title>
-  <meta name="description" content="Локальная панель управления заявками GastroConnect." />
-  <link rel="icon" href="favicon.ico" sizes="any" />
-  <link rel="manifest" href="site.webmanifest" />
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-<div class="page-shell">
-  <header class="site-header">
-    <a class="brand" href="index.html" aria-label="GastroConnect">
-      <span class="brand-mark" aria-hidden="true">GC</span>
-      <span class="brand-text">GastroConnect</span>
-    </a>
-    <nav class="main-nav" aria-label="Главное меню">
-      <a href="workers.html">Сотрудникам</a>
-      <a href="restaurants.html">Заведениям</a>
-      <a href="suppliers.html">Поставщикам</a>
-      <a href="#contacts">Контакты</a>
-    </nav>
-    <a class="header-cta" href="restaurants.html#request">Оставить заявку</a>
-  </header>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Панель управления — GastroConnect</title>
+    <meta
+      name="description"
+      content="Локальная панель управления заявками GastroConnect."
+    />
+    <link rel="icon" href="favicon.ico" sizes="any" />
+    <link rel="manifest" href="site.webmanifest" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="site-header">
+        <a class="brand" href="index.html" aria-label="GastroConnect">
+          <img
+            class="brand-logo"
+            data-site-logo
+            src="assets/logo-full.png"
+            width="240"
+            height="60"
+            alt=""
+            decoding="async"
+          />
+        </a>
+        <nav class="main-nav" aria-label="Главное меню">
+          <a href="workers.html">Сотрудникам</a>
+          <a href="restaurants.html">Заведениям</a>
+          <a href="suppliers.html">Поставщикам</a>
+          <a href="#contacts">Контакты</a>
+        </nav>
+        <a class="header-cta" href="restaurants.html#request"
+          >Оставить заявку</a
+        >
+      </header>
 
-  <main>
-    <section class="admin-hero">
-      <h1>Панель управления GastroConnect</h1>
-      <p>Временная панель для просмотра заявок, отправленных через публичные формы.</p>
-      <div class="admin-actions">
-        <button id="exportJson" type="button">Экспорт JSON</button>
-        <button id="exportCsv" class="btn" type="button">Экспорт CSV</button>
-        <button id="clearData" class="btn danger" type="button">Очистить</button>
-        <input id="adminSearch" type="search" placeholder="Поиск: имя, телефон, Telegram, город..." />
-      </div>
-    </section>
+      <main>
+        <section class="admin-hero">
+          <h1>Панель управления GastroConnect</h1>
+          <p>Панель для заявок и быстрых настроек контента сайта.</p>
+          <div class="admin-actions">
+            <button id="exportJson" type="button">Экспорт JSON</button>
+            <button id="exportCsv" class="btn" type="button">
+              Экспорт CSV
+            </button>
+            <button id="clearData" class="btn danger" type="button">
+              Очистить
+            </button>
+            <input
+              id="adminSearch"
+              type="search"
+              placeholder="Поиск: имя, телефон, Telegram, город..."
+            />
+          </div>
+        </section>
 
-    <section class="admin-panel">
-      <div id="adminStats" class="stats"></div>
-      <div class="table-wrap">
-        <table id="adminTable">
-          <thead>
-            <tr>
-              <th>Дата</th>
-              <th>Тип</th>
-              <th>Имя/Компания</th>
-              <th>Телефон</th>
-              <th>Telegram</th>
-              <th>Данные</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </section>
-  </main>
+        <section class="admin-panel">
+          <div class="section-head">
+            <h2>Настройки сайта</h2>
+            <p>
+              Меняйте логотип, hero-картинки и главные надписи. Для глобального
+              сохранения нужна таблица site_settings в Supabase; без нее
+              настройки сохраняются локально в этом браузере.
+            </p>
+          </div>
 
-  <footer class="footer" id="contacts">
-    <div class="footer-brand"><span class="brand-mark" aria-hidden="true">GC</span> <strong>GastroConnect</strong></div>
-    <div class="footer-links">
-      <span>Telegram: @GastroConnect_bot</span>
-      <span>Email: info@gastroconnect.ru</span>
+          <form id="siteSettingsForm" class="settings-form">
+            <label class="full"
+              >Логотип
+              <input
+                name="logo"
+                type="text"
+                placeholder="assets/logo-full.png"
+              />
+            </label>
+            <label
+              >Hero главной
+              <input
+                name="home.hero"
+                type="text"
+                placeholder="assets/hero-home.webp"
+              />
+            </label>
+            <label
+              >Hero сотрудников
+              <input
+                name="workers.hero"
+                type="text"
+                placeholder="assets/hero-workers.webp"
+              />
+            </label>
+            <label
+              >Hero заведений
+              <input
+                name="restaurants.hero"
+                type="text"
+                placeholder="assets/hero-restaurants.webp"
+              />
+            </label>
+            <label
+              >Hero поставщиков
+              <input
+                name="suppliers.hero"
+                type="text"
+                placeholder="assets/hero-suppliers.webp"
+              />
+            </label>
+            <label class="full"
+              >Заголовок главной
+              <input name="home.title" type="text" />
+            </label>
+            <label class="full"
+              >Описание главной
+              <textarea name="home.lead"></textarea>
+            </label>
+            <label class="full"
+              >Заголовок сотрудников
+              <input name="workers.title" type="text" />
+            </label>
+            <label class="full"
+              >Описание сотрудников
+              <textarea name="workers.lead"></textarea>
+            </label>
+            <label class="full"
+              >Заголовок заведений
+              <input name="restaurants.title" type="text" />
+            </label>
+            <label class="full"
+              >Описание заведений
+              <textarea name="restaurants.lead"></textarea>
+            </label>
+            <label class="full"
+              >Заголовок поставщиков
+              <input name="suppliers.title" type="text" />
+            </label>
+            <label class="full"
+              >Описание поставщиков
+              <textarea name="suppliers.lead"></textarea>
+            </label>
+            <div class="cabinet-actions form-actions">
+              <button type="submit">Сохранить настройки</button>
+              <button id="resetSiteSettings" class="btn" type="button">
+                Сбросить
+              </button>
+            </div>
+            <p id="siteSettingsMessage" class="message"></p>
+          </form>
+        </section>
+
+        <section class="admin-panel">
+          <div id="adminStats" class="stats"></div>
+          <div class="table-wrap">
+            <table id="adminTable">
+              <thead>
+                <tr>
+                  <th>Дата</th>
+                  <th>Тип</th>
+                  <th>Имя/Компания</th>
+                  <th>Телефон</th>
+                  <th>Telegram</th>
+                  <th>Данные</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer" id="contacts">
+        <div class="footer-brand">
+          <img
+            class="footer-logo"
+            data-site-logo
+            src="assets/logo-full.png"
+            width="200"
+            height="50"
+            alt="GastroConnect"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+        <div class="footer-links">
+          <span>Telegram: @GastroConnect_bot</span>
+          <span>Email: info@gastroconnect.ru</span>
+        </div>
+      </footer>
     </div>
-  </footer>
-</div>
-<script src="script.js"></script>
-</body>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+    <script src="script.js"></script>
+  </body>
 </html>
-
-
-
-

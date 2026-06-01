@@ -29,6 +29,12 @@ create table if not exists public.profiles (
   updated_at timestamptz not null default now()
 );
 
+create table if not exists public.site_settings (
+  setting_key text primary key,
+  settings jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now()
+);
+
 create table if not exists public.worker_profiles (
   user_id uuid primary key references public.profiles(id) on delete cascade,
   professions text[] not null default '{}',
@@ -207,8 +213,11 @@ alter table public.supplier_offers enable row level security;
 alter table public.supplier_inquiries enable row level security;
 alter table public.supply_requests enable row level security;
 alter table public.supplier_responses enable row level security;
+alter table public.site_settings enable row level security;
 
 grant select, insert, update on all tables in schema public to authenticated;
+grant select on public.site_settings to anon, authenticated;
+grant insert, update, delete on public.site_settings to authenticated;
 
 drop policy if exists profiles_select on public.profiles;
 create policy profiles_select on public.profiles for select to authenticated
@@ -225,6 +234,14 @@ with check (id = auth.uid() or public.is_admin());
 
 drop policy if exists worker_profiles_select_authenticated on public.worker_profiles;
 create policy worker_profiles_select_authenticated on public.worker_profiles for select to authenticated using (true);
+
+drop policy if exists site_settings_public_read on public.site_settings;
+create policy site_settings_public_read on public.site_settings for select to anon, authenticated using (true);
+
+drop policy if exists site_settings_admin_write on public.site_settings;
+create policy site_settings_admin_write on public.site_settings for all to authenticated
+using (public.is_admin())
+with check (public.is_admin());
 
 drop policy if exists worker_profiles_insert_own_or_admin on public.worker_profiles;
 create policy worker_profiles_insert_own_or_admin on public.worker_profiles for insert to authenticated
@@ -287,7 +304,19 @@ using (restaurant_id = auth.uid() or worker_id = auth.uid() or public.is_admin()
 with check (restaurant_id = auth.uid() or worker_id = auth.uid() or public.is_admin());
 
 drop policy if exists supplier_offers_select_authenticated on public.supplier_offers;
-create policy supplier_offers_select_authenticated on public.supplier_offers for select to authenticated using (true);
+drop policy if exists supplier_offers_select_by_role on public.supplier_offers;
+create policy supplier_offers_select_by_role on public.supplier_offers for select to authenticated
+using (
+  supplier_id = auth.uid()
+  or public.is_admin()
+  or exists (
+    select 1
+    from public.profiles p
+    where p.id = auth.uid()
+      and p.role = 'restaurant'
+      and supplier_offers.status = 'active'
+  )
+);
 
 drop policy if exists supplier_offers_insert_supplier_or_admin on public.supplier_offers;
 create policy supplier_offers_insert_supplier_or_admin on public.supplier_offers for insert to authenticated
