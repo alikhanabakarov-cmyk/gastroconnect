@@ -28,7 +28,7 @@
     <h1>Кабинет GastroConnect</h1>
     <p id="userInfo" class="message">Проверяем вход...</p>
 
-    <section id="workerCabinet" style="display:none;">
+    <section id="workerCabinet" class="role-panel">
       <h2>Кабинет работника</h2>
       <p>Заполните профиль, чтобы заведения понимали, кого они приглашают на смену.</p>
 
@@ -55,8 +55,8 @@
             <option value="per_day">За день</option>
           </select>
         </label>
-        <label style="display:flex; gap:10px; align-items:center;">
-          <input id="workerCanTravel" type="checkbox" style="width:auto; min-height:auto;" />
+        <label class="check-label">
+          <input id="workerCanTravel" type="checkbox" />
           Готов ехать в другой город
         </label>
         <label>Города, куда готов ехать
@@ -70,12 +70,12 @@
         </label>
       </div>
 
-      <div class="cabinet-actions" style="margin-top:20px;">
+      <div class="cabinet-actions form-actions">
         <button id="saveWorkerProfileBtn" type="button">Сохранить профиль работника</button>
       </div>
       <p id="workerProfileMessage" class="message"></p>
 
-      <hr style="margin:34px 0; border:0; border-top:1px solid rgba(201,154,63,.28);" />
+      <hr class="section-divider" />
 
       <h3>Приглашения на смены</h3>
       <div class="cabinet-actions">
@@ -84,10 +84,10 @@
       <div id="invitesList" class="list-grid"></div>
       <p id="invitesMessage" class="message"></p>
 
-      <hr style="margin:34px 0; border:0; border-top:1px solid rgba(201,154,63,.28);" />
+      <hr class="section-divider" />
 
       <h3>Доступные смены</h3>
-      <label style="margin-bottom:14px;">Фильтр смен
+      <label class="filter-label">Фильтр смен
         <input id="shiftSearchInput" type="search" placeholder="Повар, бариста, Москва, ставка..." />
       </label>
       <div class="cabinet-actions">
@@ -97,7 +97,7 @@
       <p id="shiftPostsMessage" class="message"></p>
     </section>
 
-    <section id="restaurantCabinet" style="display:none;">
+    <section id="restaurantCabinet" class="role-panel">
       <h2>Кабинет заведения</h2>
       <p>Здесь заведение ведет профиль, публикует смены, смотрит анкеты работников и отправляет заявки поставщикам.</p>
 
@@ -122,12 +122,12 @@
           <textarea id="restaurantAbout" placeholder="Формат кухни, условия смен, питание, форма, особенности объекта"></textarea>
         </label>
       </div>
-      <div class="cabinet-actions" style="margin-top:20px;">
+      <div class="cabinet-actions form-actions">
         <button id="saveRestaurantProfileBtn" type="button">Сохранить профиль заведения</button>
       </div>
       <p id="restaurantProfileMessage" class="message"></p>
 
-      <hr style="margin:34px 0; border:0; border-top:1px solid rgba(201,154,63,.28);" />
+      <hr class="section-divider" />
 
       <h3>Создать смену</h3>
       <div class="cabinet-grid">
@@ -162,7 +162,7 @@
           <textarea id="shiftRequirements" placeholder="Форма, опыт, обязанности, питание, оплата..."></textarea>
         </label>
       </div>
-      <div class="cabinet-actions" style="margin-top:20px;">
+      <div class="cabinet-actions form-actions">
         <button id="createShiftPostBtn" type="button">Опубликовать смену</button>
         <button id="loadRestaurantShiftPostsBtn" class="btn" type="button">Мои смены</button>
         <button id="loadShiftApplicationsBtn" class="btn" type="button">Отклики работников</button>
@@ -172,7 +172,7 @@
       <div id="shiftApplicationsList" class="list-grid"></div>
 
       <h3>Работники</h3>
-      <label style="margin-bottom:14px;">Фильтр работников
+      <label class="filter-label">Фильтр работников
         <input id="workerSearchInput" type="search" placeholder="Профессия, опыт, город, ставка..." />
       </label>
       <div class="cabinet-actions">
@@ -181,7 +181,7 @@
       <div id="workersList" class="list-grid"></div>
       <p id="workersMessage" class="message"></p>
 
-      <hr style="margin:34px 0; border:0; border-top:1px solid rgba(201,154,63,.28);" />
+      <hr class="section-divider" />
 
       <h3>Запрос поставщику</h3>
       <div class="cabinet-grid">
@@ -204,17 +204,17 @@
           <textarea id="supplyRequestMessage" placeholder="Срок, доставка, требования..."></textarea>
         </label>
       </div>
-      <div class="cabinet-actions" style="margin-top:20px;">
+      <div class="cabinet-actions form-actions">
         <button id="createSupplyRequestBtn" type="button">Опубликовать запрос</button>
         <button id="loadSupplierOffersBtn" class="btn" type="button">Показать предложения поставщиков</button>
       </div>
-      <label style="margin-top:16px;">Фильтр предложений
+      <label class="filter-label filter-label-top">Фильтр предложений
         <input id="supplierOffersSearchInput" type="search" placeholder="Сыр, сахар, город, цена..." />
       </label>
       <p id="supplyRequestMessageBox" class="message"></p>
       <div id="supplierOffersList" class="list-grid"></div>
 
-      <hr style="margin:34px 0; border:0; border-top:1px solid rgba(201,154,63,.28);" />
+      <hr class="section-divider" />
 
       <h3>Отклики поставщиков на запросы</h3>
       <div class="cabinet-actions">
@@ -224,7 +224,7 @@
       <div id="supplyResponsesList" class="list-grid"></div>
     </section>
 
-    <section id="supplierCabinet" style="display:none;">
+    <section id="supplierCabinet" class="role-panel">
       <h2>Кабинет поставщика</h2>
       <p>Здесь поставщик ведет профиль, публикует предложения и видит запросы заведений.</p>
 
@@ -249,12 +249,12 @@
           <textarea id="supplierProfileAbout" placeholder="Ассортимент, минимальный заказ, доставка, документы, условия"></textarea>
         </label>
       </div>
-      <div class="cabinet-actions" style="margin-top:20px;">
+      <div class="cabinet-actions form-actions">
         <button id="saveSupplierProfileBtn" type="button">Сохранить профиль поставщика</button>
       </div>
       <p id="supplierProfileMessage" class="message"></p>
 
-      <hr style="margin:34px 0; border:0; border-top:1px solid rgba(201,154,63,.28);" />
+      <hr class="section-divider" />
 
       <h3>Мое предложение</h3>
       <div class="cabinet-grid">
@@ -277,17 +277,17 @@
           <textarea id="supplierOfferMessage" placeholder="Доставка, сроки, остатки, условия..."></textarea>
         </label>
       </div>
-      <div class="cabinet-actions" style="margin-top:20px;">
+      <div class="cabinet-actions form-actions">
         <button id="createSupplierOfferBtn" type="button">Опубликовать предложение</button>
         <button id="loadSupplyRequestsBtn" class="btn" type="button">Показать запросы заведений</button>
       </div>
-      <label style="margin-top:16px;">Фильтр запросов
+      <label class="filter-label filter-label-top">Фильтр запросов
         <input id="supplyRequestsSearchInput" type="search" placeholder="Сахар, продукты, город, бюджет..." />
       </label>
       <p id="supplierOfferMessageBox" class="message"></p>
       <div id="supplyRequestsList" class="list-grid"></div>
 
-      <hr style="margin:34px 0; border:0; border-top:1px solid rgba(201,154,63,.28);" />
+      <hr class="section-divider" />
 
       <h3>Входящие заявки от заведений</h3>
       <div class="cabinet-actions">
@@ -297,7 +297,7 @@
       <div id="supplierInquiriesList" class="list-grid"></div>
     </section>
 
-    <section id="adminCabinet" style="display:none;">
+    <section id="adminCabinet" class="role-panel">
       <h2>Кабинет админа</h2>
       <p>Обзор данных платформы: работники, приглашения, запросы заведений и предложения поставщиков.</p>
       <div class="cabinet-actions">
@@ -307,7 +307,7 @@
       <div id="adminDataList" class="list-grid"></div>
     </section>
 
-    <section id="unknownRole" style="display:none;">
+    <section id="unknownRole" class="role-panel">
       <h2>Роль не найдена</h2>
       <p>Профиль пользователя пока не настроен. Проверьте таблицу profiles.</p>
     </section>
@@ -315,8 +315,8 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase.js?v=1003"></script>
-<script src="cabinet-v1003.js"></script>
+<script src="supabase.js"></script>
+<script src="cabinet.js"></script>
 </body>
 </html>
 
