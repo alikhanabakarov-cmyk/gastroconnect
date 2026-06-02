@@ -12,6 +12,16 @@
 
   const defaultSiteSettings = {
     logo: "assets/logo-full.png",
+    nav: {
+      workers: "Сотрудникам",
+      restaurants: "Заведениям",
+      suppliers: "Поставщикам",
+      contacts: "Контакты",
+      workflow: "Как работает",
+      login: "Войти / регистрация",
+      home: "На главную",
+      request: "Оставить заявку",
+    },
     home: {
       hero: "assets/hero-home.webp",
       eyebrow: "Российская платформа гибкой занятости для HoReCa",
@@ -22,6 +32,15 @@
       benefit1: "Смены за 24 часа",
       benefit2: "Профили и отклики",
       benefit3: "Поставщики рядом",
+      dashboard1Label: "Сегодня",
+      dashboard1Value: "18 смен",
+      dashboard1Text: "повара, официанты, бариста",
+      dashboard2Label: "Заполнено",
+      dashboard2Value: "82%",
+      dashboard2Text: "по активным заявкам",
+      dashboard3Label: "Поставки",
+      dashboard3Value: "47 офферов",
+      dashboard3Text: "продукты, клининг, оборудование",
     },
     workers: {
       hero: "assets/hero-workers.webp",

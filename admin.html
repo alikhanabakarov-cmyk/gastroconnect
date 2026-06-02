@@ -27,12 +27,15 @@
           />
         </a>
         <nav class="main-nav" aria-label="Главное меню">
-          <a href="workers.html">Сотрудникам</a>
-          <a href="restaurants.html">Заведениям</a>
-          <a href="suppliers.html">Поставщикам</a>
-          <a href="#contacts">Контакты</a>
+          <a href="workers.html" data-site-setting="nav.workers">Сотрудникам</a>
+          <a href="restaurants.html" data-site-setting="nav.restaurants">Заведениям</a>
+          <a href="suppliers.html" data-site-setting="nav.suppliers">Поставщикам</a>
+          <a href="#contacts" data-site-setting="nav.contacts">Контакты</a>
         </nav>
-        <a class="header-cta" href="restaurants.html#request"
+        <a
+          class="header-cta"
+          href="restaurants.html#request"
+          data-site-setting="nav.request"
           >Оставить заявку</a
         >
       </header>
@@ -193,6 +196,39 @@
                 <figcaption>Поставщики</figcaption>
               </figure>
             </div>
+            <div class="settings-subhead full">Верхняя панель</div>
+            <label
+              >Пункт меню: сотрудники
+              <input name="nav.workers" type="text" />
+            </label>
+            <label
+              >Пункт меню: заведения
+              <input name="nav.restaurants" type="text" />
+            </label>
+            <label
+              >Пункт меню: поставщики
+              <input name="nav.suppliers" type="text" />
+            </label>
+            <label
+              >Пункт меню: контакты
+              <input name="nav.contacts" type="text" />
+            </label>
+            <label
+              >Пункт меню: как работает
+              <input name="nav.workflow" type="text" />
+            </label>
+            <label
+              >Кнопка входа
+              <input name="nav.login" type="text" />
+            </label>
+            <label
+              >Кнопка на главную
+              <input name="nav.home" type="text" />
+            </label>
+            <label
+              >Кнопка заявки
+              <input name="nav.request" type="text" />
+            </label>
             <div class="settings-subhead full">Главная</div>
             <label class="full"
               >Подпись главной
@@ -225,6 +261,43 @@
             <label
               >Преимущество 3 главной
               <input name="home.benefit3" type="text" />
+            </label>
+            <div class="settings-subhead full">Дашборд главной</div>
+            <label
+              >Карточка 1: подпись
+              <input name="home.dashboard1Label" type="text" />
+            </label>
+            <label
+              >Карточка 1: число
+              <input name="home.dashboard1Value" type="text" />
+            </label>
+            <label class="full"
+              >Карточка 1: описание
+              <input name="home.dashboard1Text" type="text" />
+            </label>
+            <label
+              >Карточка 2: подпись
+              <input name="home.dashboard2Label" type="text" />
+            </label>
+            <label
+              >Карточка 2: число
+              <input name="home.dashboard2Value" type="text" />
+            </label>
+            <label class="full"
+              >Карточка 2: описание
+              <input name="home.dashboard2Text" type="text" />
+            </label>
+            <label
+              >Карточка 3: подпись
+              <input name="home.dashboard3Label" type="text" />
+            </label>
+            <label
+              >Карточка 3: число
+              <input name="home.dashboard3Value" type="text" />
+            </label>
+            <label class="full"
+              >Карточка 3: описание
+              <input name="home.dashboard3Text" type="text" />
             </label>
             <div class="settings-subhead full">Сотрудники</div>
             <label class="full"
@@ -376,6 +449,6 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase.js"></script>
-    <script src="script-v1005.js"></script>
+    <script src="script.js?v=1006"></script>
   </body>
 </html>

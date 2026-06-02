@@ -23,12 +23,14 @@
           />
         </a>
         <nav class="main-nav" aria-label="Главное меню">
-          <a href="workers.html">Сотрудникам</a>
-          <a href="restaurants.html">Заведениям</a>
-          <a href="suppliers.html">Поставщикам</a>
-          <a href="index.html#contacts">Контакты</a>
+          <a href="workers.html" data-site-setting="nav.workers">Сотрудникам</a>
+          <a href="restaurants.html" data-site-setting="nav.restaurants">Заведениям</a>
+          <a href="suppliers.html" data-site-setting="nav.suppliers">Поставщикам</a>
+          <a href="index.html#contacts" data-site-setting="nav.contacts">Контакты</a>
         </nav>
-        <a class="header-cta" href="index.html">На главную</a>
+        <a class="header-cta" href="index.html" data-site-setting="nav.home"
+          >На главную</a
+        >
       </header>
 
       <main class="auth-page">
@@ -73,6 +75,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase.js"></script>
-    <script src="script-v1005.js"></script>
+    <script src="script.js?v=1006"></script>
   </body>
 </html>

@@ -28,12 +28,15 @@
           />
         </a>
         <nav class="main-nav" aria-label="Главное меню">
-          <a href="workers.html">Сотрудникам</a>
-          <a href="restaurants.html">Заведениям</a>
-          <a href="suppliers.html">Поставщикам</a>
-          <a href="#contacts">Контакты</a>
+          <a href="workers.html" data-site-setting="nav.workers">Сотрудникам</a>
+          <a href="restaurants.html" data-site-setting="nav.restaurants">Заведениям</a>
+          <a href="suppliers.html" data-site-setting="nav.suppliers">Поставщикам</a>
+          <a href="#contacts" data-site-setting="nav.contacts">Контакты</a>
         </nav>
-        <a class="header-cta" href="auth.html?role=restaurant"
+        <a
+          class="header-cta"
+          href="auth.html?role=restaurant"
+          data-site-setting="nav.login"
           >Войти / регистрация</a
         >
       </header>
@@ -206,6 +209,6 @@
         </div>
       </footer>
     </div>
-    <script src="script-v1005.js"></script>
+    <script src="script.js?v=1006"></script>
   </body>
 </html>

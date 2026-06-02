@@ -29,13 +29,15 @@
         </a>
 
         <nav class="main-nav" aria-label="Главное меню">
-          <a href="#business">Заведениям</a>
-          <a href="#workers">Сотрудникам</a>
-          <a href="#suppliers">Поставщикам</a>
-          <a href="#workflow">Как работает</a>
+          <a href="#business" data-site-setting="nav.restaurants">Заведениям</a>
+          <a href="#workers" data-site-setting="nav.workers">Сотрудникам</a>
+          <a href="#suppliers" data-site-setting="nav.suppliers">Поставщикам</a>
+          <a href="#workflow" data-site-setting="nav.workflow">Как работает</a>
         </nav>
 
-        <a class="header-cta" href="auth.html">Войти / регистрация</a>
+        <a class="header-cta" href="auth.html" data-site-setting="nav.login"
+          >Войти / регистрация</a
+        >
       </header>
 
       <main>
@@ -90,19 +92,23 @@
             />
             <div class="hero-dashboard">
               <div class="dash-card dash-card-main">
-                <span>Сегодня</span>
-                <strong>18 смен</strong>
-                <p>повара, официанты, бариста</p>
+                <span data-site-setting="home.dashboard1Label">Сегодня</span>
+                <strong data-site-setting="home.dashboard1Value">18 смен</strong>
+                <p data-site-setting="home.dashboard1Text">
+                  повара, официанты, бариста
+                </p>
               </div>
               <div class="dash-card">
-                <span>Заполнено</span>
-                <strong>82%</strong>
-                <p>по активным заявкам</p>
+                <span data-site-setting="home.dashboard2Label">Заполнено</span>
+                <strong data-site-setting="home.dashboard2Value">82%</strong>
+                <p data-site-setting="home.dashboard2Text">по активным заявкам</p>
               </div>
               <div class="dash-card">
-                <span>Поставки</span>
-                <strong>47 офферов</strong>
-                <p>продукты, клининг, оборудование</p>
+                <span data-site-setting="home.dashboard3Label">Поставки</span>
+                <strong data-site-setting="home.dashboard3Value">47 офферов</strong>
+                <p data-site-setting="home.dashboard3Text">
+                  продукты, клининг, оборудование
+                </p>
               </div>
             </div>
           </div>
@@ -340,6 +346,6 @@
         </div>
       </footer>
     </div>
-    <script src="script-v1005.js"></script>
+    <script src="script.js?v=1006"></script>
   </body>
 </html>
