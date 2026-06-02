@@ -2,6 +2,7 @@
   const PUBLIC_SUBMISSIONS_KEY = "gc_public_submissions";
   const SITE_SETTINGS_KEY = "gc_site_settings";
   const SITE_SETTINGS_ROW = "public_site";
+  const SITE_ASSETS_BUCKET = "site-assets";
 
   const roleLabels = {
     worker: "Работник",
@@ -168,6 +169,35 @@
     return error ? { saved: false, reason: error.message } : { saved: true };
   }
 
+  function safeAssetName(fileName) {
+    const normalized = fileName
+      .toLowerCase()
+      .replace(/[^a-z0-9._-]+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "");
+    return normalized || "asset";
+  }
+
+  async function uploadSiteAsset(file, target) {
+    const client = window.supabaseClient;
+    if (!client) throw new Error("Supabase Auth не подключен.");
+
+    const { data: sessionData } = await client.auth.getSession();
+    if (!sessionData.session) throw new Error("Войдите как admin, чтобы загрузить файл.");
+
+    const folder = target.replaceAll(".", "-");
+    const filePath = `${folder}/${Date.now()}-${safeAssetName(file.name)}`;
+    const { error } = await client.storage.from(SITE_ASSETS_BUCKET).upload(filePath, file, {
+      cacheControl: "31536000",
+      upsert: false,
+    });
+    if (error) throw new Error(error.message);
+
+    const { data } = client.storage.from(SITE_ASSETS_BUCKET).getPublicUrl(filePath);
+    if (!data?.publicUrl) throw new Error("Supabase не вернул публичный URL.");
+    return data.publicUrl;
+  }
+
   function fillSiteSettingsForm(settings = readSiteSettings()) {
     const form = document.getElementById("siteSettingsForm");
     if (!form) return;
@@ -216,6 +246,26 @@
       message.textContent = remote.saved
         ? "Настройки сброшены глобально."
         : "Настройки сброшены локально.";
+    });
+
+    form.querySelectorAll("[data-upload-target]").forEach((input) => {
+      input.addEventListener("change", async () => {
+        const file = input.files?.[0];
+        if (!file) return;
+        const target = input.dataset.uploadTarget;
+        const targetField = form.elements[target];
+
+        try {
+          message.textContent = "Загружаем файл...";
+          const publicUrl = await uploadSiteAsset(file, target);
+          if (targetField) targetField.value = publicUrl;
+          message.textContent = "Файл загружен. Нажмите «Сохранить настройки», чтобы применить на сайте.";
+        } catch (error) {
+          message.textContent = `Загрузка не удалась: ${error.message}`;
+        } finally {
+          input.value = "";
+        }
+      });
     });
   }
 
