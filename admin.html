@@ -10,7 +10,7 @@
     />
     <link rel="icon" href="favicon.ico" sizes="any" />
     <link rel="manifest" href="site.webmanifest" />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style-v1004.css" />
   </head>
   <body>
     <div class="page-shell">
@@ -141,6 +141,58 @@
               <option value="assets/hero-restaurants.webp"></option>
               <option value="assets/hero-suppliers.webp"></option>
             </datalist>
+            <div class="asset-preview-grid full" aria-label="Текущие изображения сайта">
+              <figure class="asset-preview-card asset-preview-card-logo">
+                <img
+                  data-setting-preview="logo"
+                  src="assets/logo-full.png"
+                  alt="Текущий логотип"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <figcaption>Логотип</figcaption>
+              </figure>
+              <figure class="asset-preview-card">
+                <img
+                  data-setting-preview="home.hero"
+                  src="assets/hero-home.webp"
+                  alt="Hero главной"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <figcaption>Главная</figcaption>
+              </figure>
+              <figure class="asset-preview-card">
+                <img
+                  data-setting-preview="workers.hero"
+                  src="assets/hero-workers.webp"
+                  alt="Hero сотрудников"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <figcaption>Сотрудники</figcaption>
+              </figure>
+              <figure class="asset-preview-card">
+                <img
+                  data-setting-preview="restaurants.hero"
+                  src="assets/hero-restaurants.webp"
+                  alt="Hero заведений"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <figcaption>Заведения</figcaption>
+              </figure>
+              <figure class="asset-preview-card">
+                <img
+                  data-setting-preview="suppliers.hero"
+                  src="assets/hero-suppliers.webp"
+                  alt="Hero поставщиков"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <figcaption>Поставщики</figcaption>
+              </figure>
+            </div>
             <label class="full"
               >Заголовок главной
               <input name="home.title" type="text" />
@@ -224,6 +276,6 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase.js"></script>
-    <script src="script.js"></script>
+    <script src="script-v1004.js"></script>
   </body>
 </html>
