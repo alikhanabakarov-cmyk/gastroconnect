@@ -10,7 +10,7 @@
     />
     <link rel="icon" href="favicon.ico" sizes="any" />
     <link rel="manifest" href="site.webmanifest" />
-    <link rel="preload" href="assets/hero-restaurants.webp" as="image" type="image/webp" />
+    <link rel="preload" href="assets/hero-restaurants.webp" as="image" type="image/webp" fetchpriority="high" />
     <link rel="stylesheet" href="style-v1005.css" />
   </head>
   <body>
@@ -82,9 +82,12 @@
               class="poster-image"
               data-site-image="restaurants.hero"
               src="assets/hero-restaurants.webp"
+              width="1080"
+              height="675"
               alt="Быстрый подбор персонала для заведений"
               loading="eager"
               decoding="async"
+              fetchpriority="high"
             />
           </div>
         </section>
@@ -209,6 +212,6 @@
         </div>
       </footer>
     </div>
-    <script src="script.js?v=1006"></script>
+    <script src="script.js?v=1007"></script>
   </body>
 </html>

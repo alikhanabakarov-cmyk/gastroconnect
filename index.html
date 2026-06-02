@@ -10,7 +10,7 @@
     />
     <link rel="icon" href="favicon.ico" sizes="any" />
     <link rel="manifest" href="site.webmanifest" />
-    <link rel="preload" href="assets/hero-home.webp" as="image" type="image/webp" />
+    <link rel="preload" href="assets/hero-home.webp" as="image" type="image/webp" fetchpriority="high" />
     <link rel="stylesheet" href="style-v1005.css" />
   </head>
   <body>
@@ -85,6 +85,8 @@
               class="poster-image poster-image-home"
               data-site-image="home.hero"
               src="assets/hero-home.webp"
+              width="1080"
+              height="675"
               alt="GastroConnect для HoReCa"
               loading="eager"
               decoding="async"
@@ -346,6 +348,6 @@
         </div>
       </footer>
     </div>
-    <script src="script.js?v=1006"></script>
+    <script src="script.js?v=1007"></script>
   </body>
 </html>

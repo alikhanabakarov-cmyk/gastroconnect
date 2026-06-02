@@ -126,12 +126,13 @@
 
   function applySiteSettings(settings = readSiteSettings()) {
     document.querySelectorAll("[data-site-logo]").forEach((image) => {
-      image.src = settings.logo || defaultSiteSettings.logo;
+      const src = settings.logo || defaultSiteSettings.logo;
+      if (image.getAttribute("src") !== src) image.src = src;
     });
 
     document.querySelectorAll("[data-site-image]").forEach((image) => {
       const src = getPath(settings, image.dataset.siteImage);
-      if (src) image.src = src;
+      if (src && image.getAttribute("src") !== src) image.src = src;
     });
 
     document.querySelectorAll("[data-site-setting]").forEach((element) => {
@@ -152,7 +153,7 @@
       return window.__gcSupabaseRestConfig;
     }
 
-    const response = await fetch("supabase.js", { cache: "no-store" });
+    const response = await fetch("supabase.js", { cache: "force-cache" });
     if (!response.ok) throw new Error("supabase.js не загрузился");
     const source = await response.text();
     const url = source.match(/SUPABASE_URL\s*=\s*['"]([^'"]+)['"]/i)?.[1];
@@ -189,6 +190,19 @@
     } catch {
       // Local defaults remain active if the remote settings table is unavailable.
     }
+  }
+
+  function scheduleRemoteSiteSettings() {
+    const run = () => loadRemoteSiteSettings();
+    if ("requestIdleCallback" in window) {
+      window.requestIdleCallback(run, { timeout: 2500 });
+      return;
+    }
+    if (document.readyState === "complete") {
+      setTimeout(run, 400);
+      return;
+    }
+    window.addEventListener("load", () => setTimeout(run, 400), { once: true });
   }
 
   async function saveSettingsToSupabase(settings) {
@@ -591,7 +605,7 @@
   }
 
   applySiteSettings();
-  loadRemoteSiteSettings();
+  scheduleRemoteSiteSettings();
   initSiteSettingsForm();
   initPublicForms();
   initAuthPage();
