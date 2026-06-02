@@ -1,1 +1,484 @@
-!function(){const e="gc_public_submissions",t={worker:"Работник",restaurant:"Заведение",supplier:"Поставщик"},n="gc_site_settings",a={logo:"assets/logo-full.png",home:{hero:"assets/hero-home.webp",title:"Смены, персонал и поставки без хаоса в чатах",lead:"GastroConnect помогает заведениям быстро закрывать смены, работникам находить подработку, а поставщикам получать реальные запросы от ресторанов и кафе."},workers:{hero:"assets/hero-workers.webp",title:"Смены в ресторанах, кафе и доставке рядом",lead:"Заполните профиль, смотрите открытые смены, откликайтесь на задания и принимайте приглашения от заведений."},restaurants:{hero:"assets/hero-restaurants.webp",title:"Закрывайте смены без бесконечных чатов",lead:"Публикуйте смены, получайте отклики, смотрите анкеты работников и отправляйте прямые приглашения."},suppliers:{hero:"assets/hero-suppliers.webp",title:"Поставщики для HoReCa с входящими заявками",lead:"Публикуйте предложения по товарам и услугам, получайте запросы заведений и ведите коммуникацию в кабинете."}};function o(e){return"function"==typeof structuredClone?structuredClone(e):JSON.parse(JSON.stringify(e))}function r(e,t){const n=o(e);return Object.entries(t||{}).forEach((([e,t])=>{t&&"object"==typeof t&&!Array.isArray(t)?n[e]=r(n[e]||{},t):t&&(n[e]=t)})),n}function s(){try{return r(a,JSON.parse(localStorage.getItem(n)||"{}"))}catch{return o(a)}}function i(e){localStorage.setItem(n,JSON.stringify(e))}function c(e,t){return t.split(".").reduce(((e,t)=>e?.[t]),e)}function l(e=s()){document.querySelectorAll("[data-site-logo]").forEach((t=>{t.src=e.logo||a.logo})),document.querySelectorAll("[data-site-image]").forEach((t=>{const n=c(e,t.dataset.siteImage);n&&(t.src=n)})),document.querySelectorAll("[data-site-setting]").forEach((t=>{const n=c(e,t.dataset.siteSetting);n&&(t.textContent=n)}))}function u(){try{const t=localStorage.getItem(e);return t?JSON.parse(t):[]}catch{return[]}}function d(t){localStorage.setItem(e,JSON.stringify(t))}function m(e,t){return"worker"===e?t.name||"Работник":"restaurant"===e?t.business_name||"Заведение":t.company_name||"Поставщик"}function g(e){return String(e??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}function f(e){const t=new Date(e);return Number.isNaN(t.getTime())?"-":t.toLocaleString("ru-RU")}function p(e){return t[e]||e||"-"}function y(e,t,n){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([t],{type:n})),a.download=e,a.click(),URL.revokeObjectURL(a.href)}function h(){const e=document.querySelector("#adminTable tbody");if(!e)return;const t=document.getElementById("adminSearch"),n=t?t.value.toLowerCase().trim():"",a=u(),o=n?a.filter((e=>JSON.stringify(e).toLowerCase().includes(n))):a;!function(e){const t=document.getElementById("adminStats");if(!t)return;const n=e.reduce(((e,t)=>(e.all+=1,e[t.type]=(e[t.type]||0)+1,e)),{all:0,worker:0,restaurant:0,supplier:0});t.innerHTML=`\n      <div class="stat">Всего: ${n.all}</div>\n      <div class="stat">Работники: ${n.worker}</div>\n      <div class="stat">Заведения: ${n.restaurant}</div>\n      <div class="stat">Поставщики: ${n.supplier}</div>\n    `}(o),e.innerHTML=o.map((e=>`\n      <tr>\n        <td>${g(f(e.created_at))}</td>\n        <td>${g(p(e.type))}</td>\n        <td>${g(e.title)}</td>\n        <td>${e.phone?`<a href="tel:${g(e.phone)}">${g(e.phone)}</a>`:"-"}</td>\n        <td>${e.telegram?g(e.telegram):"-"}</td>\n        <td>${g(JSON.stringify(e.data))}</td>\n      </tr>\n    `)).join(""),o.length||(e.innerHTML='<tr><td colspan="6">Заявок пока нет.</td></tr>')}l(),function(){const e=document.getElementById("siteSettingsForm");if(!e)return;const t=document.getElementById("siteSettingsMessage"),n=document.getElementById("resetSiteSettings"),o=s();[...e.elements].forEach((e=>{e.name&&(e.value="logo"===e.name?o.logo:c(o,e.name)||"")})),e.addEventListener("submit",(async n=>{n.preventDefault();const o=s();[...e.elements].forEach((e=>{if(!e.name)return;const t=e.value.trim();"logo"===e.name?o.logo=t||a.logo:function(e,t,n){const a=t.split(".");let o=e;a.slice(0,-1).forEach((e=>{o[e]=o[e]||{},o=o[e]})),o[a[a.length-1]]=n}(o,e.name,t||c(a,e.name))})),i(o),l(o);const r=await async function(e){const t=window.supabaseClient;if(!t)return{saved:!1,reason:"Supabase не подключен на этой странице."};const{data:n}=await t.auth.getSession();if(!n.session)return{saved:!1,reason:"Войдите как admin через Supabase, чтобы сохранить глобально."};const{error:a}=await t.from("site_settings").upsert({setting_key:"public_site",settings:e,updated_at:(new Date).toISOString()},{onConflict:"setting_key"});return a?{saved:!1,reason:a.message}:{saved:!0}}(o);t.textContent=r.saved?"Настройки сохранены локально и в Supabase.":`Настройки сохранены локально. Глобальное сохранение: ${r.reason}`})),n?.addEventListener("click",(()=>{i(a),l(a),[...e.elements].forEach((e=>{e.name&&(e.value="logo"===e.name?a.logo:c(a,e.name)||"")})),t.textContent="Настройки сброшены локально."}))}(),document.querySelectorAll("form[data-form-type]").forEach((e=>{e.addEventListener("submit",(t=>{t.preventDefault(),function(e,t){const n=u();n.unshift({id:crypto&&"function"==typeof crypto.randomUUID?crypto.randomUUID():`gc-${Date.now()}-${Math.random().toString(16).slice(2)}`,type:e,title:m(e,t),phone:t.phone||"",telegram:t.telegram||"",city:t.city||"",data:t,created_at:(new Date).toISOString()}),d(n)}(e.dataset.formType,Object.fromEntries(new FormData(e).entries()));const n=e.querySelector(".success");n&&(n.textContent="Заявка сохранена. Для работы с профилем, приглашениями и откликами войдите в личный кабинет.",n.style.display="block"),e.reset()}))})),function(){const e=document.getElementById("email"),t=document.getElementById("password"),n=document.getElementById("role"),a=document.getElementById("authMessage"),o=document.getElementById("registerBtn"),r=document.getElementById("loginBtn"),s=document.getElementById("authTitle"),i=document.getElementById("authLead");if(!(e&&t&&n&&a))return;const c={worker:{title:"Регистрация работника",lead:"Создайте аккаунт работника, заполните профиль и откликайтесь на смены в кабинете."},restaurant:{title:"Регистрация заведения",lead:"Создайте аккаунт заведения, публикуйте смены, смотрите работников и заявки поставщикам."},supplier:{title:"Регистрация поставщика",lead:"Создайте аккаунт поставщика, публикуйте предложения и принимайте заявки от заведений."}},l=new URLSearchParams(window.location.search).get("role");function u(){const e=c[n.value]||c.worker;s&&(s.textContent=e.title),i&&(i.textContent=e.lead)}async function d(e,t){if(!e)return;const{data:n,error:a}=await window.supabaseClient.from("profiles").select("id").eq("id",e.id).maybeSingle();n||a||await window.supabaseClient.from("profiles").upsert({id:e.id,role:t,name:e.email||"Пользователь",status:"active",updated_at:(new Date).toISOString()},{onConflict:"id"})}c[l]&&(n.value=l),n.addEventListener("change",u),o?.addEventListener("click",(async function(){const o=window.supabaseClient,r=e.value.trim(),s=t.value,i=n.value;if(!o)return void(a.textContent="Supabase не загрузился. Обновите страницу.");if(!r||!s)return void(a.textContent="Введите email и пароль.");a.textContent="Регистрируем...";const{data:c,error:l}=await o.auth.signUp({email:r,password:s,options:{data:{role:i}}});!l&&c?.session?.user&&await d(c.session.user,i),a.textContent=l?`Ошибка регистрации: ${l.message}`:"Регистрация успешна. Теперь попробуйте войти."})),r?.addEventListener("click",(async function(){const o=window.supabaseClient,r=e.value.trim(),s=t.value;if(!o)return void(a.textContent="Supabase не загрузился. Обновите страницу.");if(!r||!s)return void(a.textContent="Введите email и пароль.");a.textContent="Входим...";const{data:i,error:c}=await o.auth.signInWithPassword({email:r,password:s});c?a.textContent=`Ошибка входа: ${c.message}`:(await d(i.user,n.value),window.location.href="cabinet.html")})),u()}(),function(){if(!document.querySelector("#adminTable tbody"))return;const e=document.getElementById("exportJson"),t=document.getElementById("exportCsv"),n=document.getElementById("clearData"),a=document.getElementById("adminSearch");e?.addEventListener("click",(()=>{y("gastroconnect-submissions.json",JSON.stringify(u(),null,2),"application/json;charset=utf-8")})),t?.addEventListener("click",(()=>{y("gastroconnect-submissions.csv",`\ufeff${["Дата,Тип,Название,Телефон,Telegram,Город",...u().map((e=>[f(e.created_at),p(e.type),e.title||"",e.phone||"",e.telegram||"",e.city||""].map((e=>`"${String(e).replaceAll('"','""')}"`)).join(",")))].join("\n")}`,"text/csv;charset=utf-8")})),n?.addEventListener("click",(()=>{confirm("Очистить локальные заявки?")&&(d([]),h())})),a?.addEventListener("input",h)}(),h()}();
+(function () {
+  const PUBLIC_SUBMISSIONS_KEY = "gc_public_submissions";
+  const SITE_SETTINGS_KEY = "gc_site_settings";
+  const SITE_SETTINGS_ROW = "public_site";
+
+  const roleLabels = {
+    worker: "Работник",
+    restaurant: "Заведение",
+    supplier: "Поставщик",
+  };
+
+  const defaultSiteSettings = {
+    logo: "assets/logo-full.png",
+    home: {
+      hero: "assets/hero-home.webp",
+      title: "Смены, персонал и поставки без хаоса в чатах",
+      lead: "GastroConnect помогает заведениям быстро закрывать смены, работникам находить подработку, а поставщикам получать реальные запросы от ресторанов и кафе.",
+    },
+    workers: {
+      hero: "assets/hero-workers.webp",
+      title: "Смены в ресторанах, кафе и доставке рядом",
+      lead: "Заполните профиль, смотрите открытые смены, откликайтесь на задания и принимайте приглашения от заведений.",
+    },
+    restaurants: {
+      hero: "assets/hero-restaurants.webp",
+      title: "Закрывайте смены без бесконечных чатов",
+      lead: "Публикуйте смены, получайте отклики, смотрите анкеты работников и отправляйте прямые приглашения.",
+    },
+    suppliers: {
+      hero: "assets/hero-suppliers.webp",
+      title: "Поставщики для HoReCa с входящими заявками",
+      lead: "Публикуйте предложения по товарам и услугам, получайте запросы заведений и ведите коммуникацию в кабинете.",
+    },
+  };
+
+  function clone(value) {
+    return JSON.parse(JSON.stringify(value));
+  }
+
+  function mergeSettings(base, override) {
+    const result = clone(base);
+    Object.entries(override || {}).forEach(([key, value]) => {
+      if (value && typeof value === "object" && !Array.isArray(value)) {
+        result[key] = mergeSettings(result[key] || {}, value);
+      } else if (value) {
+        result[key] = value;
+      }
+    });
+    return result;
+  }
+
+  function getPath(object, path) {
+    return path.split(".").reduce((current, key) => current?.[key], object);
+  }
+
+  function setPath(object, path, value) {
+    const keys = path.split(".");
+    let cursor = object;
+    keys.slice(0, -1).forEach((key) => {
+      cursor[key] = cursor[key] || {};
+      cursor = cursor[key];
+    });
+    cursor[keys[keys.length - 1]] = value;
+  }
+
+  function readJsonStorage(key, fallback) {
+    try {
+      const value = localStorage.getItem(key);
+      return value ? JSON.parse(value) : fallback;
+    } catch {
+      return fallback;
+    }
+  }
+
+  function readSiteSettings() {
+    return mergeSettings(defaultSiteSettings, readJsonStorage(SITE_SETTINGS_KEY, {}));
+  }
+
+  function writeSiteSettings(settings) {
+    localStorage.setItem(SITE_SETTINGS_KEY, JSON.stringify(settings));
+  }
+
+  function applySiteSettings(settings = readSiteSettings()) {
+    document.querySelectorAll("[data-site-logo]").forEach((image) => {
+      image.src = settings.logo || defaultSiteSettings.logo;
+    });
+
+    document.querySelectorAll("[data-site-image]").forEach((image) => {
+      const src = getPath(settings, image.dataset.siteImage);
+      if (src) image.src = src;
+    });
+
+    document.querySelectorAll("[data-site-setting]").forEach((element) => {
+      const text = getPath(settings, element.dataset.siteSetting);
+      if (text) element.textContent = text;
+    });
+  }
+
+  async function getSupabaseRestConfig() {
+    if (window.__gcSupabaseRestConfig) return window.__gcSupabaseRestConfig;
+
+    const client = window.supabaseClient;
+    if (client?.supabaseUrl && client?.supabaseKey) {
+      window.__gcSupabaseRestConfig = {
+        url: client.supabaseUrl,
+        key: client.supabaseKey,
+      };
+      return window.__gcSupabaseRestConfig;
+    }
+
+    const response = await fetch("supabase.js", { cache: "no-store" });
+    if (!response.ok) throw new Error("supabase.js не загрузился");
+    const source = await response.text();
+    const url = source.match(/SUPABASE_URL\s*=\s*['"]([^'"]+)['"]/i)?.[1];
+    const key = source.match(/SUPABASE_ANON_KEY\s*=\s*['"]([^'"]+)['"]/i)?.[1];
+    if (!url || !key) throw new Error("Supabase config не найден");
+
+    window.__gcSupabaseRestConfig = { url, key };
+    return window.__gcSupabaseRestConfig;
+  }
+
+  async function fetchRemoteSiteSettings() {
+    const { url, key } = await getSupabaseRestConfig();
+    const endpoint = `${url}/rest/v1/site_settings?setting_key=eq.${encodeURIComponent(SITE_SETTINGS_ROW)}&select=settings&limit=1`;
+    const response = await fetch(endpoint, {
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+      },
+    });
+
+    if (!response.ok) throw new Error(`site_settings ${response.status}`);
+    const rows = await response.json();
+    return rows[0]?.settings || null;
+  }
+
+  async function loadRemoteSiteSettings() {
+    try {
+      const remote = await fetchRemoteSiteSettings();
+      if (!remote) return;
+      const merged = mergeSettings(defaultSiteSettings, remote);
+      writeSiteSettings(merged);
+      applySiteSettings(merged);
+      fillSiteSettingsForm(merged);
+    } catch {
+      // Local defaults remain active if the remote settings table is unavailable.
+    }
+  }
+
+  async function saveSettingsToSupabase(settings) {
+    const client = window.supabaseClient;
+    if (!client) return { saved: false, reason: "Supabase Auth не подключен на этой странице." };
+
+    const { data: sessionData } = await client.auth.getSession();
+    if (!sessionData.session) {
+      return { saved: false, reason: "Войдите как admin, чтобы сохранить глобально." };
+    }
+
+    const { error } = await client.from("site_settings").upsert(
+      {
+        setting_key: SITE_SETTINGS_ROW,
+        settings,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "setting_key" },
+    );
+
+    return error ? { saved: false, reason: error.message } : { saved: true };
+  }
+
+  function fillSiteSettingsForm(settings = readSiteSettings()) {
+    const form = document.getElementById("siteSettingsForm");
+    if (!form) return;
+
+    [...form.elements].forEach((field) => {
+      if (!field.name) return;
+      field.value = field.name === "logo" ? settings.logo : getPath(settings, field.name) || "";
+    });
+  }
+
+  function initSiteSettingsForm() {
+    const form = document.getElementById("siteSettingsForm");
+    if (!form) return;
+
+    const message = document.getElementById("siteSettingsMessage");
+    const resetButton = document.getElementById("resetSiteSettings");
+    fillSiteSettingsForm();
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const next = readSiteSettings();
+
+      [...form.elements].forEach((field) => {
+        if (!field.name) return;
+        const fieldValue = field.value.trim();
+        if (field.name === "logo") {
+          next.logo = fieldValue || defaultSiteSettings.logo;
+        } else {
+          setPath(next, field.name, fieldValue || getPath(defaultSiteSettings, field.name));
+        }
+      });
+
+      writeSiteSettings(next);
+      applySiteSettings(next);
+      const remote = await saveSettingsToSupabase(next);
+      message.textContent = remote.saved
+        ? "Настройки сохранены глобально в Supabase."
+        : `Настройки сохранены локально. Глобальное сохранение: ${remote.reason}`;
+    });
+
+    resetButton?.addEventListener("click", async () => {
+      writeSiteSettings(defaultSiteSettings);
+      applySiteSettings(defaultSiteSettings);
+      fillSiteSettingsForm(defaultSiteSettings);
+      const remote = await saveSettingsToSupabase(defaultSiteSettings);
+      message.textContent = remote.saved
+        ? "Настройки сброшены глобально."
+        : "Настройки сброшены локально.";
+    });
+  }
+
+  function readRows() {
+    return readJsonStorage(PUBLIC_SUBMISSIONS_KEY, []);
+  }
+
+  function writeRows(rows) {
+    localStorage.setItem(PUBLIC_SUBMISSIONS_KEY, JSON.stringify(rows));
+  }
+
+  function makeId() {
+    if (window.crypto && typeof crypto.randomUUID === "function") return crypto.randomUUID();
+    return `gc-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  }
+
+  function getFormTitle(type, data) {
+    if (type === "worker") return data.name || "Работник";
+    if (type === "restaurant") return data.business_name || "Заведение";
+    return data.company_name || "Поставщик";
+  }
+
+  function saveSubmission(type, data) {
+    const rows = readRows();
+    rows.unshift({
+      id: makeId(),
+      type,
+      title: getFormTitle(type, data),
+      phone: data.phone || "",
+      telegram: data.telegram || "",
+      city: data.city || "",
+      data,
+      created_at: new Date().toISOString(),
+    });
+    writeRows(rows);
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function formatDate(value) {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "-";
+    return date.toLocaleString("ru-RU");
+  }
+
+  function roleText(type) {
+    return roleLabels[type] || type || "-";
+  }
+
+  function download(name, text, type) {
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(new Blob([text], { type }));
+    link.download = name;
+    link.click();
+    URL.revokeObjectURL(link.href);
+  }
+
+  function initPublicForms() {
+    document.querySelectorAll("form[data-form-type]").forEach((form) => {
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const type = form.dataset.formType;
+        const data = Object.fromEntries(new FormData(form).entries());
+        saveSubmission(type, data);
+
+        const box = form.querySelector(".success");
+        if (box) {
+          box.textContent = "Заявка сохранена. Для работы с профилем, приглашениями и откликами войдите в личный кабинет.";
+          box.style.display = "block";
+        }
+        form.reset();
+      });
+    });
+  }
+
+  function initAuthPage() {
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const roleInput = document.getElementById("role");
+    const message = document.getElementById("authMessage");
+    const registerBtn = document.getElementById("registerBtn");
+    const loginBtn = document.getElementById("loginBtn");
+    const authTitle = document.getElementById("authTitle");
+    const authLead = document.getElementById("authLead");
+    if (!emailInput || !passwordInput || !roleInput || !message) return;
+
+    const roleCopy = {
+      worker: {
+        title: "Регистрация работника",
+        lead: "Создайте аккаунт работника, заполните профиль и откликайтесь на смены в кабинете.",
+      },
+      restaurant: {
+        title: "Регистрация заведения",
+        lead: "Создайте аккаунт заведения, публикуйте смены, смотрите работников и заявки поставщикам.",
+      },
+      supplier: {
+        title: "Регистрация поставщика",
+        lead: "Создайте аккаунт поставщика, публикуйте предложения и принимайте заявки от заведений.",
+      },
+    };
+
+    const requestedRole = new URLSearchParams(window.location.search).get("role");
+    if (roleCopy[requestedRole]) roleInput.value = requestedRole;
+
+    function updateRoleText() {
+      const copy = roleCopy[roleInput.value] || roleCopy.worker;
+      if (authTitle) authTitle.textContent = copy.title;
+      if (authLead) authLead.textContent = copy.lead;
+    }
+
+    async function ensureProfileAfterAuth(user, role) {
+      if (!user) return;
+      const { data: existing, error: readError } = await window.supabaseClient
+        .from("profiles")
+        .select("id")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (existing || readError) return;
+
+      await window.supabaseClient.from("profiles").upsert(
+        {
+          id: user.id,
+          role,
+          name: user.email || "Пользователь",
+          status: "active",
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "id" },
+      );
+    }
+
+    registerBtn?.addEventListener("click", async () => {
+      const client = window.supabaseClient;
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+      const role = roleInput.value;
+
+      if (!client) return void (message.textContent = "Supabase не загрузился. Обновите страницу.");
+      if (!email || !password) return void (message.textContent = "Введите email и пароль.");
+
+      message.textContent = "Регистрируем...";
+      const { data, error } = await client.auth.signUp({
+        email,
+        password,
+        options: { data: { role } },
+      });
+
+      if (!error && data?.session?.user) await ensureProfileAfterAuth(data.session.user, role);
+      message.textContent = error ? `Ошибка регистрации: ${error.message}` : "Регистрация успешна. Теперь попробуйте войти.";
+    });
+
+    loginBtn?.addEventListener("click", async () => {
+      const client = window.supabaseClient;
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+      if (!client) return void (message.textContent = "Supabase не загрузился. Обновите страницу.");
+      if (!email || !password) return void (message.textContent = "Введите email и пароль.");
+
+      message.textContent = "Входим...";
+      const { data, error } = await client.auth.signInWithPassword({ email, password });
+      if (error) return void (message.textContent = `Ошибка входа: ${error.message}`);
+
+      await ensureProfileAfterAuth(data.user, roleInput.value);
+      window.location.href = "cabinet.html";
+    });
+
+    roleInput.addEventListener("change", updateRoleText);
+    updateRoleText();
+  }
+
+  function renderStats(rows) {
+    const stats = document.getElementById("adminStats");
+    if (!stats) return;
+    const counts = rows.reduce(
+      (acc, row) => {
+        acc.all += 1;
+        acc[row.type] = (acc[row.type] || 0) + 1;
+        return acc;
+      },
+      { all: 0, worker: 0, restaurant: 0, supplier: 0 },
+    );
+
+    stats.innerHTML = `
+      <div class="stat">Всего: ${counts.all}</div>
+      <div class="stat">Работники: ${counts.worker}</div>
+      <div class="stat">Заведения: ${counts.restaurant}</div>
+      <div class="stat">Поставщики: ${counts.supplier}</div>
+    `;
+  }
+
+  function renderAdmin() {
+    const tbody = document.querySelector("#adminTable tbody");
+    if (!tbody) return;
+
+    const searchInput = document.getElementById("adminSearch");
+    const query = searchInput ? searchInput.value.toLowerCase().trim() : "";
+    const rows = readRows();
+    const visibleRows = query ? rows.filter((row) => JSON.stringify(row).toLowerCase().includes(query)) : rows;
+    renderStats(visibleRows);
+
+    tbody.innerHTML = visibleRows
+      .map(
+        (row) => `
+      <tr>
+        <td>${escapeHtml(formatDate(row.created_at))}</td>
+        <td>${escapeHtml(roleText(row.type))}</td>
+        <td>${escapeHtml(row.title)}</td>
+        <td>${row.phone ? `<a href="tel:${escapeHtml(row.phone)}">${escapeHtml(row.phone)}</a>` : "-"}</td>
+        <td>${row.telegram ? escapeHtml(row.telegram) : "-"}</td>
+        <td>${escapeHtml(JSON.stringify(row.data))}</td>
+      </tr>
+    `,
+      )
+      .join("");
+
+    if (!visibleRows.length) {
+      tbody.innerHTML = '<tr><td colspan="6">Заявок пока нет.</td></tr>';
+    }
+  }
+
+  function initAdminActions() {
+    const tbody = document.querySelector("#adminTable tbody");
+    if (!tbody) return;
+
+    document.getElementById("exportJson")?.addEventListener("click", () => {
+      download("gastroconnect-submissions.json", JSON.stringify(readRows(), null, 2), "application/json;charset=utf-8");
+    });
+
+    document.getElementById("exportCsv")?.addEventListener("click", () => {
+      const csv = [
+        "Дата,Тип,Название,Телефон,Telegram,Город",
+        ...readRows().map((row) =>
+          [formatDate(row.created_at), roleText(row.type), row.title || "", row.phone || "", row.telegram || "", row.city || ""]
+            .map((value) => `"${String(value).replaceAll('"', '""')}"`)
+            .join(","),
+        ),
+      ].join("\n");
+      download("gastroconnect-submissions.csv", `\ufeff${csv}`, "text/csv;charset=utf-8");
+    });
+
+    document.getElementById("clearData")?.addEventListener("click", () => {
+      if (confirm("Очистить локальные заявки?")) {
+        writeRows([]);
+        renderAdmin();
+      }
+    });
+
+    document.getElementById("adminSearch")?.addEventListener("input", renderAdmin);
+  }
+
+  applySiteSettings();
+  loadRemoteSiteSettings();
+  initSiteSettingsForm();
+  initPublicForms();
+  initAuthPage();
+  initAdminActions();
+  renderAdmin();
+})();
