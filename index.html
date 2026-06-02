@@ -11,7 +11,7 @@
     <link rel="icon" href="favicon.ico" sizes="any" />
     <link rel="manifest" href="site.webmanifest" />
     <link rel="preload" href="assets/hero-home.webp" as="image" type="image/webp" />
-    <link rel="stylesheet" href="style-v1004.css" />
+    <link rel="stylesheet" href="style-v1005.css" />
   </head>
   <body>
     <div class="page-shell">
@@ -41,7 +41,7 @@
       <main>
         <section class="poster-hero">
           <div class="poster-copy">
-            <div class="eyebrow">
+            <div class="eyebrow" data-site-setting="home.eyebrow">
               Российская платформа гибкой занятости для HoReCa
             </div>
             <h1 data-site-setting="home.title">
@@ -54,16 +54,24 @@
             </p>
 
             <div class="hero-actions">
-              <a class="btn primary" href="auth.html?role=restaurant"
+              <a
+                class="btn primary"
+                href="auth.html?role=restaurant"
+                data-site-setting="home.ctaPrimary"
                 >Запустить подбор</a
               >
-              <a class="btn" href="auth.html?role=worker">Найти смену</a>
+              <a
+                class="btn"
+                href="auth.html?role=worker"
+                data-site-setting="home.ctaSecondary"
+                >Найти смену</a
+              >
             </div>
 
             <div class="hero-benefits">
-              <span>Смены за 24 часа</span>
-              <span>Профили и отклики</span>
-              <span>Поставщики рядом</span>
+              <span data-site-setting="home.benefit1">Смены за 24 часа</span>
+              <span data-site-setting="home.benefit2">Профили и отклики</span>
+              <span data-site-setting="home.benefit3">Поставщики рядом</span>
             </div>
           </div>
 
@@ -332,6 +340,6 @@
         </div>
       </footer>
     </div>
-    <script src="script-v1004.js"></script>
+    <script src="script-v1005.js"></script>
   </body>
 </html>

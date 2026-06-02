@@ -11,7 +11,7 @@
     <link rel="icon" href="favicon.ico" sizes="any" />
     <link rel="manifest" href="site.webmanifest" />
     <link rel="preload" href="assets/hero-restaurants.webp" as="image" type="image/webp" />
-    <link rel="stylesheet" href="style-v1004.css" />
+    <link rel="stylesheet" href="style-v1005.css" />
   </head>
   <body>
     <div class="page-shell">
@@ -41,7 +41,9 @@
       <main>
         <section class="poster-hero poster-hero-restaurants">
           <div class="poster-copy">
-            <div class="eyebrow">Заведениям HoReCa</div>
+            <div class="eyebrow" data-site-setting="restaurants.eyebrow">
+              Заведениям HoReCa
+            </div>
             <h1 data-site-setting="restaurants.title">
               Закрывайте смены без бесконечных чатов
             </h1>
@@ -50,15 +52,23 @@
               отправляйте прямые приглашения.
             </p>
             <div class="hero-actions">
-              <a class="btn primary" href="auth.html?role=restaurant"
+              <a
+                class="btn primary"
+                href="auth.html?role=restaurant"
+                data-site-setting="restaurants.ctaPrimary"
                 >Найти персонал</a
               >
-              <a class="btn" href="#request">Оставить заявку</a>
+              <a
+                class="btn"
+                href="#request"
+                data-site-setting="restaurants.ctaSecondary"
+                >Оставить заявку</a
+              >
             </div>
             <div class="hero-benefits">
-              <span>Публикация смен</span>
-              <span>Отклики работников</span>
-              <span>База анкет</span>
+              <span data-site-setting="restaurants.benefit1">Публикация смен</span>
+              <span data-site-setting="restaurants.benefit2">Отклики работников</span>
+              <span data-site-setting="restaurants.benefit3">База анкет</span>
             </div>
           </div>
           <div
@@ -196,6 +206,6 @@
         </div>
       </footer>
     </div>
-    <script src="script-v1004.js"></script>
+    <script src="script-v1005.js"></script>
   </body>
 </html>

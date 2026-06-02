@@ -11,7 +11,7 @@
     <link rel="icon" href="favicon.ico" sizes="any" />
     <link rel="manifest" href="site.webmanifest" />
     <link rel="preload" href="assets/hero-suppliers.webp" as="image" type="image/webp" />
-    <link rel="stylesheet" href="style-v1004.css" />
+    <link rel="stylesheet" href="style-v1005.css" />
   </head>
   <body>
     <div class="page-shell">
@@ -41,7 +41,9 @@
       <main>
         <section class="poster-hero poster-hero-suppliers">
           <div class="poster-copy">
-            <div class="eyebrow">Поставщикам HoReCa</div>
+            <div class="eyebrow" data-site-setting="suppliers.eyebrow">
+              Поставщикам HoReCa
+            </div>
             <h1 data-site-setting="suppliers.title">
               Поставщики для HoReCa с входящими заявками
             </h1>
@@ -50,15 +52,23 @@
               заведений и ведите коммуникацию в кабинете.
             </p>
             <div class="hero-actions">
-              <a class="btn primary" href="auth.html?role=supplier"
+              <a
+                class="btn primary"
+                href="auth.html?role=supplier"
+                data-site-setting="suppliers.ctaPrimary"
                 >Стать поставщиком</a
               >
-              <a class="btn" href="auth.html?role=supplier">Войти</a>
+              <a
+                class="btn"
+                href="auth.html?role=supplier"
+                data-site-setting="suppliers.ctaSecondary"
+                >Войти</a
+              >
             </div>
             <div class="hero-benefits">
-              <span>Офферы поставщиков</span>
-              <span>Заявки заведений</span>
-              <span>Фильтр по категориям</span>
+              <span data-site-setting="suppliers.benefit1">Офферы поставщиков</span>
+              <span data-site-setting="suppliers.benefit2">Заявки заведений</span>
+              <span data-site-setting="suppliers.benefit3">Фильтр по категориям</span>
             </div>
           </div>
           <div class="poster-visual" aria-label="Поставщики для HoReCa">
@@ -194,6 +204,6 @@
         </div>
       </footer>
     </div>
-    <script src="script-v1004.js"></script>
+    <script src="script-v1005.js"></script>
   </body>
 </html>

@@ -11,7 +11,7 @@
     <link rel="icon" href="favicon.ico" sizes="any" />
     <link rel="manifest" href="site.webmanifest" />
     <link rel="preload" href="assets/hero-workers.webp" as="image" type="image/webp" />
-    <link rel="stylesheet" href="style-v1004.css" />
+    <link rel="stylesheet" href="style-v1005.css" />
   </head>
   <body>
     <div class="page-shell">
@@ -41,7 +41,9 @@
       <main>
         <section class="poster-hero poster-hero-workers">
           <div class="poster-copy">
-            <div class="eyebrow">Сотрудникам HoReCa</div>
+            <div class="eyebrow" data-site-setting="workers.eyebrow">
+              Сотрудникам HoReCa
+            </div>
             <h1 data-site-setting="workers.title">
               Смены в ресторанах, кафе и доставке рядом
             </h1>
@@ -50,15 +52,23 @@
               задания и принимайте приглашения от заведений.
             </p>
             <div class="hero-actions">
-              <a class="btn primary" href="auth.html?role=worker"
+              <a
+                class="btn primary"
+                href="auth.html?role=worker"
+                data-site-setting="workers.ctaPrimary"
                 >Создать анкету</a
               >
-              <a class="btn" href="auth.html?role=worker">Войти в кабинет</a>
+              <a
+                class="btn"
+                href="auth.html?role=worker"
+                data-site-setting="workers.ctaSecondary"
+                >Войти в кабинет</a
+              >
             </div>
             <div class="hero-benefits">
-              <span>Смены рядом</span>
-              <span>Отклики на задания</span>
-              <span>Приглашения от заведений</span>
+              <span data-site-setting="workers.benefit1">Смены рядом</span>
+              <span data-site-setting="workers.benefit2">Отклики на задания</span>
+              <span data-site-setting="workers.benefit3">Приглашения от заведений</span>
             </div>
           </div>
           <div class="poster-visual" aria-label="Смены и подработки для HoReCa">
@@ -203,6 +213,6 @@
         </div>
       </footer>
     </div>
-    <script src="script-v1004.js"></script>
+    <script src="script-v1005.js"></script>
   </body>
 </html>
