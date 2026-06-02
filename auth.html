@@ -6,7 +6,14 @@
     <title>Вход и регистрация — GastroConnect</title>
     <link rel="icon" href="favicon.ico" sizes="any" />
     <link rel="manifest" href="site.webmanifest" />
-    <link rel="stylesheet" href="style-v1005.css" />
+    <link rel="preload" href="assets/hero-home.webp" as="image" type="image/webp" fetchpriority="high" />
+    <link
+      rel="preload"
+      href="style.css?v=1008"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript><link rel="stylesheet" href="style.css?v=1008" /></noscript>
   </head>
   <body>
     <div class="page-shell">
@@ -33,12 +40,36 @@
         >
       </header>
 
-      <main class="auth-page">
+      <main class="auth-page service-page">
+        <section class="service-hero service-hero-auth">
+          <div class="service-hero-copy">
+            <p class="eyebrow" data-site-setting="auth.eyebrow">
+              Единый вход GastroConnect
+            </p>
+            <h1 id="authTitle" data-site-setting="auth.title">
+              Вход и регистрация
+            </h1>
+            <p id="authLead" data-site-setting="auth.lead">
+              Выберите роль и создайте аккаунт. После входа вы попадете в
+              кабинет.
+            </p>
+          </div>
+          <div class="service-hero-media" aria-hidden="true">
+            <img
+              class="service-hero-image"
+              data-site-image="auth.hero"
+              src="assets/hero-home.webp"
+              width="1080"
+              height="675"
+              alt=""
+              decoding="async"
+              fetchpriority="high"
+            />
+          </div>
+        </section>
+
         <section class="auth-card">
-          <h1 id="authTitle">Вход и регистрация</h1>
-          <p id="authLead">
-            Выберите роль и создайте аккаунт. После входа вы попадете в кабинет.
-          </p>
+          <h2>Данные аккаунта</h2>
 
           <label
             >Email<input
@@ -75,6 +106,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase.js"></script>
-    <script src="script.js?v=1007"></script>
+    <script src="script.js?v=1008"></script>
   </body>
 </html>

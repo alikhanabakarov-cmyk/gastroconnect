@@ -10,7 +10,14 @@
     />
     <link rel="icon" href="favicon.ico" sizes="any" />
     <link rel="manifest" href="site.webmanifest" />
-    <link rel="stylesheet" href="style-v1005.css" />
+    <link rel="preload" href="assets/hero-home.webp" as="image" type="image/webp" fetchpriority="high" />
+    <link
+      rel="preload"
+      href="style.css?v=1008"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript><link rel="stylesheet" href="style.css?v=1008" /></noscript>
   </head>
   <body>
     <div class="page-shell">
@@ -41,21 +48,43 @@
       </header>
 
       <main>
-        <section class="admin-hero">
-          <h1>Панель управления GastroConnect</h1>
-          <p>Панель для заявок и быстрых настроек контента сайта.</p>
-          <div class="admin-actions">
-            <button id="exportJson" type="button">Экспорт JSON</button>
-            <button id="exportCsv" class="btn" type="button">
-              Экспорт CSV
-            </button>
-            <button id="clearData" class="btn danger" type="button">
-              Очистить
-            </button>
-            <input
-              id="adminSearch"
-              type="search"
-              placeholder="Поиск: имя, телефон, Telegram, город..."
+        <section class="admin-hero service-hero service-hero-admin">
+          <div class="service-hero-copy">
+            <p class="eyebrow" data-site-setting="admin.eyebrow">
+              Управление сайтом
+            </p>
+            <h1 data-site-setting="admin.title">
+              Панель управления GastroConnect
+            </h1>
+            <p data-site-setting="admin.lead">
+              Панель для заявок, изображений, логотипа и главных надписей
+              сайта.
+            </p>
+            <div class="admin-actions">
+              <button id="exportJson" type="button">Экспорт JSON</button>
+              <button id="exportCsv" class="btn" type="button">
+                Экспорт CSV
+              </button>
+              <button id="clearData" class="btn danger" type="button">
+                Очистить
+              </button>
+              <input
+                id="adminSearch"
+                type="search"
+                placeholder="Поиск: имя, телефон, Telegram, город..."
+              />
+            </div>
+          </div>
+          <div class="service-hero-media" aria-hidden="true">
+            <img
+              class="service-hero-image"
+              data-site-image="admin.hero"
+              src="assets/hero-home.webp"
+              width="1080"
+              height="675"
+              alt=""
+              decoding="async"
+              fetchpriority="high"
             />
           </div>
         </section>
@@ -136,6 +165,45 @@
               >Загрузить hero поставщиков
               <input type="file" accept="image/*" data-upload-target="suppliers.hero" />
             </label>
+            <label
+              >Hero входа
+              <input
+                name="auth.hero"
+                type="text"
+                list="siteAssetOptions"
+                placeholder="assets/hero-home.webp"
+              />
+            </label>
+            <label
+              >Загрузить hero входа
+              <input type="file" accept="image/*" data-upload-target="auth.hero" />
+            </label>
+            <label
+              >Hero кабинета
+              <input
+                name="cabinet.hero"
+                type="text"
+                list="siteAssetOptions"
+                placeholder="assets/hero-home.webp"
+              />
+            </label>
+            <label
+              >Загрузить hero кабинета
+              <input type="file" accept="image/*" data-upload-target="cabinet.hero" />
+            </label>
+            <label
+              >Hero админки
+              <input
+                name="admin.hero"
+                type="text"
+                list="siteAssetOptions"
+                placeholder="assets/hero-home.webp"
+              />
+            </label>
+            <label
+              >Загрузить hero админки
+              <input type="file" accept="image/*" data-upload-target="admin.hero" />
+            </label>
             <datalist id="siteAssetOptions">
               <option value="assets/logo-full.png"></option>
               <option value="assets/logo-mark.png"></option>
@@ -194,6 +262,36 @@
                   decoding="async"
                 />
                 <figcaption>Поставщики</figcaption>
+              </figure>
+              <figure class="asset-preview-card">
+                <img
+                  data-setting-preview="auth.hero"
+                  src="assets/hero-home.webp"
+                  alt="Hero входа"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <figcaption>Вход</figcaption>
+              </figure>
+              <figure class="asset-preview-card">
+                <img
+                  data-setting-preview="cabinet.hero"
+                  src="assets/hero-home.webp"
+                  alt="Hero кабинета"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <figcaption>Кабинет</figcaption>
+              </figure>
+              <figure class="asset-preview-card">
+                <img
+                  data-setting-preview="admin.hero"
+                  src="assets/hero-home.webp"
+                  alt="Hero админки"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <figcaption>Админка</figcaption>
               </figure>
             </div>
             <div class="settings-subhead full">Верхняя панель</div>
@@ -398,6 +496,43 @@
               >Преимущество 3 поставщиков
               <input name="suppliers.benefit3" type="text" />
             </label>
+            <div class="settings-subhead full">Вход, кабинет и админка</div>
+            <label class="full"
+              >Подпись входа
+              <input name="auth.eyebrow" type="text" />
+            </label>
+            <label class="full"
+              >Заголовок входа
+              <input name="auth.title" type="text" />
+            </label>
+            <label class="full"
+              >Описание входа
+              <textarea name="auth.lead"></textarea>
+            </label>
+            <label class="full"
+              >Подпись кабинета
+              <input name="cabinet.eyebrow" type="text" />
+            </label>
+            <label class="full"
+              >Заголовок кабинета
+              <input name="cabinet.title" type="text" />
+            </label>
+            <label class="full"
+              >Описание кабинета
+              <textarea name="cabinet.lead"></textarea>
+            </label>
+            <label class="full"
+              >Подпись админки
+              <input name="admin.eyebrow" type="text" />
+            </label>
+            <label class="full"
+              >Заголовок админки
+              <input name="admin.title" type="text" />
+            </label>
+            <label class="full"
+              >Описание админки
+              <textarea name="admin.lead"></textarea>
+            </label>
             <div class="cabinet-actions form-actions">
               <button type="submit">Сохранить настройки</button>
               <button id="resetSiteSettings" class="btn" type="button">
@@ -449,6 +584,6 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase.js"></script>
-    <script src="script.js?v=1007"></script>
+    <script src="script.js?v=1008"></script>
   </body>
 </html>

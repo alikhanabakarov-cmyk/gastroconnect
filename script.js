@@ -75,6 +75,24 @@
       benefit2: "Заявки заведений",
       benefit3: "Фильтр по категориям",
     },
+    auth: {
+      hero: "assets/hero-home.webp",
+      eyebrow: "Единый вход GastroConnect",
+      title: "Вход и регистрация",
+      lead: "Выберите роль и создайте аккаунт. После входа вы попадете в кабинет.",
+    },
+    cabinet: {
+      hero: "assets/hero-home.webp",
+      eyebrow: "Рабочее пространство",
+      title: "Кабинет GastroConnect",
+      lead: "Профили, смены, приглашения и заявки собраны в одном месте для каждой роли.",
+    },
+    admin: {
+      hero: "assets/hero-home.webp",
+      eyebrow: "Управление сайтом",
+      title: "Панель управления GastroConnect",
+      lead: "Панель для заявок, изображений, логотипа и главных надписей сайта.",
+    },
   };
 
   function clone(value) {
@@ -459,8 +477,8 @@
 
     function updateRoleText() {
       const copy = roleCopy[roleInput.value] || roleCopy.worker;
-      if (authTitle) authTitle.textContent = copy.title;
-      if (authLead) authLead.textContent = copy.lead;
+      if (authTitle && !authTitle.dataset.siteSetting) authTitle.textContent = copy.title;
+      if (authLead && !authLead.dataset.siteSetting) authLead.textContent = copy.lead;
     }
 
     async function ensureProfileAfterAuth(user, role) {
