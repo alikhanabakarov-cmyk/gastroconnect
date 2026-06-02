@@ -73,6 +73,7 @@
               <input
                 name="logo"
                 type="text"
+                list="siteAssetOptions"
                 placeholder="assets/logo-full.png"
               />
             </label>
@@ -81,6 +82,7 @@
               <input
                 name="home.hero"
                 type="text"
+                list="siteAssetOptions"
                 placeholder="assets/hero-home.webp"
               />
             </label>
@@ -89,6 +91,7 @@
               <input
                 name="workers.hero"
                 type="text"
+                list="siteAssetOptions"
                 placeholder="assets/hero-workers.webp"
               />
             </label>
@@ -97,6 +100,7 @@
               <input
                 name="restaurants.hero"
                 type="text"
+                list="siteAssetOptions"
                 placeholder="assets/hero-restaurants.webp"
               />
             </label>
@@ -105,9 +109,18 @@
               <input
                 name="suppliers.hero"
                 type="text"
+                list="siteAssetOptions"
                 placeholder="assets/hero-suppliers.webp"
               />
             </label>
+            <datalist id="siteAssetOptions">
+              <option value="assets/logo-full.png"></option>
+              <option value="assets/logo-mark.png"></option>
+              <option value="assets/hero-home.webp"></option>
+              <option value="assets/hero-workers.webp"></option>
+              <option value="assets/hero-restaurants.webp"></option>
+              <option value="assets/hero-suppliers.webp"></option>
+            </datalist>
             <label class="full"
               >Заголовок главной
               <input name="home.title" type="text" />
