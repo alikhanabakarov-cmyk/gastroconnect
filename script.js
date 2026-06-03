@@ -350,6 +350,8 @@
 
     const message = document.getElementById("siteSettingsMessage");
     const resetButton = document.getElementById("resetSiteSettings");
+    const refreshJsonButton = document.getElementById("refreshSiteSettingsJson");
+    const downloadJsonButton = document.getElementById("downloadSiteSettingsJson");
     fillSiteSettingsForm();
 
     form.addEventListener("submit", async (event) => {
@@ -384,6 +386,30 @@
       message.textContent = remote.saved
         ? "Настройки сброшены глобально."
         : "Настройки сброшены локально.";
+    });
+
+    refreshJsonButton?.addEventListener("click", () => {
+      const jsonField = document.getElementById("siteSettingsJson");
+      if (jsonField) jsonField.dataset.dirty = "false";
+      try {
+        updateSiteSettingsJson(collectSiteSettingsFromForm(form));
+      } catch (error) {
+        if (message) message.textContent = `JSON не обновлен: ${error.message}`;
+        return;
+      }
+      if (message) message.textContent = "JSON обновлен из текущих полей формы.";
+    });
+
+    downloadJsonButton?.addEventListener("click", () => {
+      let next;
+      try {
+        next = collectSiteSettingsFromForm(form);
+      } catch (error) {
+        if (message) message.textContent = `JSON не скачан: ${error.message}`;
+        return;
+      }
+      download("gastroconnect-site-settings.json", JSON.stringify(next, null, 2), "application/json;charset=utf-8");
+      if (message) message.textContent = "JSON настроек скачан.";
     });
 
     form.querySelectorAll("input[name], textarea[name]").forEach((field) => {
