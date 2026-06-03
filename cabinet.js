@@ -273,6 +273,11 @@
     return query;
   }
 
+  async function rowExists(table, filters) {
+    const { data, error } = await selectRows(table, filters, { select: "id", limit: 1 });
+    return { exists: Boolean(data?.length), error };
+  }
+
   async function saveWorkerProfile(event) {
     const button = event?.currentTarget;
     setBusy(button, true);
@@ -363,6 +368,24 @@
   async function applyToShift(shift, node, button) {
     setBusy(button, true, "Отправляем...");
     const message = node.querySelector(".message");
+    const duplicate = await rowExists("shift_applications", {
+      shift_id: shift.id,
+      worker_id: state.user.id,
+    });
+
+    if (duplicate.error) {
+      setMessage(message, `Ошибка: ${duplicate.error.message}`);
+      setBusy(button, false);
+      return;
+    }
+
+    if (duplicate.exists) {
+      setMessage(message, "Вы уже откликались на эту смену.");
+      button.textContent = "Отклик уже есть";
+      button.disabled = true;
+      return;
+    }
+
     const { error } = await insertRow("shift_applications", {
       shift_id: shift.id,
       worker_id: state.user.id,
@@ -673,6 +696,26 @@
     }
 
     setBusy(button, true, "Отправляем...");
+    const message = node.querySelector(".message");
+    const duplicate = await rowExists("shift_invites", {
+      restaurant_id: state.user.id,
+      worker_id: worker.user_id,
+      status: "pending",
+    });
+
+    if (duplicate.error) {
+      setMessage(message, `Ошибка: ${duplicate.error.message}`);
+      setBusy(button, false);
+      return;
+    }
+
+    if (duplicate.exists) {
+      setMessage(message, "Активное приглашение этому работнику уже отправлено.");
+      button.textContent = "Приглашение уже есть";
+      button.disabled = true;
+      return;
+    }
+
     const { error } = await insertRow("shift_invites", {
       restaurant_id: state.user.id,
       worker_id: worker.user_id,
@@ -683,12 +726,12 @@
     });
 
     if (error) {
-      setMessage(node.querySelector(".message"), `Ошибка: ${error.message}`);
+      setMessage(message, `Ошибка: ${errorText(error, "активное приглашение этому работнику уже отправлено")}`);
       setBusy(button, false);
       return;
     }
 
-    setMessage(node.querySelector(".message"), "Приглашение отправлено работнику.");
+    setMessage(message, "Приглашение отправлено работнику.");
     button.textContent = "Приглашение отправлено";
     button.disabled = true;
   }
@@ -774,6 +817,25 @@
 
   async function sendSupplierInquiry(offer, node, button) {
     setBusy(button, true, "Отправляем...");
+    const message = node.querySelector(".message");
+    const duplicate = await rowExists("supplier_inquiries", {
+      offer_id: offer.id,
+      restaurant_id: state.user.id,
+    });
+
+    if (duplicate.error) {
+      setMessage(message, `Ошибка: ${duplicate.error.message}`);
+      setBusy(button, false);
+      return;
+    }
+
+    if (duplicate.exists) {
+      setMessage(message, "Запрос по этому предложению уже отправлен.");
+      button.textContent = "Запрос уже есть";
+      button.disabled = true;
+      return;
+    }
+
     const { error } = await insertRow("supplier_inquiries", {
       offer_id: offer.id,
       restaurant_id: state.user.id,
@@ -785,12 +847,12 @@
     });
 
     if (error) {
-      setMessage(node.querySelector(".message"), `Ошибка: ${errorText(error, "запрос по этому предложению уже отправлен")}`);
+      setMessage(message, `Ошибка: ${errorText(error, "запрос по этому предложению уже отправлен")}`);
       setBusy(button, false);
       return;
     }
 
-    setMessage(node.querySelector(".message"), "Запрос отправлен поставщику.");
+    setMessage(message, "Запрос отправлен поставщику.");
     button.textContent = "Запрос отправлен";
     button.disabled = true;
   }
@@ -1013,6 +1075,25 @@
 
   async function respondToSupplyRequest(request, node, button) {
     setBusy(button, true, "Отправляем...");
+    const message = node.querySelector(".message");
+    const duplicate = await rowExists("supplier_responses", {
+      request_id: request.id,
+      supplier_id: state.user.id,
+    });
+
+    if (duplicate.error) {
+      setMessage(message, `Ошибка: ${duplicate.error.message}`);
+      setBusy(button, false);
+      return;
+    }
+
+    if (duplicate.exists) {
+      setMessage(message, "Вы уже откликались на этот запрос.");
+      button.textContent = "Отклик уже есть";
+      button.disabled = true;
+      return;
+    }
+
     const { error } = await insertRow("supplier_responses", {
       request_id: request.id,
       restaurant_id: request.restaurant_id,
@@ -1025,12 +1106,12 @@
     });
 
     if (error) {
-      setMessage(node.querySelector(".message"), `Ошибка: ${error.message}`);
+      setMessage(message, `Ошибка: ${errorText(error, "вы уже откликались на этот запрос")}`);
       setBusy(button, false);
       return;
     }
 
-    setMessage(node.querySelector(".message"), "Отклик отправлен заведению.");
+    setMessage(message, "Отклик отправлен заведению.");
     button.textContent = "Отклик отправлен";
     button.disabled = true;
   }

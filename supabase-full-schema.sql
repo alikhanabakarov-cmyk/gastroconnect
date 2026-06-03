@@ -429,6 +429,7 @@ create index if not exists shift_posts_profession_idx on public.shift_posts(prof
 create index if not exists shift_applications_restaurant_id_idx on public.shift_applications(restaurant_id);
 create index if not exists shift_applications_worker_id_idx on public.shift_applications(worker_id);
 create index if not exists shift_invites_worker_id_idx on public.shift_invites(worker_id);
+create unique index if not exists shift_invites_pending_unique_idx on public.shift_invites(restaurant_id, worker_id) where status = 'pending';
 create index if not exists supplier_offers_category_idx on public.supplier_offers(category);
 create index if not exists supplier_inquiries_supplier_id_idx on public.supplier_inquiries(supplier_id);
 create index if not exists supply_requests_status_idx on public.supply_requests(status);
@@ -436,6 +437,7 @@ create index if not exists supplier_responses_request_id_idx on public.supplier_
 create index if not exists supplier_responses_restaurant_id_idx on public.supplier_responses(restaurant_id);
 create index if not exists supplier_responses_supplier_id_idx on public.supplier_responses(supplier_id);
 create index if not exists supplier_responses_status_idx on public.supplier_responses(status);
+create unique index if not exists supplier_responses_request_supplier_unique_idx on public.supplier_responses(request_id, supplier_id);
 
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values (
