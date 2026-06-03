@@ -1,0 +1,612 @@
+﻿<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Управление сайтом — GastroConnect</title>
+    <meta
+      name="description"
+      content="Панель управления логотипом, hero-картинками, текстами и заявками GastroConnect."
+    />
+    <link rel="icon" href="favicon.ico" sizes="any" />
+    <link rel="manifest" href="site.webmanifest" />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link rel="preload" href="assets/logo-full.png" as="image" type="image/png" fetchpriority="high" />
+    <link rel="preload" href="assets/hero-home.webp" as="image" type="image/webp" fetchpriority="high" />
+    <style>
+      :root{--cream:#fffaf2;--cream-2:#f6ecdf;--green:#064c3b;--gold:#c99a3f;--ink:#101312;--text:#2d3431;--line:rgba(201,154,63,.28);--shadow:0 24px 70px rgba(42,33,18,.12)}*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;color:var(--ink);background:linear-gradient(180deg,var(--cream) 0%,var(--cream-2) 100%);overflow-x:hidden}img{max-width:100%}.site-header{position:sticky;top:0;z-index:50;min-height:88px;padding:14px 56px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:34px;background:rgba(255,250,242,.95);border-bottom:1px solid var(--line)}.brand{display:flex;align-items:center;width:250px;max-width:32vw;text-decoration:none}.brand-logo{width:100%;max-width:240px;height:auto;aspect-ratio:4/1;display:block;object-fit:contain}.main-nav{display:flex;justify-content:center;align-items:center;gap:28px}.main-nav a{text-decoration:none;color:var(--ink);font-size:17px;font-weight:900}.header-cta,.btn,button{min-height:54px;padding:0 24px;border:1px solid var(--gold);border-radius:14px;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,250,242,.9);color:#b37a1f;text-decoration:none;font:inherit;font-size:17px;font-weight:900}.header-cta,button{border-color:var(--green);background:var(--green);color:#fff}.admin-hero,.admin-panel{max-width:1380px;margin:60px auto;padding:0 48px}.service-hero{width:100%;display:grid;grid-template-columns:minmax(300px,.9fr) minmax(420px,1.1fr);align-items:center;gap:34px;margin-bottom:34px}.service-hero-copy{min-width:0}.eyebrow{margin:0 0 18px;color:var(--gold);font-size:14px;font-weight:900;text-transform:uppercase;letter-spacing:.06em}.service-hero-copy h1{margin:0 0 16px;color:var(--green);font-size:clamp(36px,4.6vw,64px);line-height:1.04;font-weight:950;overflow-wrap:break-word}.service-hero-copy p:not(.eyebrow):not(.message){max-width:620px;margin:0 0 18px;color:var(--text);font-size:20px;line-height:1.45}.service-hero-media{position:relative;min-height:360px;overflow:hidden;border-radius:24px;border:1px solid rgba(201,154,63,.24);background:#eadfce;box-shadow:var(--shadow)}.service-hero-image{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:cover;object-position:center}.admin-actions{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-top:24px}@media(max-width:1050px){.site-header{padding:16px 22px;grid-template-columns:1fr;gap:16px}.main-nav{justify-content:flex-start;flex-wrap:wrap;gap:14px}.admin-hero,.admin-panel{padding-left:22px;padding-right:22px}.service-hero{grid-template-columns:1fr;gap:24px}.service-hero-media{min-height:340px}}@media(max-width:620px){.site-header{display:flex;flex-direction:column;align-items:stretch;padding:14px 20px}.brand{width:220px;max-width:100%}.main-nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 14px}.service-hero-copy h1{font-size:30px;line-height:1.08;overflow-wrap:anywhere}.service-hero-copy p:not(.eyebrow):not(.message){font-size:17px;overflow-wrap:anywhere}.service-hero-media{min-height:250px;border-radius:18px}.btn,.header-cta,button{width:100%;min-width:0}}
+    </style>
+    <link
+      rel="preload"
+      href="style.css?v=1010"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript><link rel="stylesheet" href="style.css?v=1010" /></noscript>
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="site-header">
+        <a class="brand" href="index.html" aria-label="GastroConnect">
+          <img
+            class="brand-logo"
+            data-site-logo
+            src="assets/logo-full.png"
+            width="240"
+            height="60"
+            alt=""
+            decoding="async"
+            fetchpriority="high"
+          />
+        </a>
+        <nav class="main-nav" aria-label="Главное меню">
+          <a href="workers.html" data-site-setting="nav.workers">Сотрудникам</a>
+          <a href="restaurants.html" data-site-setting="nav.restaurants">Заведениям</a>
+          <a href="suppliers.html" data-site-setting="nav.suppliers">Поставщикам</a>
+          <a href="#contacts" data-site-setting="nav.contacts">Контакты</a>
+        </nav>
+        <a
+          class="header-cta"
+          href="restaurants.html#request"
+          data-site-setting="nav.request"
+          >Оставить заявку</a
+        >
+      </header>
+
+      <main>
+        <section class="admin-hero service-hero service-hero-admin">
+          <div class="service-hero-copy">
+            <p class="eyebrow" data-site-setting="admin.eyebrow">
+              Управление сайтом
+            </p>
+            <h1 data-site-setting="admin.title">
+              Панель управления GastroConnect
+            </h1>
+            <p data-site-setting="admin.lead">
+              Панель для заявок, изображений, логотипа и главных надписей
+              сайта.
+            </p>
+            <div class="admin-actions">
+              <button id="exportJson" type="button">Экспорт JSON</button>
+              <button id="exportCsv" class="btn" type="button">
+                Экспорт CSV
+              </button>
+              <button id="clearData" class="btn danger" type="button">
+                Очистить
+              </button>
+              <input
+                id="adminSearch"
+                type="search"
+                placeholder="Поиск: имя, телефон, Telegram, город..."
+              />
+            </div>
+          </div>
+          <div class="service-hero-media" aria-hidden="true">
+            <img
+              class="service-hero-image"
+              data-site-image="admin.hero"
+              src="assets/hero-home.webp"
+              width="1080"
+              height="675"
+              alt=""
+              decoding="async"
+              fetchpriority="high"
+            />
+          </div>
+        </section>
+
+        <section class="admin-panel">
+          <div class="section-head">
+            <h2>Настройки сайта</h2>
+            <p>
+              Меняйте логотип, hero-картинки и главные надписи. Для глобального
+              сохранения нужна таблица site_settings в Supabase; без нее
+              настройки сохраняются локально в этом браузере.
+            </p>
+          </div>
+
+          <form id="siteSettingsForm" class="settings-form">
+            <label class="full"
+              >Логотип
+              <input
+                name="logo"
+                type="text"
+                list="siteAssetOptions"
+                placeholder="assets/logo-full.png"
+              />
+            </label>
+            <label class="full upload-label"
+              >Загрузить новый логотип
+              <input type="file" accept="image/*" data-upload-target="logo" />
+            </label>
+            <label
+              >Hero главной
+              <input
+                name="home.hero"
+                type="text"
+                list="siteAssetOptions"
+                placeholder="assets/hero-home.webp"
+              />
+            </label>
+            <label
+              >Загрузить hero главной
+              <input type="file" accept="image/*" data-upload-target="home.hero" />
+            </label>
+            <label
+              >Hero сотрудников
+              <input
+                name="workers.hero"
+                type="text"
+                list="siteAssetOptions"
+                placeholder="assets/hero-workers.webp"
+              />
+            </label>
+            <label
+              >Загрузить hero сотрудников
+              <input type="file" accept="image/*" data-upload-target="workers.hero" />
+            </label>
+            <label
+              >Hero заведений
+              <input
+                name="restaurants.hero"
+                type="text"
+                list="siteAssetOptions"
+                placeholder="assets/hero-restaurants.webp"
+              />
+            </label>
+            <label
+              >Загрузить hero заведений
+              <input type="file" accept="image/*" data-upload-target="restaurants.hero" />
+            </label>
+            <label
+              >Hero поставщиков
+              <input
+                name="suppliers.hero"
+                type="text"
+                list="siteAssetOptions"
+                placeholder="assets/hero-suppliers.webp"
+              />
+            </label>
+            <label
+              >Загрузить hero поставщиков
+              <input type="file" accept="image/*" data-upload-target="suppliers.hero" />
+            </label>
+            <label
+              >Hero входа
+              <input
+                name="auth.hero"
+                type="text"
+                list="siteAssetOptions"
+                placeholder="assets/hero-home.webp"
+              />
+            </label>
+            <label
+              >Загрузить hero входа
+              <input type="file" accept="image/*" data-upload-target="auth.hero" />
+            </label>
+            <label
+              >Hero кабинета
+              <input
+                name="cabinet.hero"
+                type="text"
+                list="siteAssetOptions"
+                placeholder="assets/hero-home.webp"
+              />
+            </label>
+            <label
+              >Загрузить hero кабинета
+              <input type="file" accept="image/*" data-upload-target="cabinet.hero" />
+            </label>
+            <label
+              >Hero админки
+              <input
+                name="admin.hero"
+                type="text"
+                list="siteAssetOptions"
+                placeholder="assets/hero-home.webp"
+              />
+            </label>
+            <label
+              >Загрузить hero админки
+              <input type="file" accept="image/*" data-upload-target="admin.hero" />
+            </label>
+            <datalist id="siteAssetOptions">
+              <option value="assets/logo-full.png"></option>
+              <option value="assets/logo-mark.png"></option>
+              <option value="assets/hero-home.webp"></option>
+              <option value="assets/hero-workers.webp"></option>
+              <option value="assets/hero-restaurants.webp"></option>
+              <option value="assets/hero-suppliers.webp"></option>
+            </datalist>
+            <div class="asset-preview-grid full" aria-label="Текущие изображения сайта">
+              <figure class="asset-preview-card asset-preview-card-logo">
+                <img
+                  data-setting-preview="logo"
+                  src="assets/logo-full.png"
+                  alt="Текущий логотип"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <figcaption>Логотип</figcaption>
+              </figure>
+              <figure class="asset-preview-card">
+                <img
+                  data-setting-preview="home.hero"
+                  src="assets/hero-home.webp"
+                  alt="Hero главной"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <figcaption>Главная</figcaption>
+              </figure>
+              <figure class="asset-preview-card">
+                <img
+                  data-setting-preview="workers.hero"
+                  src="assets/hero-workers.webp"
+                  alt="Hero сотрудников"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <figcaption>Сотрудники</figcaption>
+              </figure>
+              <figure class="asset-preview-card">
+                <img
+                  data-setting-preview="restaurants.hero"
+                  src="assets/hero-restaurants.webp"
+                  alt="Hero заведений"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <figcaption>Заведения</figcaption>
+              </figure>
+              <figure class="asset-preview-card">
+                <img
+                  data-setting-preview="suppliers.hero"
+                  src="assets/hero-suppliers.webp"
+                  alt="Hero поставщиков"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <figcaption>Поставщики</figcaption>
+              </figure>
+              <figure class="asset-preview-card">
+                <img
+                  data-setting-preview="auth.hero"
+                  src="assets/hero-home.webp"
+                  alt="Hero входа"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <figcaption>Вход</figcaption>
+              </figure>
+              <figure class="asset-preview-card">
+                <img
+                  data-setting-preview="cabinet.hero"
+                  src="assets/hero-home.webp"
+                  alt="Hero кабинета"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <figcaption>Кабинет</figcaption>
+              </figure>
+              <figure class="asset-preview-card">
+                <img
+                  data-setting-preview="admin.hero"
+                  src="assets/hero-home.webp"
+                  alt="Hero админки"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <figcaption>Админка</figcaption>
+              </figure>
+            </div>
+            <div class="settings-subhead full">Верхняя панель</div>
+            <label
+              >Пункт меню: сотрудники
+              <input name="nav.workers" type="text" />
+            </label>
+            <label
+              >Пункт меню: заведения
+              <input name="nav.restaurants" type="text" />
+            </label>
+            <label
+              >Пункт меню: поставщики
+              <input name="nav.suppliers" type="text" />
+            </label>
+            <label
+              >Пункт меню: контакты
+              <input name="nav.contacts" type="text" />
+            </label>
+            <label
+              >Пункт меню: как работает
+              <input name="nav.workflow" type="text" />
+            </label>
+            <label
+              >Кнопка входа
+              <input name="nav.login" type="text" />
+            </label>
+            <label
+              >Кнопка на главную
+              <input name="nav.home" type="text" />
+            </label>
+            <label
+              >Кнопка заявки
+              <input name="nav.request" type="text" />
+            </label>
+            <div class="settings-subhead full">Главная</div>
+            <label class="full"
+              >Подпись главной
+              <input name="home.eyebrow" type="text" />
+            </label>
+            <label class="full"
+              >Заголовок главной
+              <input name="home.title" type="text" />
+            </label>
+            <label class="full"
+              >Описание главной
+              <textarea name="home.lead"></textarea>
+            </label>
+            <label
+              >Кнопка 1 главной
+              <input name="home.ctaPrimary" type="text" />
+            </label>
+            <label
+              >Кнопка 2 главной
+              <input name="home.ctaSecondary" type="text" />
+            </label>
+            <label
+              >Преимущество 1 главной
+              <input name="home.benefit1" type="text" />
+            </label>
+            <label
+              >Преимущество 2 главной
+              <input name="home.benefit2" type="text" />
+            </label>
+            <label
+              >Преимущество 3 главной
+              <input name="home.benefit3" type="text" />
+            </label>
+            <div class="settings-subhead full">Дашборд главной</div>
+            <label
+              >Карточка 1: подпись
+              <input name="home.dashboard1Label" type="text" />
+            </label>
+            <label
+              >Карточка 1: число
+              <input name="home.dashboard1Value" type="text" />
+            </label>
+            <label class="full"
+              >Карточка 1: описание
+              <input name="home.dashboard1Text" type="text" />
+            </label>
+            <label
+              >Карточка 2: подпись
+              <input name="home.dashboard2Label" type="text" />
+            </label>
+            <label
+              >Карточка 2: число
+              <input name="home.dashboard2Value" type="text" />
+            </label>
+            <label class="full"
+              >Карточка 2: описание
+              <input name="home.dashboard2Text" type="text" />
+            </label>
+            <label
+              >Карточка 3: подпись
+              <input name="home.dashboard3Label" type="text" />
+            </label>
+            <label
+              >Карточка 3: число
+              <input name="home.dashboard3Value" type="text" />
+            </label>
+            <label class="full"
+              >Карточка 3: описание
+              <input name="home.dashboard3Text" type="text" />
+            </label>
+            <div class="settings-subhead full">Сотрудники</div>
+            <label class="full"
+              >Подпись сотрудников
+              <input name="workers.eyebrow" type="text" />
+            </label>
+            <label class="full"
+              >Заголовок сотрудников
+              <input name="workers.title" type="text" />
+            </label>
+            <label class="full"
+              >Описание сотрудников
+              <textarea name="workers.lead"></textarea>
+            </label>
+            <label
+              >Кнопка 1 сотрудников
+              <input name="workers.ctaPrimary" type="text" />
+            </label>
+            <label
+              >Кнопка 2 сотрудников
+              <input name="workers.ctaSecondary" type="text" />
+            </label>
+            <label
+              >Преимущество 1 сотрудников
+              <input name="workers.benefit1" type="text" />
+            </label>
+            <label
+              >Преимущество 2 сотрудников
+              <input name="workers.benefit2" type="text" />
+            </label>
+            <label
+              >Преимущество 3 сотрудников
+              <input name="workers.benefit3" type="text" />
+            </label>
+            <div class="settings-subhead full">Заведения</div>
+            <label class="full"
+              >Подпись заведений
+              <input name="restaurants.eyebrow" type="text" />
+            </label>
+            <label class="full"
+              >Заголовок заведений
+              <input name="restaurants.title" type="text" />
+            </label>
+            <label class="full"
+              >Описание заведений
+              <textarea name="restaurants.lead"></textarea>
+            </label>
+            <label
+              >Кнопка 1 заведений
+              <input name="restaurants.ctaPrimary" type="text" />
+            </label>
+            <label
+              >Кнопка 2 заведений
+              <input name="restaurants.ctaSecondary" type="text" />
+            </label>
+            <label
+              >Преимущество 1 заведений
+              <input name="restaurants.benefit1" type="text" />
+            </label>
+            <label
+              >Преимущество 2 заведений
+              <input name="restaurants.benefit2" type="text" />
+            </label>
+            <label
+              >Преимущество 3 заведений
+              <input name="restaurants.benefit3" type="text" />
+            </label>
+            <div class="settings-subhead full">Поставщики</div>
+            <label class="full"
+              >Подпись поставщиков
+              <input name="suppliers.eyebrow" type="text" />
+            </label>
+            <label class="full"
+              >Заголовок поставщиков
+              <input name="suppliers.title" type="text" />
+            </label>
+            <label class="full"
+              >Описание поставщиков
+              <textarea name="suppliers.lead"></textarea>
+            </label>
+            <label
+              >Кнопка 1 поставщиков
+              <input name="suppliers.ctaPrimary" type="text" />
+            </label>
+            <label
+              >Кнопка 2 поставщиков
+              <input name="suppliers.ctaSecondary" type="text" />
+            </label>
+            <label
+              >Преимущество 1 поставщиков
+              <input name="suppliers.benefit1" type="text" />
+            </label>
+            <label
+              >Преимущество 2 поставщиков
+              <input name="suppliers.benefit2" type="text" />
+            </label>
+            <label
+              >Преимущество 3 поставщиков
+              <input name="suppliers.benefit3" type="text" />
+            </label>
+            <div class="settings-subhead full">Вход, кабинет и админка</div>
+            <label class="full"
+              >Подпись входа
+              <input name="auth.eyebrow" type="text" />
+            </label>
+            <label class="full"
+              >Заголовок входа
+              <input name="auth.title" type="text" />
+            </label>
+            <label class="full"
+              >Описание входа
+              <textarea name="auth.lead"></textarea>
+            </label>
+            <label class="full"
+              >Подпись кабинета
+              <input name="cabinet.eyebrow" type="text" />
+            </label>
+            <label class="full"
+              >Заголовок кабинета
+              <input name="cabinet.title" type="text" />
+            </label>
+            <label class="full"
+              >Описание кабинета
+              <textarea name="cabinet.lead"></textarea>
+            </label>
+            <label class="full"
+              >Подпись админки
+              <input name="admin.eyebrow" type="text" />
+            </label>
+            <label class="full"
+              >Заголовок админки
+              <input name="admin.title" type="text" />
+            </label>
+            <label class="full"
+              >Описание админки
+              <textarea name="admin.lead"></textarea>
+            </label>
+            <div class="settings-subhead full">Расширенные настройки</div>
+            <label class="full"
+              >JSON всех настроек
+              <textarea
+                id="siteSettingsJson"
+                class="settings-json"
+                spellcheck="false"
+              ></textarea>
+            </label>
+            <div class="cabinet-actions form-actions full">
+              <button id="refreshSiteSettingsJson" class="btn" type="button">
+                Обновить JSON
+              </button>
+              <button id="downloadSiteSettingsJson" class="btn" type="button">
+                Скачать JSON
+              </button>
+            </div>
+            <div class="cabinet-actions form-actions">
+              <button type="submit">Сохранить настройки</button>
+              <button id="resetSiteSettings" class="btn" type="button">
+                Сбросить
+              </button>
+            </div>
+            <p id="siteSettingsMessage" class="message"></p>
+          </form>
+        </section>
+
+        <section class="admin-panel">
+          <div id="adminStats" class="stats"></div>
+          <div class="table-wrap">
+            <table id="adminTable">
+              <thead>
+                <tr>
+                  <th>Дата</th>
+                  <th>Тип</th>
+                  <th>Имя/Компания</th>
+                  <th>Телефон</th>
+                  <th>Telegram</th>
+                  <th>Данные</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer" id="contacts">
+        <div class="footer-brand">
+          <img
+            class="footer-logo"
+            data-site-logo
+            src="assets/logo-full.png"
+            width="200"
+            height="50"
+            alt="GastroConnect"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+        <div class="footer-links">
+          <span>Telegram: @GastroConnect_bot</span>
+          <span>Email: info@gastroconnect.ru</span>
+        </div>
+      </footer>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js?v=1002"></script>
+    <script src="script.js?v=1017"></script>
+  </body>
+</html>
