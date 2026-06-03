@@ -233,7 +233,18 @@ using (id = auth.uid() or public.is_admin())
 with check (id = auth.uid() or public.is_admin());
 
 drop policy if exists worker_profiles_select_authenticated on public.worker_profiles;
-create policy worker_profiles_select_authenticated on public.worker_profiles for select to authenticated using (true);
+drop policy if exists worker_profiles_select_by_role on public.worker_profiles;
+create policy worker_profiles_select_by_role on public.worker_profiles for select to authenticated
+using (
+  user_id = auth.uid()
+  or public.is_admin()
+  or exists (
+    select 1
+    from public.profiles p
+    where p.id = auth.uid()
+      and p.role = 'restaurant'
+  )
+);
 
 drop policy if exists site_settings_public_read on public.site_settings;
 create policy site_settings_public_read on public.site_settings for select to anon, authenticated using (true);
@@ -266,7 +277,19 @@ using (user_id = auth.uid() or public.is_admin())
 with check (user_id = auth.uid() or public.is_admin());
 
 drop policy if exists shift_posts_select_authenticated on public.shift_posts;
-create policy shift_posts_select_authenticated on public.shift_posts for select to authenticated using (true);
+drop policy if exists shift_posts_select_by_role on public.shift_posts;
+create policy shift_posts_select_by_role on public.shift_posts for select to authenticated
+using (
+  restaurant_id = auth.uid()
+  or public.is_admin()
+  or exists (
+    select 1
+    from public.profiles p
+    where p.id = auth.uid()
+      and p.role = 'worker'
+      and shift_posts.status = 'open'
+  )
+);
 
 drop policy if exists shift_posts_insert_restaurant_or_admin on public.shift_posts;
 create policy shift_posts_insert_restaurant_or_admin on public.shift_posts for insert to authenticated
@@ -341,7 +364,19 @@ using (supplier_id = auth.uid() or public.is_admin())
 with check (supplier_id = auth.uid() or public.is_admin());
 
 drop policy if exists supply_requests_select_authenticated on public.supply_requests;
-create policy supply_requests_select_authenticated on public.supply_requests for select to authenticated using (true);
+drop policy if exists supply_requests_select_by_role on public.supply_requests;
+create policy supply_requests_select_by_role on public.supply_requests for select to authenticated
+using (
+  restaurant_id = auth.uid()
+  or public.is_admin()
+  or exists (
+    select 1
+    from public.profiles p
+    where p.id = auth.uid()
+      and p.role = 'supplier'
+      and supply_requests.status = 'open'
+  )
+);
 
 drop policy if exists supply_requests_insert_restaurant on public.supply_requests;
 create policy supply_requests_insert_restaurant on public.supply_requests for insert to authenticated

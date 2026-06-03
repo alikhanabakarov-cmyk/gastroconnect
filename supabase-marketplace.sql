@@ -50,11 +50,21 @@ using (restaurant_id = auth.uid())
 with check (restaurant_id = auth.uid());
 
 drop policy if exists "authenticated can read supply requests" on public.supply_requests;
-create policy "authenticated can read supply requests"
+drop policy if exists "suppliers and owners can read supply requests" on public.supply_requests;
+create policy "suppliers and owners can read supply requests"
 on public.supply_requests
 for select
 to authenticated
-using (true);
+using (
+  restaurant_id = auth.uid()
+  or exists (
+    select 1
+    from public.profiles p
+    where p.id = auth.uid()
+      and p.role in ('supplier', 'admin')
+      and supply_requests.status = 'open'
+  )
+);
 
 drop policy if exists "supplier responses related users can read" on public.supplier_responses;
 create policy "supplier responses related users can read"
