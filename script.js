@@ -143,9 +143,35 @@
     localStorage.setItem(SITE_SETTINGS_KEY, JSON.stringify(settings));
   }
 
+  function isSafeImageSrc(src) {
+    const value = String(src || "").trim();
+    if (!value) return false;
+    const lower = value.toLowerCase();
+    if (
+      lower.startsWith("javascript:") ||
+      lower.startsWith("data:") ||
+      lower.includes("raw.githubusercontent.com")
+    ) {
+      return false;
+    }
+
+    if (lower.startsWith("assets/")) return true;
+
+    try {
+      const url = new URL(value, window.location.href);
+      return url.protocol === "https:" || url.protocol === "http:";
+    } catch {
+      return false;
+    }
+  }
+
+  function safeImageSrc(src, fallback) {
+    return isSafeImageSrc(src) ? String(src).trim() : fallback;
+  }
+
   function setImageWithFallback(image, src, fallback) {
     const fallbackSrc = fallback || src;
-    const nextSrc = src || fallbackSrc;
+    const nextSrc = safeImageSrc(src, fallbackSrc);
     if (!image || !nextSrc) return;
 
     if (fallbackSrc) image.dataset.fallbackSrc = fallbackSrc;
@@ -154,7 +180,18 @@
       if (safeSrc && image.getAttribute("src") !== safeSrc) image.src = safeSrc;
     };
 
-    if (image.getAttribute("src") !== nextSrc) image.src = nextSrc;
+    if (image.getAttribute("src") === nextSrc) return;
+
+    const preload = new Image();
+    preload.decoding = "async";
+    preload.onload = () => {
+      if (image.getAttribute("src") !== nextSrc) image.src = nextSrc;
+    };
+    preload.onerror = () => {
+      const safeSrc = image.dataset.fallbackSrc;
+      if (safeSrc && image.getAttribute("src") !== safeSrc) image.src = safeSrc;
+    };
+    preload.src = nextSrc;
   }
 
   function applySiteSettings(settings = readSiteSettings()) {
