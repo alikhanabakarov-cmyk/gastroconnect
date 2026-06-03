@@ -322,6 +322,7 @@ create policy shift_applications_insert_worker on public.shift_applications for 
 with check (worker_id = auth.uid());
 
 drop policy if exists shift_applications_update_related on public.shift_applications;
+drop policy if exists shift_applications_update_restaurant_or_admin on public.shift_applications;
 create policy shift_applications_update_related on public.shift_applications for update to authenticated
 using (worker_id = auth.uid() or restaurant_id = auth.uid() or public.is_admin())
 with check (worker_id = auth.uid() or restaurant_id = auth.uid() or public.is_admin());
@@ -331,10 +332,12 @@ create policy shift_invites_select_own on public.shift_invites for select to aut
 using (restaurant_id = auth.uid() or worker_id = auth.uid() or public.is_admin());
 
 drop policy if exists shift_invites_insert_own_restaurant on public.shift_invites;
+drop policy if exists shift_invites_insert_restaurant on public.shift_invites;
 create policy shift_invites_insert_own_restaurant on public.shift_invites for insert to authenticated
 with check (restaurant_id = auth.uid() or public.is_admin());
 
 drop policy if exists shift_invites_update_own on public.shift_invites;
+drop policy if exists shift_invites_update_worker on public.shift_invites;
 create policy shift_invites_update_own on public.shift_invites for update to authenticated
 using (restaurant_id = auth.uid() or worker_id = auth.uid() or public.is_admin())
 with check (restaurant_id = auth.uid() or worker_id = auth.uid() or public.is_admin());
@@ -377,6 +380,8 @@ using (supplier_id = auth.uid() or public.is_admin())
 with check (supplier_id = auth.uid() or public.is_admin());
 
 drop policy if exists supply_requests_select_authenticated on public.supply_requests;
+drop policy if exists "authenticated can read supply requests" on public.supply_requests;
+drop policy if exists "suppliers and owners can read supply requests" on public.supply_requests;
 drop policy if exists supply_requests_select_by_role on public.supply_requests;
 create policy supply_requests_select_by_role on public.supply_requests for select to authenticated
 using (
@@ -392,23 +397,28 @@ using (
 );
 
 drop policy if exists supply_requests_insert_restaurant on public.supply_requests;
+drop policy if exists "restaurants can create supply requests" on public.supply_requests;
 create policy supply_requests_insert_restaurant on public.supply_requests for insert to authenticated
 with check (restaurant_id = auth.uid() or public.is_admin());
 
 drop policy if exists supply_requests_update_restaurant on public.supply_requests;
+drop policy if exists "restaurants can update own supply requests" on public.supply_requests;
 create policy supply_requests_update_restaurant on public.supply_requests for update to authenticated
 using (restaurant_id = auth.uid() or public.is_admin())
 with check (restaurant_id = auth.uid() or public.is_admin());
 
 drop policy if exists supplier_responses_select_related on public.supplier_responses;
+drop policy if exists "supplier responses related users can read" on public.supplier_responses;
 create policy supplier_responses_select_related on public.supplier_responses for select to authenticated
 using (restaurant_id = auth.uid() or supplier_id = auth.uid() or public.is_admin());
 
 drop policy if exists supplier_responses_insert_supplier on public.supplier_responses;
+drop policy if exists "suppliers can create supplier responses" on public.supplier_responses;
 create policy supplier_responses_insert_supplier on public.supplier_responses for insert to authenticated
 with check (supplier_id = auth.uid() or public.is_admin());
 
 drop policy if exists supplier_responses_update_related on public.supplier_responses;
+drop policy if exists "restaurants can update supplier responses" on public.supplier_responses;
 create policy supplier_responses_update_related on public.supplier_responses for update to authenticated
 using (restaurant_id = auth.uid() or supplier_id = auth.uid() or public.is_admin())
 with check (restaurant_id = auth.uid() or supplier_id = auth.uid() or public.is_admin());
