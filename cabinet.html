@@ -14,11 +14,11 @@
     </style>
     <link
       rel="preload"
-      href="style.css?v=1009"
+      href="style.css?v=1010"
       as="style"
       onload="this.onload=null;this.rel='stylesheet'"
     />
-    <noscript><link rel="stylesheet" href="style.css?v=1009" /></noscript>
+    <noscript><link rel="stylesheet" href="style.css?v=1010" /></noscript>
   </head>
   <body>
     <div class="page-shell">
@@ -618,6 +618,16 @@
             <label class="full">Кабинет: заголовок<input name="cabinet.title" type="text" /></label>
             <label class="full">Админка: заголовок<input name="admin.title" type="text" /></label>
 
+            <div class="settings-subhead full">Расширенные настройки</div>
+            <label class="full"
+              >JSON всех настроек
+              <textarea
+                id="siteSettingsJson"
+                class="settings-json"
+                spellcheck="false"
+              ></textarea>
+            </label>
+
             <div class="cabinet-actions form-actions">
               <button type="submit">Сохранить настройки</button>
               <button id="resetSiteSettings" class="btn" type="button">Сбросить</button>
@@ -643,7 +653,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase.js?v=1001"></script>
-    <script src="script.js?v=1009"></script>
+    <script src="script.js?v=1010"></script>
     <script src="cabinet.js?v=1005"></script>
   </body>
 </html>

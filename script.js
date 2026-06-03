@@ -305,6 +305,7 @@
       field.value = field.name === "logo" ? settings.logo : getPath(settings, field.name) || "";
     });
     updateSiteSettingsPreview(settings);
+    updateSiteSettingsJson(settings);
   }
 
   function updateSiteSettingsPreview(settings = readSiteSettings()) {
@@ -314,6 +315,12 @@
       const fallback = path === "logo" ? defaultSiteSettings.logo : getPath(defaultSiteSettings, path);
       setImageWithFallback(image, src, fallback);
     });
+  }
+
+  function updateSiteSettingsJson(settings = readSiteSettings()) {
+    const jsonField = document.getElementById("siteSettingsJson");
+    if (!jsonField || jsonField.dataset.dirty === "true") return;
+    jsonField.value = JSON.stringify(settings, null, 2);
   }
 
   function collectSiteSettingsFromForm(form) {
@@ -329,6 +336,11 @@
       }
     });
 
+    const jsonField = document.getElementById("siteSettingsJson");
+    if (jsonField?.dataset.dirty === "true" && jsonField.value.trim()) {
+      return mergeSettings(next, JSON.parse(jsonField.value));
+    }
+
     return next;
   }
 
@@ -342,11 +354,20 @@
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
-      const next = collectSiteSettingsFromForm(form);
+      let next;
+      try {
+        next = collectSiteSettingsFromForm(form);
+      } catch (error) {
+        message.textContent = `JSON настроек не сохранен: ${error.message}`;
+        return;
+      }
 
       writeSiteSettings(next);
       applySiteSettings(next);
       updateSiteSettingsPreview(next);
+      const jsonField = document.getElementById("siteSettingsJson");
+      if (jsonField) jsonField.dataset.dirty = "false";
+      updateSiteSettingsJson(next);
       const remote = await saveSettingsToSupabase(next);
       message.textContent = remote.saved
         ? "Настройки сохранены глобально в Supabase."
@@ -356,6 +377,8 @@
     resetButton?.addEventListener("click", async () => {
       writeSiteSettings(defaultSiteSettings);
       applySiteSettings(defaultSiteSettings);
+      const jsonField = document.getElementById("siteSettingsJson");
+      if (jsonField) jsonField.dataset.dirty = "false";
       fillSiteSettingsForm(defaultSiteSettings);
       const remote = await saveSettingsToSupabase(defaultSiteSettings);
       message.textContent = remote.saved
@@ -365,9 +388,27 @@
 
     form.querySelectorAll("input[name], textarea[name]").forEach((field) => {
       field.addEventListener("input", () => {
-        updateSiteSettingsPreview(collectSiteSettingsFromForm(form));
+        try {
+          updateSiteSettingsPreview(collectSiteSettingsFromForm(form));
+        } catch {
+          // The JSON field can be incomplete while the admin is editing it.
+        }
       });
     });
+
+    const jsonField = document.getElementById("siteSettingsJson");
+    if (jsonField) {
+      updateSiteSettingsJson();
+      jsonField.addEventListener("input", () => {
+        jsonField.dataset.dirty = "true";
+        try {
+          updateSiteSettingsPreview(mergeSettings(readSiteSettings(), JSON.parse(jsonField.value || "{}")));
+          if (message) message.textContent = "";
+        } catch {
+          if (message) message.textContent = "JSON настроек пока невалидный.";
+        }
+      });
+    }
 
     form.querySelectorAll("[data-upload-target]").forEach((input) => {
       input.addEventListener("change", async () => {

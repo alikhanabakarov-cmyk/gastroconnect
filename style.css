@@ -1030,6 +1030,13 @@ textarea:focus {
   min-height: 96px;
 }
 
+.settings-json {
+  min-height: 210px;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
 .settings-form input[type="file"] {
   padding: 12px;
   min-height: 48px;
