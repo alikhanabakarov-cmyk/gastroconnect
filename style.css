@@ -684,6 +684,18 @@ button:disabled {
   align-items: start;
 }
 
+.metrics-band,
+.live-board-section,
+.direction-section,
+.function-section,
+.market-section,
+.form-section,
+.admin-panel,
+.footer {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 620px;
+}
+
 .form-info,
 .form-intro,
 .form-card,

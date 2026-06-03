@@ -142,15 +142,29 @@
     localStorage.setItem(SITE_SETTINGS_KEY, JSON.stringify(settings));
   }
 
+  function setImageWithFallback(image, src, fallback) {
+    const fallbackSrc = fallback || src;
+    const nextSrc = src || fallbackSrc;
+    if (!image || !nextSrc) return;
+
+    if (fallbackSrc) image.dataset.fallbackSrc = fallbackSrc;
+    image.onerror = () => {
+      const safeSrc = image.dataset.fallbackSrc;
+      if (safeSrc && image.getAttribute("src") !== safeSrc) image.src = safeSrc;
+    };
+
+    if (image.getAttribute("src") !== nextSrc) image.src = nextSrc;
+  }
+
   function applySiteSettings(settings = readSiteSettings()) {
     document.querySelectorAll("[data-site-logo]").forEach((image) => {
-      const src = settings.logo || defaultSiteSettings.logo;
-      if (image.getAttribute("src") !== src) image.src = src;
+      setImageWithFallback(image, settings.logo, defaultSiteSettings.logo);
     });
 
     document.querySelectorAll("[data-site-image]").forEach((image) => {
       const src = getPath(settings, image.dataset.siteImage);
-      if (src && image.getAttribute("src") !== src) image.src = src;
+      const fallback = getPath(defaultSiteSettings, image.dataset.siteImage);
+      setImageWithFallback(image, src, fallback);
     });
 
     document.querySelectorAll("[data-site-setting]").forEach((element) => {
@@ -185,12 +199,21 @@
   async function fetchRemoteSiteSettings() {
     const { url, key } = await getSupabaseRestConfig();
     const endpoint = `${url}/rest/v1/site_settings?setting_key=eq.${encodeURIComponent(SITE_SETTINGS_ROW)}&select=settings&limit=1`;
-    const response = await fetch(endpoint, {
-      headers: {
-        apikey: key,
-        Authorization: `Bearer ${key}`,
-      },
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 4000);
+    let response;
+
+    try {
+      response = await fetch(endpoint, {
+        signal: controller.signal,
+        headers: {
+          apikey: key,
+          Authorization: `Bearer ${key}`,
+        },
+      });
+    } finally {
+      clearTimeout(timeoutId);
+    }
 
     if (!response.ok) throw new Error(`site_settings ${response.status}`);
     const rows = await response.json();
@@ -288,7 +311,8 @@
     document.querySelectorAll("[data-setting-preview]").forEach((image) => {
       const path = image.dataset.settingPreview;
       const src = path === "logo" ? settings.logo : getPath(settings, path);
-      if (src) image.src = src;
+      const fallback = path === "logo" ? defaultSiteSettings.logo : getPath(defaultSiteSettings, path);
+      setImageWithFallback(image, src, fallback);
     });
   }
 
