@@ -2,5 +2,7 @@ User-agent: *
 Allow: /
 
 Disallow: /admin.html
+Disallow: /manage.html
+Disallow: /cabinet.html
 
 Sitemap: https://gastroconnect.ru/sitemap.xml
