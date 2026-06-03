@@ -58,18 +58,6 @@
             </p>
             <p id="userInfo" class="message">Проверяем вход...</p>
           </div>
-          <div class="service-hero-media" aria-hidden="true">
-            <img
-              class="service-hero-image"
-              data-site-image="cabinet.hero"
-              src="assets/hero-home.webp"
-              width="1080"
-              height="675"
-              alt=""
-              decoding="async"
-              fetchpriority="high"
-            />
-          </div>
         </section>
 
         <section id="workerCabinet" class="role-panel">
@@ -564,126 +552,15 @@
 
         <section id="adminCabinet" class="role-panel">
           <h2>Кабинет админа</h2>
-          <p>
-            Обзор данных платформы: работники, приглашения, запросы заведений и
-            предложения поставщиков.
-          </p>
 
           <h3>Настройки сайта</h3>
           <p>
-            Админ может менять логотип, hero-картинки и главные надписи. При
-            роли admin изменения сохраняются глобально в Supabase.
+            Логотип, hero-картинки и главные тексты вынесены в отдельную
+            лёгкую админку, чтобы кабинет быстро открывался у всех ролей.
           </p>
           <div class="cabinet-actions">
             <a class="btn primary" href="manage.html">Открыть отдельную админку</a>
           </div>
-          <form id="siteSettingsForm" class="settings-form compact-settings-form">
-            <label class="full">Логотип<input name="logo" type="text" list="siteAssetOptions" /></label>
-            <label class="full upload-label">Загрузить логотип<input type="file" accept="image/*" data-upload-target="logo" /></label>
-            <datalist id="siteAssetOptions">
-              <option value="assets/logo-full.png"></option>
-              <option value="assets/logo-mark.png"></option>
-              <option value="assets/hero-home.webp"></option>
-              <option value="assets/hero-workers.webp"></option>
-              <option value="assets/hero-restaurants.webp"></option>
-              <option value="assets/hero-suppliers.webp"></option>
-            </datalist>
-
-            <div class="settings-subhead full">Hero-картинки</div>
-            <label>Главная<input name="home.hero" type="text" list="siteAssetOptions" /></label>
-            <label>Загрузить<input type="file" accept="image/*" data-upload-target="home.hero" /></label>
-            <label>Сотрудники<input name="workers.hero" type="text" list="siteAssetOptions" /></label>
-            <label>Загрузить<input type="file" accept="image/*" data-upload-target="workers.hero" /></label>
-            <label>Заведения<input name="restaurants.hero" type="text" list="siteAssetOptions" /></label>
-            <label>Загрузить<input type="file" accept="image/*" data-upload-target="restaurants.hero" /></label>
-            <label>Поставщики<input name="suppliers.hero" type="text" list="siteAssetOptions" /></label>
-            <label>Загрузить<input type="file" accept="image/*" data-upload-target="suppliers.hero" /></label>
-            <label>Вход<input name="auth.hero" type="text" list="siteAssetOptions" /></label>
-            <label>Загрузить<input type="file" accept="image/*" data-upload-target="auth.hero" /></label>
-            <label>Кабинет<input name="cabinet.hero" type="text" list="siteAssetOptions" /></label>
-            <label>Загрузить<input type="file" accept="image/*" data-upload-target="cabinet.hero" /></label>
-            <label>Админка<input name="admin.hero" type="text" list="siteAssetOptions" /></label>
-            <label>Загрузить<input type="file" accept="image/*" data-upload-target="admin.hero" /></label>
-
-            <div class="asset-preview-grid full" aria-label="Текущие изображения сайта">
-              <figure class="asset-preview-card asset-preview-card-logo">
-                <img data-setting-preview="logo" src="assets/logo-full.png" alt="Текущий логотип" loading="lazy" decoding="async" />
-                <figcaption>Логотип</figcaption>
-              </figure>
-              <figure class="asset-preview-card">
-                <img data-setting-preview="home.hero" src="assets/hero-home.webp" alt="Hero главной" loading="lazy" decoding="async" />
-                <figcaption>Главная</figcaption>
-              </figure>
-              <figure class="asset-preview-card">
-                <img data-setting-preview="workers.hero" src="assets/hero-workers.webp" alt="Hero сотрудников" loading="lazy" decoding="async" />
-                <figcaption>Сотрудники</figcaption>
-              </figure>
-              <figure class="asset-preview-card">
-                <img data-setting-preview="restaurants.hero" src="assets/hero-restaurants.webp" alt="Hero заведений" loading="lazy" decoding="async" />
-                <figcaption>Заведения</figcaption>
-              </figure>
-              <figure class="asset-preview-card">
-                <img data-setting-preview="suppliers.hero" src="assets/hero-suppliers.webp" alt="Hero поставщиков" loading="lazy" decoding="async" />
-                <figcaption>Поставщики</figcaption>
-              </figure>
-              <figure class="asset-preview-card">
-                <img data-setting-preview="auth.hero" src="assets/hero-home.webp" alt="Hero входа" loading="lazy" decoding="async" />
-                <figcaption>Вход</figcaption>
-              </figure>
-              <figure class="asset-preview-card">
-                <img data-setting-preview="cabinet.hero" src="assets/hero-home.webp" alt="Hero кабинета" loading="lazy" decoding="async" />
-                <figcaption>Кабинет</figcaption>
-              </figure>
-              <figure class="asset-preview-card">
-                <img data-setting-preview="admin.hero" src="assets/hero-home.webp" alt="Hero админки" loading="lazy" decoding="async" />
-                <figcaption>Админка</figcaption>
-              </figure>
-            </div>
-
-            <div class="settings-subhead full">Верхняя панель</div>
-            <label>Сотрудникам<input name="nav.workers" type="text" /></label>
-            <label>Заведениям<input name="nav.restaurants" type="text" /></label>
-            <label>Поставщикам<input name="nav.suppliers" type="text" /></label>
-            <label>Контакты<input name="nav.contacts" type="text" /></label>
-            <label>Кнопка входа<input name="nav.login" type="text" /></label>
-
-            <div class="settings-subhead full">Главные тексты</div>
-            <label class="full">Главная: заголовок<input name="home.title" type="text" /></label>
-            <label class="full">Главная: описание<textarea name="home.lead"></textarea></label>
-            <label class="full">Сотрудники: заголовок<input name="workers.title" type="text" /></label>
-            <label class="full">Сотрудники: описание<textarea name="workers.lead"></textarea></label>
-            <label class="full">Заведения: заголовок<input name="restaurants.title" type="text" /></label>
-            <label class="full">Заведения: описание<textarea name="restaurants.lead"></textarea></label>
-            <label class="full">Поставщики: заголовок<input name="suppliers.title" type="text" /></label>
-            <label class="full">Поставщики: описание<textarea name="suppliers.lead"></textarea></label>
-            <label class="full">Вход: заголовок<input name="auth.title" type="text" /></label>
-            <label class="full">Кабинет: заголовок<input name="cabinet.title" type="text" /></label>
-            <label class="full">Админка: заголовок<input name="admin.title" type="text" /></label>
-
-            <div class="settings-subhead full">Расширенные настройки</div>
-            <label class="full"
-              >JSON всех настроек
-              <textarea
-                id="siteSettingsJson"
-                class="settings-json"
-                spellcheck="false"
-              ></textarea>
-            </label>
-            <div class="cabinet-actions form-actions full">
-              <button id="refreshSiteSettingsJson" class="btn" type="button">
-                Обновить JSON
-              </button>
-              <button id="downloadSiteSettingsJson" class="btn" type="button">
-                Скачать JSON
-              </button>
-            </div>
-
-            <div class="cabinet-actions form-actions">
-              <button type="submit">Сохранить настройки</button>
-              <button id="resetSiteSettings" class="btn" type="button">Сбросить</button>
-            </div>
-            <p id="siteSettingsMessage" class="message"></p>
-          </form>
           <h3>Данные платформы</h3>
           <div class="cabinet-actions">
             <button id="loadAdminDataBtn" type="button">Обновить данные</button>
