@@ -3,6 +3,7 @@
   const SITE_SETTINGS_KEY = "gc_site_settings";
   const SITE_SETTINGS_ROW = "public_site";
   const SITE_ASSETS_BUCKET = "site-assets";
+  const SUPABASE_CONFIG_URL = "supabase.js?v=1001";
 
   const roleLabels = {
     worker: "Работник",
@@ -185,7 +186,18 @@
       return window.__gcSupabaseRestConfig;
     }
 
-    const response = await fetch("supabase.js", { cache: "force-cache" });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
+    let response;
+
+    try {
+      response = await fetch(SUPABASE_CONFIG_URL, {
+        cache: "force-cache",
+        signal: controller.signal,
+      });
+    } finally {
+      clearTimeout(timeoutId);
+    }
     if (!response.ok) throw new Error("supabase.js не загрузился");
     const source = await response.text();
     const url = source.match(/SUPABASE_URL\s*=\s*['"]([^'"]+)['"]/i)?.[1];
