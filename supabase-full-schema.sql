@@ -184,7 +184,11 @@ begin
   insert into public.profiles (id, role, name, city, status)
   values (
     new.id,
-    coalesce(new.raw_user_meta_data->>'role', 'worker'),
+    case
+      when new.raw_user_meta_data->>'role' in ('worker', 'restaurant', 'supplier')
+        then new.raw_user_meta_data->>'role'
+      else 'worker'
+    end,
     coalesce(new.raw_user_meta_data->>'name', new.email, 'Пользователь'),
     new.raw_user_meta_data->>'city',
     'active'
@@ -225,12 +229,21 @@ using (id = auth.uid() or status = 'active' or public.is_admin());
 
 drop policy if exists profiles_insert_own on public.profiles;
 create policy profiles_insert_own on public.profiles for insert to authenticated
-with check (id = auth.uid());
+with check (
+  id = auth.uid()
+  and role in ('worker', 'restaurant', 'supplier')
+);
 
 drop policy if exists profiles_update_own_or_admin on public.profiles;
 create policy profiles_update_own_or_admin on public.profiles for update to authenticated
 using (id = auth.uid() or public.is_admin())
-with check (id = auth.uid() or public.is_admin());
+with check (
+  public.is_admin()
+  or (
+    id = auth.uid()
+    and role in ('worker', 'restaurant', 'supplier')
+  )
+);
 
 drop policy if exists worker_profiles_select_authenticated on public.worker_profiles;
 drop policy if exists worker_profiles_select_by_role on public.worker_profiles;

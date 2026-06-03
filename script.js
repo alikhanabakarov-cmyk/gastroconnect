@@ -581,6 +581,9 @@
       },
     };
 
+    const publicAuthRoles = ["worker", "restaurant", "supplier"];
+    const normalizeAuthRole = (role) => (publicAuthRoles.includes(role) ? role : "worker");
+
     const requestedRole = new URLSearchParams(window.location.search).get("role");
     if (roleCopy[requestedRole]) roleInput.value = requestedRole;
 
@@ -592,7 +595,7 @@
 
     async function ensureProfileAfterAuth(user, role) {
       if (!user) return;
-      const profileRole = user.user_metadata?.role || role || "worker";
+      const profileRole = normalizeAuthRole(user.user_metadata?.role || role);
       const { data: existing, error: readError } = await window.supabaseClient
         .from("profiles")
         .select("id")
@@ -617,7 +620,7 @@
       const client = window.supabaseClient;
       const email = emailInput.value.trim();
       const password = passwordInput.value;
-      const role = roleInput.value;
+      const role = normalizeAuthRole(roleInput.value);
 
       if (!client) return void (message.textContent = "Supabase не загрузился. Обновите страницу.");
       if (!email || !password) return void (message.textContent = "Введите email и пароль.");

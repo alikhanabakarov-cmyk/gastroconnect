@@ -1,1 +1,1267 @@
-!function(){const e=window.supabaseClient,t=e=>document.getElementById(e),s=Object.fromEntries(["userInfo","workerCabinet","restaurantCabinet","supplierCabinet","adminCabinet","unknownRole","logoutBtn","workerProfileMessage","restaurantProfileMessage","supplierProfileMessage","workersList","workersMessage","workerSearchInput","invitesList","invitesMessage","shiftPostsList","shiftPostsMessage","shiftSearchInput","restaurantShiftPostsList","shiftApplicationsList","shiftPostMessage","supplierOffersList","supplierOffersSearchInput","supplyRequestMessageBox","supplyResponsesMessage","supplyResponsesList","supplyRequestsList","supplyRequestsSearchInput","supplierOfferMessageBox","supplierOwnOffersList","supplierInquiriesMessage","supplierInquiriesList","adminMessage","adminDataList"].map((e=>[e,t(e)]))),r={user:null,profile:null,workers:[],shifts:[],supplierOffers:[],supplyRequests:[],supplierResponses:[],supplierInquiries:[],ownSupplierOffers:[]},n=["workerCabinet","restaurantCabinet","supplierCabinet","adminCabinet","unknownRole"],a={workerProfessions:"professions",workerAvailableDays:"available_days",workerExperience:"experience",workerAvailableTime:"available_time",workerPaymentType:"payment_type",workerCanTravel:"can_travel",workerTravelCities:"travel_cities",workerAbout:"about"},i={restaurantBusinessName:"business_name",restaurantBusinessType:"business_type",restaurantContactPerson:"contact_person",restaurantCity:"city",restaurantAddress:"address",restaurantAbout:"about"},o={supplierCompanyName:"company_name",supplierProfileCategory:"category",supplierContactPerson:"contact_person",supplierProfileCity:"city",supplierDeliveryCities:"delivery_cities",supplierProfileAbout:"about"};function u(e,t){e&&(e.textContent=t||"")}function p(e){return(t(e)?.value||"").trim()}function c(e){const t=p(e).replace(",",".").replace(/[^\d.]/g,""),s=Number(t);return Number.isFinite(s)&&t?s:null}function l(e){return p(e).split(",").map((e=>e.trim())).filter(Boolean)}function d(e){return String(e??"").replace(/[&<>"']/g,(e=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[e])))}function f(e){return Array.isArray(e)&&e.length?e.join(", "):"-"}function g(e){return e||0===e?`${e} ₽`:"-"}function y(e){return{pending:"ожидает",new:"новая",accepted:"принята",declined:"отклонена",cancelled:"отменена",done:"завершена",open:"открыта",closed:"закрыта",active:"активно",paused:"пауза"}[e]||e||"-"}function m(e,t){return!t||JSON.stringify(e).toLowerCase().includes(t.toLowerCase())}function _(e,t,s=""){const r=document.createElement("article");return r.className="data-card",r.innerHTML=`<h4>${d(e)}</h4>${t}${s}`,r}function w(e,t){e&&(e.innerHTML="",e.appendChild(_(t,"<p>Данные появятся здесь после публикации или отклика.</p>")))}function h(e){n.forEach((t=>{const r=s[t];r&&(r.style.display=r===e?"block":"none")}))}function S(e,s){Object.entries(e).forEach((([e,r])=>{const n=t(e);if(!n)return;const a=s?.[r];"checkbox"===n.type?n.checked=Boolean(a):n.value=Array.isArray(a)?a.join(", "):a??""}))}function b(e){const s={};return Object.entries(e).forEach((([e,r])=>{const n=t(e);if(!n)return;const a=e.toLowerCase();"checkbox"===n.type?s[r]=n.checked:a.includes("cities")||a.includes("professions")||a.includes("days")?s[r]=l(e):s[r]=p(e)})),s}function q(e,t,s="Сохраняем..."){e&&(t?(e.dataset.defaultText=e.textContent,e.textContent=s,e.disabled=!0):(e.textContent=e.dataset.defaultText||e.textContent,e.disabled=!1))}async function v(t,s={},r={}){let n=e.from(t).select(r.select||"*");return Object.entries(s).forEach((([e,t])=>{null!=t&&(n=n.eq(e,t))})),r.order&&(n=n.order(r.order.column,{ascending:r.order.ascending??!1})),n}async function L(t,s){return e.from(t).insert(s).select()}async function $(t,s,r){let n=e.from(t).update(r);return Object.entries(s).forEach((([e,t])=>{n=n.eq(e,t)})),n.select()}async function k(t,s){return e.from(t).upsert(s,{onConflict:"user_id"}).select()}async function O(e){const t=e?.currentTarget;q(t,!0);const n={user_id:r.user.id,...b(a),min_rate:c("workerMinRate"),travel_radius_km:c("workerTravelRadiusKm"),updated_at:(new Date).toISOString()},{error:i}=await k("worker_profiles",n);u(s.workerProfileMessage,i?`Ошибка: ${i.message}`:"Профиль работника сохранен."),q(t,!1)}async function M(){const{data:e,error:t}=await v("shift_posts",{status:"open"},{order:{column:"created_at",ascending:!1}});t?u(s.shiftPostsMessage,t.message):(r.shifts=e||[],I())}function I(){const e=p("shiftSearchInput"),t=r.shifts.filter((t=>m(t,e)));if(s.shiftPostsList.innerHTML="",!t.length)return w(s.shiftPostsList,"Смен пока нет"),void u(s.shiftPostsMessage,"Подходящих смен нет.");t.forEach((e=>{const t=_(e.title||"Смена",`\n          <p>${d(e.profession||"-")} / ${d(e.city||"-")}</p>\n          <p>${d(e.date_from||"")} ${d(e.time_from||"")}-${d(e.time_to||"")}</p>\n          <p>Ставка: ${d(g(e.rate))}</p>\n          <p>${d(e.requirements||"")}</p>\n        `,'<button type="button" data-action="apply-shift">Откликнуться</button><p class="message"></p>');t.querySelector('[data-action="apply-shift"]').addEventListener("click",(()=>async function(e,t){const s=t.querySelector(".message"),{error:n}=await L("shift_applications",{shift_id:e.id,worker_id:r.user.id,restaurant_id:e.restaurant_id,message:"Отклик работника",status:"pending",created_at:(new Date).toISOString()});u(s,n?`Ошибка: ${"23505"===n.code?"вы уже откликались на эту смену":n.message}`:"Отклик отправлен заведению.")}(e,t))),s.shiftPostsList.appendChild(t)})),u(s.shiftPostsMessage,`Смен найдено: ${t.length}`)}async function C(){const{data:e,error:t}=await v("shift_invites",{worker_id:r.user.id},{order:{column:"created_at",ascending:!1}});t?u(s.invitesMessage,t.message):function(e){if(s.invitesList.innerHTML="",!e.length)return w(s.invitesList,"Приглашений нет"),void u(s.invitesMessage,"Входящих приглашений пока нет.");e.forEach((e=>{const t="pending"===e.status,n=_("Приглашение на смену",`\n          <p>Статус: ${d(y(e.status))}</p>\n          <p>${d(e.message||"Заведение приглашает вас на смену.")}</p>\n        `,t?'<button type="button" data-status="accepted">Принять</button><button class="btn" type="button" data-status="declined">Отклонить</button><p class="message"></p>':'<p class="message">Решение уже сохранено.</p>');n.querySelectorAll("[data-status]").forEach((t=>{t.addEventListener("click",(()=>async function(e,t,s){const{error:n}=await $("shift_invites",{id:e,worker_id:r.user.id},{status:t,updated_at:(new Date).toISOString()});u(s.querySelector(".message"),n?`Ошибка: ${n.message}`:"Решение сохранено."),n||C()}(e.id,t.dataset.status,n)))})),s.invitesList.appendChild(n)})),u(s.invitesMessage,`Приглашений: ${e.length}`)}(e||[])}async function R(e){const t=e?.currentTarget;q(t,!0);const{error:n}=await k("restaurant_profiles",{user_id:r.user.id,...b(i),updated_at:(new Date).toISOString()});u(s.restaurantProfileMessage,n?`Ошибка: ${n.message}`:"Профиль заведения сохранен."),q(t,!1)}async function P(e){const t=e?.currentTarget,n=p("shiftTitle"),a=p("shiftProfession");if(!n||!a)return void u(s.shiftPostMessage,"Заполните название смены и профессию.");q(t,!0,"Публикуем...");const{error:i}=await L("shift_posts",{restaurant_id:r.user.id,title:n,profession:a,city:p("shiftCity"),district:p("shiftDistrict"),address:p("shiftAddress"),date_from:p("shiftDateFrom")||null,time_from:p("shiftTimeFrom")||null,time_to:p("shiftTimeTo")||null,rate:c("shiftRate"),requirements:p("shiftRequirements"),status:"open",created_at:(new Date).toISOString(),updated_at:(new Date).toISOString()});u(s.shiftPostMessage,i?`Ошибка: ${i.message}`:"Смена опубликована."),q(t,!1),i||E()}async function E(){const{data:e,error:t}=await v("shift_posts",{restaurant_id:r.user.id},{order:{column:"created_at",ascending:!1}});t?u(s.shiftPostMessage,t.message):(s.restaurantShiftPostsList.innerHTML="",e?.length?e.forEach((e=>{s.restaurantShiftPostsList.appendChild(_(e.title||"Смена",`<p>${d(e.profession||"-")} / ${d(e.city||"-")}</p><p>Статус: ${d(y(e.status))}</p>`))})):w(s.restaurantShiftPostsList,"Смены еще не опубликованы"))}async function T(){const{data:e,error:t}=await v("shift_applications",{restaurant_id:r.user.id},{order:{column:"created_at",ascending:!1}});t?u(s.shiftPostMessage,t.message):(s.shiftApplicationsList.innerHTML="",e?.length?e.forEach((e=>{const t="pending"===e.status,n=_("Отклик работника",`<p>Работник: ${d(e.worker_id)}</p><p>Статус: ${d(y(e.status))}</p><p>${d(e.message||"")}</p>`,t?'<button type="button" data-status="accepted">Принять</button><button class="btn" type="button" data-status="declined">Отклонить</button><p class="message"></p>':'<p class="message">Решение уже сохранено.</p>');n.querySelectorAll("[data-status]").forEach((t=>{t.addEventListener("click",(()=>async function(e,t,s){const{error:n}=await $("shift_applications",{id:e,restaurant_id:r.user.id},{status:t,updated_at:(new Date).toISOString()});u(s.querySelector(".message"),n?`Ошибка: ${n.message}`:"Решение сохранено."),n||T()}(e.id,t.dataset.status,n)))})),s.shiftApplicationsList.appendChild(n)})):w(s.shiftApplicationsList,"Откликов работников пока нет"))}async function B(){u(s.workersMessage,"Загрузка анкет...");const{data:e,error:t}=await v("worker_profiles",{},{order:{column:"updated_at",ascending:!1}});t?u(s.workersMessage,t.message):(r.workers=e||[],D())}function D(){const e=p("workerSearchInput"),t=r.workers.filter((t=>m(t,e)));if(s.workersList.innerHTML="",!t.length)return w(s.workersList,"Анкет работников пока нет"),void u(s.workersMessage,"Подходящих анкет нет.");t.forEach((e=>{const t=_(f(e.professions)||"Работник",`\n          <p>${d(e.experience||"Опыт не указан")}</p>\n          <p>Дни: ${d(f(e.available_days))}</p>\n          <p>Ставка: ${d(g(e.min_rate))}</p>\n          <p>${e.can_travel?"Готов к выезду":"Без выезда"}</p>\n        `,'<button type="button" data-action="invite-worker">Пригласить</button><p class="message"></p>');t.querySelector('[data-action="invite-worker"]').addEventListener("click",(()=>async function(e,t){const{error:s}=await L("shift_invites",{restaurant_id:r.user.id,worker_id:e.user_id,message:"Приглашение на смену от заведения",status:"pending",created_at:(new Date).toISOString(),updated_at:(new Date).toISOString()});u(t.querySelector(".message"),s?`Ошибка: ${s.message}`:"Приглашение отправлено работнику.")}(e,t))),s.workersList.appendChild(t)})),u(s.workersMessage,`Анкет найдено: ${t.length}`)}async function x(e){const t=e?.currentTarget,n=p("supplyRequestTitle");if(!n)return void u(s.supplyRequestMessageBox,"Заполните, что нужно заведению.");q(t,!0,"Публикуем...");const{error:a}=await L("supply_requests",{restaurant_id:r.user.id,title:n,category:p("supplyRequestCategory"),quantity:p("supplyRequestQuantity"),budget:p("supplyRequestBudget"),city:p("supplyRequestCity"),message:p("supplyRequestMessage"),status:"open",created_at:(new Date).toISOString(),updated_at:(new Date).toISOString()});u(s.supplyRequestMessageBox,a?`Ошибка: ${a.message}`:"Запрос опубликован для поставщиков."),q(t,!1)}async function A(){const{data:e,error:t}=await v("supplier_offers",{status:"active"},{order:{column:"created_at",ascending:!1}});t?u(s.supplyRequestMessageBox,t.message):(r.supplierOffers=e||[],H())}function H(){const e=p("supplierOffersSearchInput"),t=r.supplierOffers.filter((t=>m(t,e)));s.supplierOffersList.innerHTML="",t.length?t.forEach((e=>{const t=_(e.title||"Предложение",`\n          <p>${d(e.category||"-")} / ${d(g(e.price))} ${d(e.unit||"")}</p>\n          <p>Минимум: ${d(e.min_order||"-")}</p>\n          <p>Доставка: ${d(f(e.delivery_cities))}</p>\n          <p>${d(e.description||"")}</p>\n        `,'<button type="button" data-action="send-supplier-inquiry">Отправить запрос</button><p class="message"></p>');t.querySelector('[data-action="send-supplier-inquiry"]').addEventListener("click",(()=>async function(e,t){const{error:s}=await L("supplier_inquiries",{offer_id:e.id,restaurant_id:r.user.id,supplier_id:e.supplier_id,message:p("supplyRequestMessage")||"Запрос от заведения",status:"new",created_at:(new Date).toISOString(),updated_at:(new Date).toISOString()});u(t.querySelector(".message"),s?`Ошибка: ${"23505"===s.code?"запрос по этому предложению уже отправлен":s.message}`:"Запрос отправлен поставщику.")}(e,t))),s.supplierOffersList.appendChild(t)})):w(s.supplierOffersList,"Предложений поставщиков пока нет")}async function j(){const{data:e,error:t}=await v("supplier_responses",{restaurant_id:r.user.id},{order:{column:"created_at",ascending:!1}});t?u(s.supplyResponsesMessage,t.message):(r.supplierResponses=e||[],function(){if(s.supplyResponsesList.innerHTML="",!r.supplierResponses.length)return w(s.supplyResponsesList,"Откликов поставщиков пока нет"),void u(s.supplyResponsesMessage,"Откликов нет.");r.supplierResponses.forEach((e=>{const t="new"===e.status,n=_("Отклик поставщика",`<p>Поставщик: ${d(e.supplier_id)}</p><p>Категория: ${d(e.category||"-")}</p><p>${d(e.message||"")}</p><p>Статус: ${d(y(e.status))}</p>`,t?'<button type="button" data-status="accepted">Принять</button><button class="btn" type="button" data-status="declined">Отклонить</button><p class="message"></p>':'<p class="message">Решение уже сохранено.</p>');n.querySelectorAll("[data-status]").forEach((t=>{t.addEventListener("click",(()=>async function(e,t,s){const{error:n}=await $("supplier_responses",{id:e,restaurant_id:r.user.id},{status:t,updated_at:(new Date).toISOString()});u(s.querySelector(".message"),n?`Ошибка: ${n.message}`:"Решение сохранено."),n||j()}(e.id,t.dataset.status,n)))})),s.supplyResponsesList.appendChild(n)})),u(s.supplyResponsesMessage,`Откликов: ${r.supplierResponses.length}`)}())}async function N(e){const t=e?.currentTarget;q(t,!0);const{error:n}=await k("supplier_profiles",{user_id:r.user.id,...b(o),updated_at:(new Date).toISOString()});u(s.supplierProfileMessage,n?`Ошибка: ${n.message}`:"Профиль поставщика сохранен."),q(t,!1)}async function F(e){const t=e?.currentTarget,n=p("supplierOfferTitle"),a=p("supplierOfferCategory");if(!n||!a)return void u(s.supplierOfferMessageBox,"Заполните товар/услугу и категорию.");q(t,!0,"Публикуем...");const{error:i}=await L("supplier_offers",{supplier_id:r.user.id,title:n,category:a,product_name:n,price:c("supplierOfferPrice"),unit:"руб.",min_order:p("supplierOfferQuantity"),delivery_cities:l("supplierOfferCity"),description:p("supplierOfferMessage"),status:"active",created_at:(new Date).toISOString(),updated_at:(new Date).toISOString()});u(s.supplierOfferMessageBox,i?`Ошибка: ${i.message}`:"Предложение опубликовано для заведений."),q(t,!1),i||K()}async function K(){const{data:e,error:t}=await v("supplier_offers",{supplier_id:r.user.id},{order:{column:"created_at",ascending:!1}});t?u(s.supplierOfferMessageBox,t.message):(r.ownSupplierOffers=e||[],function(){if(!s.supplierOwnOffersList)return;if(s.supplierOwnOffersList.innerHTML="",!r.ownSupplierOffers.length)return void w(s.supplierOwnOffersList,"Ваших предложений пока нет");r.ownSupplierOffers.forEach((e=>{s.supplierOwnOffersList.appendChild(_(e.title||"Предложение",`<p>${d(e.category||"-")} / ${d(g(e.price))} ${d(e.unit||"")}</p><p>Статус: ${d(y(e.status))}</p><p>${d(e.description||"")}</p>`))}))}())}async function Q(){const{data:e,error:t}=await v("supply_requests",{status:"open"},{order:{column:"created_at",ascending:!1}});t?u(s.supplierOfferMessageBox,t.message):(r.supplyRequests=e||[],W())}function W(){const e=p("supplyRequestsSearchInput"),t=r.supplyRequests.filter((t=>m(t,e)));s.supplyRequestsList.innerHTML="",t.length?t.forEach((e=>{const t=_(e.title||"Запрос",`\n          <p>${d(e.category||"-")} / ${d(e.quantity||"-")}</p>\n          <p>Бюджет: ${d(e.budget||"-")}</p>\n          <p>Город: ${d(e.city||"-")}</p>\n          <p>${d(e.message||"")}</p>\n        `,'<button type="button" data-action="respond-supply-request">Откликнуться</button><p class="message"></p>');t.querySelector('[data-action="respond-supply-request"]').addEventListener("click",(()=>async function(e,t){const{error:s}=await L("supplier_responses",{request_id:e.id,restaurant_id:e.restaurant_id,supplier_id:r.user.id,category:p("supplierOfferCategory")||e.category,message:p("supplierOfferMessage")||"Отклик поставщика",status:"new",created_at:(new Date).toISOString(),updated_at:(new Date).toISOString()});u(t.querySelector(".message"),s?`Ошибка: ${s.message}`:"Отклик отправлен заведению.")}(e,t))),s.supplyRequestsList.appendChild(t)})):w(s.supplyRequestsList,"Запросов заведений пока нет")}async function J(){const{data:e,error:t}=await v("supplier_inquiries",{supplier_id:r.user.id},{order:{column:"created_at",ascending:!1}});t?u(s.supplierInquiriesMessage,t.message):(r.supplierInquiries=e||[],function(){if(s.supplierInquiriesList.innerHTML="",!r.supplierInquiries.length)return w(s.supplierInquiriesList,"Входящих заявок пока нет"),void u(s.supplierInquiriesMessage,"Заявок нет.");r.supplierInquiries.forEach((e=>{const t="new"===e.status,n=_("Заявка от заведения",`<p>${d(e.message||"Заведение заинтересовалось предложением.")}</p><p>Статус: ${d(y(e.status))}</p>`,t?'<button type="button" data-status="accepted">Принять</button><button class="btn" type="button" data-status="declined">Отклонить</button><p class="message"></p>':'<p class="message">Решение уже сохранено.</p>');n.querySelectorAll("[data-status]").forEach((t=>{t.addEventListener("click",(()=>async function(e,t,s){const{error:n}=await $("supplier_inquiries",{id:e,supplier_id:r.user.id},{status:t,updated_at:(new Date).toISOString()});u(s.querySelector(".message"),n?`Ошибка: ${n.message}`:"Решение сохранено."),n||J()}(e.id,t.dataset.status,n)))})),s.supplierInquiriesList.appendChild(n)})),u(s.supplierInquiriesMessage,`Заявок: ${r.supplierInquiries.length}`)}())}async function z(){const e=["profiles","worker_profiles","restaurant_profiles","supplier_profiles","shift_posts","shift_applications","shift_invites","supplier_offers","supplier_inquiries","supply_requests","supplier_responses"];s.adminDataList.innerHTML="",u(s.adminMessage,"Загружаем данные...");for(const t of e){const{data:e,error:r}=await v(t);s.adminDataList.appendChild(_(t,`<p>${r?d(r.message):`Записей: ${(e||[]).length}`}</p>`))}u(s.adminMessage,"Данные обновлены.")}async function G(n){return u(s.userInfo,`${r.user.email||n.name||"Пользователь"} / ${n.role}`),"worker"===n.role?(h(s.workerCabinet),await async function(){const{data:s,error:n}=await e.from("worker_profiles").select("*").eq("user_id",r.user.id).maybeSingle();n||(S(a,s),t("workerMinRate")&&(t("workerMinRate").value=s?.min_rate??""),t("workerTravelRadiusKm")&&(t("workerTravelRadiusKm").value=s?.travel_radius_km??""))}(),void await Promise.all([C(),M()])):"restaurant"===n.role?(h(s.restaurantCabinet),await async function(){const{data:t}=await e.from("restaurant_profiles").select("*").eq("user_id",r.user.id).maybeSingle();S(i,t)}(),void await E()):"supplier"===n.role?(h(s.supplierCabinet),await async function(){const{data:t}=await e.from("supplier_profiles").select("*").eq("user_id",r.user.id).maybeSingle();S(o,t)}(),void await Promise.all([K(),Q(),J()])):"admin"===n.role?(h(s.adminCabinet),void await z()):void h(s.unknownRole)}!async function(){if(!e)return void u(s.userInfo,"Supabase не загрузился. Обновите страницу.");!function(){const r=(e,s)=>t(e)?.addEventListener("click",s);r("saveWorkerProfileBtn",O),r("loadInvitesBtn",C),r("loadShiftPostsBtn",M),r("saveRestaurantProfileBtn",R),r("createShiftPostBtn",P),r("loadRestaurantShiftPostsBtn",E),r("loadShiftApplicationsBtn",T),r("loadWorkersBtn",B),r("createSupplyRequestBtn",x),r("loadSupplierOffersBtn",A),r("loadSupplyResponsesBtn",j),r("saveSupplierProfileBtn",N),r("createSupplierOfferBtn",F),r("loadSupplierOwnOffersBtn",K),r("loadSupplyRequestsBtn",Q),r("loadSupplierInquiriesBtn",J),r("loadAdminDataBtn",z),t("workerSearchInput")?.addEventListener("input",D),t("shiftSearchInput")?.addEventListener("input",I),t("supplierOffersSearchInput")?.addEventListener("input",H),t("supplyRequestsSearchInput")?.addEventListener("input",W),s.logoutBtn?.addEventListener("click",(async()=>{await e.auth.signOut(),window.location.href="auth.html"}))}();const n=await async function(){const{data:t}=await e.auth.getSession();if(!t.session)return window.location.href="auth.html",null;r.user=t.session.user;const{data:n,error:a}=await e.from("profiles").select("*").eq("id",r.user.id).maybeSingle();if(a)return u(s.userInfo,`Ошибка профиля: ${a.message}`),null;if(n)return r.profile=n,n;const i={id:r.user.id,role:r.user.user_metadata?.role||"worker",name:r.user.email||"Пользователь",status:"active",updated_at:(new Date).toISOString()},{data:o,error:p}=await e.from("profiles").upsert(i,{onConflict:"id"}).select().maybeSingle();return p?(u(s.userInfo,`Профиль не создан: ${p.message}`),r.profile=i,i):(r.profile=o,o)}();n&&await G(n)}()}();
+(function () {
+  const db = window.supabaseClient;
+
+  const ids = [
+    "userInfo",
+    "workerCabinet",
+    "restaurantCabinet",
+    "supplierCabinet",
+    "adminCabinet",
+    "unknownRole",
+    "logoutBtn",
+    "workerProfileMessage",
+    "restaurantProfileMessage",
+    "supplierProfileMessage",
+    "workersList",
+    "workersMessage",
+    "workerSearchInput",
+    "invitesList",
+    "invitesMessage",
+    "shiftPostsList",
+    "shiftPostsMessage",
+    "shiftSearchInput",
+    "restaurantShiftPostsList",
+    "shiftApplicationsList",
+    "shiftPostMessage",
+    "supplierOffersList",
+    "supplierOffersSearchInput",
+    "supplyRequestMessageBox",
+    "supplyResponsesMessage",
+    "supplyResponsesList",
+    "supplyRequestsList",
+    "supplyRequestsSearchInput",
+    "supplierOfferMessageBox",
+    "supplierOwnOffersList",
+    "supplierInquiriesMessage",
+    "supplierInquiriesList",
+    "adminMessage",
+    "adminDataList",
+  ];
+
+  const el = Object.fromEntries(ids.map((id) => [id, document.getElementById(id)]));
+
+  const state = {
+    user: null,
+    profile: null,
+    workers: [],
+    shifts: [],
+    supplierOffers: [],
+    supplyRequests: [],
+    supplierResponses: [],
+    supplierInquiries: [],
+    ownSupplierOffers: [],
+  };
+
+  const rolePanels = {
+    worker: el.workerCabinet,
+    restaurant: el.restaurantCabinet,
+    supplier: el.supplierCabinet,
+    admin: el.adminCabinet,
+  };
+
+  const publicRoles = ["worker", "restaurant", "supplier"];
+
+  const profileFields = {
+    worker: {
+      workerProfessions: "professions",
+      workerAvailableDays: "available_days",
+      workerExperience: "experience",
+      workerAvailableTime: "available_time",
+      workerPaymentType: "payment_type",
+      workerCanTravel: "can_travel",
+      workerTravelCities: "travel_cities",
+      workerAbout: "about",
+    },
+    restaurant: {
+      restaurantBusinessName: "business_name",
+      restaurantBusinessType: "business_type",
+      restaurantContactPerson: "contact_person",
+      restaurantCity: "city",
+      restaurantAddress: "address",
+      restaurantAbout: "about",
+    },
+    supplier: {
+      supplierCompanyName: "company_name",
+      supplierProfileCategory: "category",
+      supplierContactPerson: "contact_person",
+      supplierProfileCity: "city",
+      supplierDeliveryCities: "delivery_cities",
+      supplierProfileAbout: "about",
+    },
+  };
+
+  function byId(id) {
+    return document.getElementById(id);
+  }
+
+  function setMessage(target, text) {
+    if (target) target.textContent = text || "";
+  }
+
+  function value(id) {
+    return (byId(id)?.value || "").trim();
+  }
+
+  function numberValue(id) {
+    const raw = value(id).replace(",", ".").replace(/[^\d.]/g, "");
+    const parsed = Number(raw);
+    return Number.isFinite(parsed) && raw ? parsed : null;
+  }
+
+  function listValue(id) {
+    return value(id)
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+
+  function escapeHtml(input) {
+    return String(input ?? "").replace(/[&<>"']/g, (char) => {
+      return {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;",
+      }[char];
+    });
+  }
+
+  function listText(items) {
+    return Array.isArray(items) && items.length ? items.join(", ") : "-";
+  }
+
+  function money(value) {
+    return value || value === 0 ? `${value} ₽` : "-";
+  }
+
+  function statusText(status) {
+    return (
+      {
+        pending: "ожидает",
+        new: "новая",
+        accepted: "принята",
+        declined: "отклонена",
+        cancelled: "отменена",
+        done: "завершена",
+        open: "открыта",
+        closed: "закрыта",
+        active: "активно",
+        paused: "пауза",
+      }[status] ||
+      status ||
+      "-"
+    );
+  }
+
+  function matchesSearch(item, search) {
+    return !search || JSON.stringify(item).toLowerCase().includes(search.toLowerCase());
+  }
+
+  function card(title, bodyHtml, actionsHtml = "") {
+    const article = document.createElement("article");
+    article.className = "data-card";
+    article.innerHTML = `<h4>${escapeHtml(title)}</h4>${bodyHtml}${actionsHtml}`;
+    return article;
+  }
+
+  function showEmpty(list, title, text = "Данные появятся здесь после публикации или отклика.") {
+    if (!list) return;
+    list.innerHTML = "";
+    list.appendChild(card(title, `<p>${escapeHtml(text)}</p>`));
+  }
+
+  function setBusy(button, busy, text = "Сохраняем...") {
+    if (!button) return;
+    if (busy) {
+      button.dataset.defaultText = button.textContent;
+      button.textContent = text;
+      button.disabled = true;
+    } else {
+      button.textContent = button.dataset.defaultText || button.textContent;
+      button.disabled = false;
+    }
+  }
+
+  function errorText(error, duplicateText) {
+    if (!error) return "";
+    if (error.code === "23505" && duplicateText) return duplicateText;
+    return error.message || "Неизвестная ошибка Supabase";
+  }
+
+  function normalizePublicRole(role) {
+    return publicRoles.includes(role) ? role : "worker";
+  }
+
+  function collectProfile(fields) {
+    const payload = {};
+
+    Object.entries(fields).forEach(([fieldId, column]) => {
+      const input = byId(fieldId);
+      if (!input) return;
+
+      if (input.type === "checkbox") {
+        payload[column] = input.checked;
+        return;
+      }
+
+      const name = fieldId.toLowerCase();
+      if (name.includes("cities") || name.includes("professions") || name.includes("days")) {
+        payload[column] = listValue(fieldId);
+      } else {
+        payload[column] = value(fieldId);
+      }
+    });
+
+    return payload;
+  }
+
+  function fillProfile(fields, data) {
+    Object.entries(fields).forEach(([fieldId, column]) => {
+      const input = byId(fieldId);
+      if (!input) return;
+
+      const nextValue = data?.[column];
+      if (input.type === "checkbox") {
+        input.checked = Boolean(nextValue);
+      } else {
+        input.value = Array.isArray(nextValue) ? nextValue.join(", ") : nextValue ?? "";
+      }
+    });
+  }
+
+  function showRolePanel(role) {
+    Object.values(rolePanels).forEach((panel) => {
+      if (panel) panel.style.display = "none";
+    });
+
+    if (rolePanels[role]) {
+      rolePanels[role].style.display = "block";
+    } else if (el.unknownRole) {
+      el.unknownRole.style.display = "block";
+    }
+  }
+
+  async function upsertProfile(table, payload) {
+    return db.from(table).upsert(payload, { onConflict: "user_id" });
+  }
+
+  async function insertRow(table, payload) {
+    return db.from(table).insert(payload);
+  }
+
+  async function updateRows(table, filters, payload) {
+    let query = db.from(table).update(payload);
+    Object.entries(filters).forEach(([key, filterValue]) => {
+      query = query.eq(key, filterValue);
+    });
+    return query;
+  }
+
+  async function selectRows(table, filters = {}, options = {}) {
+    let query = db.from(table).select(options.select || "*");
+
+    Object.entries(filters).forEach(([key, filterValue]) => {
+      if (filterValue !== undefined && filterValue !== null) query = query.eq(key, filterValue);
+    });
+
+    if (options.order) {
+      query = query.order(options.order.column, { ascending: options.order.ascending ?? false });
+    }
+
+    if (options.limit) query = query.limit(options.limit);
+    return query;
+  }
+
+  async function saveWorkerProfile(event) {
+    const button = event?.currentTarget;
+    setBusy(button, true);
+
+    const payload = {
+      user_id: state.user.id,
+      ...collectProfile(profileFields.worker),
+      min_rate: numberValue("workerMinRate"),
+      travel_radius_km: numberValue("workerTravelRadiusKm"),
+      updated_at: new Date().toISOString(),
+    };
+
+    const { error } = await upsertProfile("worker_profiles", payload);
+    setMessage(
+      el.workerProfileMessage,
+      error ? `Ошибка: ${error.message}` : "Профиль работника сохранен."
+    );
+    setBusy(button, false);
+  }
+
+  async function loadWorkerProfile() {
+    const { data, error } = await db
+      .from("worker_profiles")
+      .select("*")
+      .eq("user_id", state.user.id)
+      .maybeSingle();
+
+    if (error) return;
+    fillProfile(profileFields.worker, data);
+    if (byId("workerMinRate")) byId("workerMinRate").value = data?.min_rate ?? "";
+    if (byId("workerTravelRadiusKm")) {
+      byId("workerTravelRadiusKm").value = data?.travel_radius_km ?? "";
+    }
+  }
+
+  async function loadShiftPosts() {
+    setMessage(el.shiftPostsMessage, "Загружаем смены...");
+    const { data, error } = await selectRows(
+      "shift_posts",
+      { status: "open" },
+      { order: { column: "created_at", ascending: false } }
+    );
+
+    if (error) {
+      setMessage(el.shiftPostsMessage, `Ошибка: ${error.message}`);
+      return;
+    }
+
+    state.shifts = data || [];
+    renderShiftPosts();
+  }
+
+  function renderShiftPosts() {
+    const search = value("shiftSearchInput");
+    const shifts = state.shifts.filter((item) => matchesSearch(item, search));
+
+    if (!el.shiftPostsList) return;
+    el.shiftPostsList.innerHTML = "";
+
+    if (!shifts.length) {
+      showEmpty(el.shiftPostsList, "Смен пока нет", "Подходящих смен пока нет.");
+      setMessage(el.shiftPostsMessage, "Подходящих смен нет.");
+      return;
+    }
+
+    shifts.forEach((shift) => {
+      const node = card(
+        shift.title || "Смена",
+        `
+          <p>${escapeHtml(shift.profession || "-")} / ${escapeHtml(shift.city || "-")}</p>
+          <p>${escapeHtml(shift.date_from || "")} ${escapeHtml(shift.time_from || "")}-${escapeHtml(shift.time_to || "")}</p>
+          <p>Ставка: ${escapeHtml(money(shift.rate))}</p>
+          <p>${escapeHtml(shift.requirements || "")}</p>
+        `,
+        '<button type="button" data-action="apply-shift">Откликнуться</button><p class="message"></p>'
+      );
+
+      node.querySelector("[data-action='apply-shift']")?.addEventListener("click", (event) => {
+        applyToShift(shift, node, event.currentTarget);
+      });
+
+      el.shiftPostsList.appendChild(node);
+    });
+
+    setMessage(el.shiftPostsMessage, `Смен найдено: ${shifts.length}`);
+  }
+
+  async function applyToShift(shift, node, button) {
+    setBusy(button, true, "Отправляем...");
+    const message = node.querySelector(".message");
+    const { error } = await insertRow("shift_applications", {
+      shift_id: shift.id,
+      worker_id: state.user.id,
+      restaurant_id: shift.restaurant_id,
+      message: "Отклик работника",
+      status: "pending",
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    });
+
+    if (error) {
+      setMessage(message, `Ошибка: ${errorText(error, "вы уже откликались на эту смену")}`);
+      setBusy(button, false);
+      return;
+    }
+
+    setMessage(message, "Отклик отправлен заведению.");
+    button.textContent = "Отклик отправлен";
+    button.disabled = true;
+  }
+
+  async function loadWorkerInvites() {
+    setMessage(el.invitesMessage, "Загружаем приглашения...");
+    const { data, error } = await selectRows(
+      "shift_invites",
+      { worker_id: state.user.id },
+      { order: { column: "created_at", ascending: false } }
+    );
+
+    if (error) {
+      setMessage(el.invitesMessage, `Ошибка: ${error.message}`);
+      return;
+    }
+
+    renderWorkerInvites(data || []);
+  }
+
+  function renderWorkerInvites(invites) {
+    if (!el.invitesList) return;
+    el.invitesList.innerHTML = "";
+
+    if (!invites.length) {
+      showEmpty(el.invitesList, "Приглашений нет", "Входящих приглашений пока нет.");
+      setMessage(el.invitesMessage, "Входящих приглашений пока нет.");
+      return;
+    }
+
+    invites.forEach((invite) => {
+      const pending = invite.status === "pending";
+      const node = card(
+        "Приглашение на смену",
+        `
+          <p>Статус: ${escapeHtml(statusText(invite.status))}</p>
+          <p>${escapeHtml(invite.message || "Заведение приглашает вас на смену.")}</p>
+        `,
+        pending
+          ? '<button type="button" data-status="accepted">Принять</button><button class="btn" type="button" data-status="declined">Отклонить</button><p class="message"></p>'
+          : '<p class="message">Решение уже сохранено.</p>'
+      );
+
+      node.querySelectorAll("[data-status]").forEach((button) => {
+        button.addEventListener("click", () => {
+          updateInviteStatus(invite.id, button.dataset.status, node);
+        });
+      });
+
+      el.invitesList.appendChild(node);
+    });
+
+    setMessage(el.invitesMessage, `Приглашений: ${invites.length}`);
+  }
+
+  async function updateInviteStatus(id, status, node) {
+    const buttons = node.querySelectorAll("button");
+    buttons.forEach((button) => (button.disabled = true));
+
+    const { error } = await updateRows(
+      "shift_invites",
+      { id, worker_id: state.user.id },
+      { status, updated_at: new Date().toISOString() }
+    );
+
+    setMessage(
+      node.querySelector(".message"),
+      error ? `Ошибка: ${error.message}` : "Решение сохранено."
+    );
+
+    if (error) {
+      buttons.forEach((button) => (button.disabled = false));
+      return;
+    }
+
+    await loadWorkerInvites();
+  }
+
+  async function saveRestaurantProfile(event) {
+    const button = event?.currentTarget;
+    setBusy(button, true);
+
+    const { error } = await upsertProfile("restaurant_profiles", {
+      user_id: state.user.id,
+      ...collectProfile(profileFields.restaurant),
+      updated_at: new Date().toISOString(),
+    });
+
+    setMessage(
+      el.restaurantProfileMessage,
+      error ? `Ошибка: ${error.message}` : "Профиль заведения сохранен."
+    );
+    setBusy(button, false);
+  }
+
+  async function loadRestaurantProfile() {
+    const { data } = await db
+      .from("restaurant_profiles")
+      .select("*")
+      .eq("user_id", state.user.id)
+      .maybeSingle();
+    fillProfile(profileFields.restaurant, data);
+  }
+
+  async function createShiftPost(event) {
+    const button = event?.currentTarget;
+    const title = value("shiftTitle");
+    const profession = value("shiftProfession");
+
+    if (!title || !profession) {
+      setMessage(el.shiftPostMessage, "Заполните название смены и профессию.");
+      return;
+    }
+
+    setBusy(button, true, "Публикуем...");
+    const { error } = await insertRow("shift_posts", {
+      restaurant_id: state.user.id,
+      title,
+      profession,
+      city: value("shiftCity"),
+      district: value("shiftDistrict"),
+      address: value("shiftAddress"),
+      date_from: value("shiftDateFrom") || null,
+      time_from: value("shiftTimeFrom") || null,
+      time_to: value("shiftTimeTo") || null,
+      rate: numberValue("shiftRate"),
+      requirements: value("shiftRequirements"),
+      status: "open",
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    });
+
+    setMessage(el.shiftPostMessage, error ? `Ошибка: ${error.message}` : "Смена опубликована.");
+    setBusy(button, false);
+    if (!error) await loadRestaurantShiftPosts();
+  }
+
+  async function loadRestaurantShiftPosts() {
+    const { data, error } = await selectRows(
+      "shift_posts",
+      { restaurant_id: state.user.id },
+      { order: { column: "created_at", ascending: false } }
+    );
+
+    if (error) {
+      setMessage(el.shiftPostMessage, `Ошибка: ${error.message}`);
+      return;
+    }
+
+    if (!el.restaurantShiftPostsList) return;
+    el.restaurantShiftPostsList.innerHTML = "";
+
+    if (!data?.length) {
+      showEmpty(el.restaurantShiftPostsList, "Смены еще не опубликованы");
+      return;
+    }
+
+    data.forEach((shift) => {
+      el.restaurantShiftPostsList.appendChild(
+        card(
+          shift.title || "Смена",
+          `<p>${escapeHtml(shift.profession || "-")} / ${escapeHtml(shift.city || "-")}</p><p>Статус: ${escapeHtml(statusText(shift.status))}</p>`
+        )
+      );
+    });
+  }
+
+  async function loadShiftApplications() {
+    setMessage(el.shiftPostMessage, "Загружаем отклики работников...");
+    const { data, error } = await selectRows(
+      "shift_applications",
+      { restaurant_id: state.user.id },
+      { order: { column: "created_at", ascending: false } }
+    );
+
+    if (error) {
+      setMessage(el.shiftPostMessage, `Ошибка: ${error.message}`);
+      return;
+    }
+
+    if (!el.shiftApplicationsList) return;
+    el.shiftApplicationsList.innerHTML = "";
+
+    if (!data?.length) {
+      showEmpty(el.shiftApplicationsList, "Откликов работников пока нет");
+      setMessage(el.shiftPostMessage, "Откликов работников пока нет.");
+      return;
+    }
+
+    data.forEach((application) => {
+      const pending = application.status === "pending";
+      const node = card(
+        "Отклик работника",
+        `<p>Работник: ${escapeHtml(application.worker_id)}</p><p>Статус: ${escapeHtml(statusText(application.status))}</p><p>${escapeHtml(application.message || "")}</p>`,
+        pending
+          ? '<button type="button" data-status="accepted">Принять</button><button class="btn" type="button" data-status="declined">Отклонить</button><p class="message"></p>'
+          : '<p class="message">Решение уже сохранено.</p>'
+      );
+
+      node.querySelectorAll("[data-status]").forEach((button) => {
+        button.addEventListener("click", () => {
+          updateShiftApplication(application.id, button.dataset.status, node);
+        });
+      });
+
+      el.shiftApplicationsList.appendChild(node);
+    });
+
+    setMessage(el.shiftPostMessage, `Откликов работников: ${data.length}`);
+  }
+
+  async function updateShiftApplication(id, status, node) {
+    const buttons = node.querySelectorAll("button");
+    buttons.forEach((button) => (button.disabled = true));
+
+    const { error } = await updateRows(
+      "shift_applications",
+      { id, restaurant_id: state.user.id },
+      { status, updated_at: new Date().toISOString() }
+    );
+
+    setMessage(
+      node.querySelector(".message"),
+      error ? `Ошибка: ${error.message}` : "Решение сохранено."
+    );
+
+    if (error) {
+      buttons.forEach((button) => (button.disabled = false));
+      return;
+    }
+
+    await loadShiftApplications();
+  }
+
+  async function loadWorkers() {
+    setMessage(el.workersMessage, "Загружаем анкеты работников...");
+    const { data, error } = await selectRows(
+      "worker_profiles",
+      {},
+      { order: { column: "updated_at", ascending: false } }
+    );
+
+    if (error) {
+      setMessage(el.workersMessage, `Ошибка: ${error.message}`);
+      return;
+    }
+
+    state.workers = data || [];
+    renderWorkers();
+  }
+
+  function renderWorkers() {
+    const search = value("workerSearchInput");
+    const workers = state.workers.filter((worker) => matchesSearch(worker, search));
+
+    if (!el.workersList) return;
+    el.workersList.innerHTML = "";
+
+    if (!workers.length) {
+      showEmpty(el.workersList, "Анкет работников пока нет", "Подходящих анкет нет.");
+      setMessage(el.workersMessage, "Подходящих анкет нет.");
+      return;
+    }
+
+    workers.forEach((worker) => {
+      const node = card(
+        listText(worker.professions) || "Работник",
+        `
+          <p>${escapeHtml(worker.experience || "Опыт не указан")}</p>
+          <p>Дни: ${escapeHtml(listText(worker.available_days))}</p>
+          <p>Ставка: ${escapeHtml(money(worker.min_rate))}</p>
+          <p>${worker.can_travel ? "Готов к выезду" : "Без выезда"}</p>
+        `,
+        '<button type="button" data-action="invite-worker">Пригласить</button><p class="message"></p>'
+      );
+
+      node.querySelector("[data-action='invite-worker']")?.addEventListener("click", (event) => {
+        inviteWorker(worker, node, event.currentTarget);
+      });
+
+      el.workersList.appendChild(node);
+    });
+
+    setMessage(el.workersMessage, `Анкет найдено: ${workers.length}`);
+  }
+
+  async function inviteWorker(worker, node, button) {
+    if (!worker.user_id) {
+      setMessage(node.querySelector(".message"), "У анкеты нет user_id, приглашение не отправлено.");
+      return;
+    }
+
+    setBusy(button, true, "Отправляем...");
+    const { error } = await insertRow("shift_invites", {
+      restaurant_id: state.user.id,
+      worker_id: worker.user_id,
+      message: "Приглашение на смену от заведения",
+      status: "pending",
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    });
+
+    if (error) {
+      setMessage(node.querySelector(".message"), `Ошибка: ${error.message}`);
+      setBusy(button, false);
+      return;
+    }
+
+    setMessage(node.querySelector(".message"), "Приглашение отправлено работнику.");
+    button.textContent = "Приглашение отправлено";
+    button.disabled = true;
+  }
+
+  async function createSupplyRequest(event) {
+    const button = event?.currentTarget;
+    const title = value("supplyRequestTitle");
+
+    if (!title) {
+      setMessage(el.supplyRequestMessageBox, "Заполните, что нужно заведению.");
+      return;
+    }
+
+    setBusy(button, true, "Публикуем...");
+    const { error } = await insertRow("supply_requests", {
+      restaurant_id: state.user.id,
+      title,
+      category: value("supplyRequestCategory"),
+      quantity: value("supplyRequestQuantity"),
+      budget: value("supplyRequestBudget"),
+      city: value("supplyRequestCity"),
+      message: value("supplyRequestMessage"),
+      status: "open",
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    });
+
+    setMessage(
+      el.supplyRequestMessageBox,
+      error ? `Ошибка: ${error.message}` : "Запрос опубликован для поставщиков."
+    );
+    setBusy(button, false);
+  }
+
+  async function loadSupplierOffers() {
+    setMessage(el.supplyRequestMessageBox, "Загружаем предложения поставщиков...");
+    const { data, error } = await selectRows(
+      "supplier_offers",
+      { status: "active" },
+      { order: { column: "created_at", ascending: false } }
+    );
+
+    if (error) {
+      setMessage(el.supplyRequestMessageBox, `Ошибка: ${error.message}`);
+      return;
+    }
+
+    state.supplierOffers = data || [];
+    renderSupplierOffers();
+  }
+
+  function renderSupplierOffers() {
+    const search = value("supplierOffersSearchInput");
+    const offers = state.supplierOffers.filter((offer) => matchesSearch(offer, search));
+
+    if (!el.supplierOffersList) return;
+    el.supplierOffersList.innerHTML = "";
+
+    if (!offers.length) {
+      showEmpty(el.supplierOffersList, "Предложений поставщиков пока нет");
+      return;
+    }
+
+    offers.forEach((offer) => {
+      const node = card(
+        offer.title || "Предложение",
+        `
+          <p>${escapeHtml(offer.category || "-")} / ${escapeHtml(money(offer.price))} ${escapeHtml(offer.unit || "")}</p>
+          <p>Минимум: ${escapeHtml(offer.min_order || "-")}</p>
+          <p>Доставка: ${escapeHtml(listText(offer.delivery_cities))}</p>
+          <p>${escapeHtml(offer.description || "")}</p>
+        `,
+        '<button type="button" data-action="send-supplier-inquiry">Отправить запрос</button><p class="message"></p>'
+      );
+
+      node.querySelector("[data-action='send-supplier-inquiry']")?.addEventListener("click", (event) => {
+        sendSupplierInquiry(offer, node, event.currentTarget);
+      });
+
+      el.supplierOffersList.appendChild(node);
+    });
+  }
+
+  async function sendSupplierInquiry(offer, node, button) {
+    setBusy(button, true, "Отправляем...");
+    const { error } = await insertRow("supplier_inquiries", {
+      offer_id: offer.id,
+      restaurant_id: state.user.id,
+      supplier_id: offer.supplier_id,
+      message: value("supplyRequestMessage") || "Запрос от заведения",
+      status: "new",
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    });
+
+    if (error) {
+      setMessage(node.querySelector(".message"), `Ошибка: ${errorText(error, "запрос по этому предложению уже отправлен")}`);
+      setBusy(button, false);
+      return;
+    }
+
+    setMessage(node.querySelector(".message"), "Запрос отправлен поставщику.");
+    button.textContent = "Запрос отправлен";
+    button.disabled = true;
+  }
+
+  async function loadSupplyResponses() {
+    setMessage(el.supplyResponsesMessage, "Загружаем отклики поставщиков...");
+    const { data, error } = await selectRows(
+      "supplier_responses",
+      { restaurant_id: state.user.id },
+      { order: { column: "created_at", ascending: false } }
+    );
+
+    if (error) {
+      setMessage(el.supplyResponsesMessage, `Ошибка: ${error.message}`);
+      return;
+    }
+
+    state.supplierResponses = data || [];
+    renderSupplyResponses();
+  }
+
+  function renderSupplyResponses() {
+    if (!el.supplyResponsesList) return;
+    el.supplyResponsesList.innerHTML = "";
+
+    if (!state.supplierResponses.length) {
+      showEmpty(el.supplyResponsesList, "Откликов поставщиков пока нет");
+      setMessage(el.supplyResponsesMessage, "Откликов поставщиков пока нет.");
+      return;
+    }
+
+    state.supplierResponses.forEach((response) => {
+      const pending = response.status === "new";
+      const node = card(
+        "Отклик поставщика",
+        `<p>Поставщик: ${escapeHtml(response.supplier_id)}</p><p>Категория: ${escapeHtml(response.category || "-")}</p><p>${escapeHtml(response.message || "")}</p><p>Статус: ${escapeHtml(statusText(response.status))}</p>`,
+        pending
+          ? '<button type="button" data-status="accepted">Принять</button><button class="btn" type="button" data-status="declined">Отклонить</button><p class="message"></p>'
+          : '<p class="message">Решение уже сохранено.</p>'
+      );
+
+      node.querySelectorAll("[data-status]").forEach((button) => {
+        button.addEventListener("click", () => {
+          updateSupplierResponse(response.id, button.dataset.status, node);
+        });
+      });
+
+      el.supplyResponsesList.appendChild(node);
+    });
+
+    setMessage(el.supplyResponsesMessage, `Откликов: ${state.supplierResponses.length}`);
+  }
+
+  async function updateSupplierResponse(id, status, node) {
+    const buttons = node.querySelectorAll("button");
+    buttons.forEach((button) => (button.disabled = true));
+
+    const { error } = await updateRows(
+      "supplier_responses",
+      { id, restaurant_id: state.user.id },
+      { status, updated_at: new Date().toISOString() }
+    );
+
+    setMessage(
+      node.querySelector(".message"),
+      error ? `Ошибка: ${error.message}` : "Решение сохранено."
+    );
+
+    if (error) {
+      buttons.forEach((button) => (button.disabled = false));
+      return;
+    }
+
+    await loadSupplyResponses();
+  }
+
+  async function saveSupplierProfile(event) {
+    const button = event?.currentTarget;
+    setBusy(button, true);
+
+    const { error } = await upsertProfile("supplier_profiles", {
+      user_id: state.user.id,
+      ...collectProfile(profileFields.supplier),
+      updated_at: new Date().toISOString(),
+    });
+
+    setMessage(
+      el.supplierProfileMessage,
+      error ? `Ошибка: ${error.message}` : "Профиль поставщика сохранен."
+    );
+    setBusy(button, false);
+  }
+
+  async function loadSupplierProfile() {
+    const { data } = await db
+      .from("supplier_profiles")
+      .select("*")
+      .eq("user_id", state.user.id)
+      .maybeSingle();
+    fillProfile(profileFields.supplier, data);
+  }
+
+  async function createSupplierOffer(event) {
+    const button = event?.currentTarget;
+    const title = value("supplierOfferTitle");
+    const category = value("supplierOfferCategory");
+
+    if (!title || !category) {
+      setMessage(el.supplierOfferMessageBox, "Заполните товар/услугу и категорию.");
+      return;
+    }
+
+    setBusy(button, true, "Публикуем...");
+    const { error } = await insertRow("supplier_offers", {
+      supplier_id: state.user.id,
+      title,
+      category,
+      product_name: title,
+      price: numberValue("supplierOfferPrice"),
+      unit: "руб.",
+      min_order: value("supplierOfferQuantity"),
+      delivery_cities: listValue("supplierOfferCity"),
+      description: value("supplierOfferMessage"),
+      status: "active",
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    });
+
+    setMessage(
+      el.supplierOfferMessageBox,
+      error ? `Ошибка: ${error.message}` : "Предложение опубликовано для заведений."
+    );
+    setBusy(button, false);
+    if (!error) await loadSupplierOwnOffers();
+  }
+
+  async function loadSupplierOwnOffers() {
+    const { data, error } = await selectRows(
+      "supplier_offers",
+      { supplier_id: state.user.id },
+      { order: { column: "created_at", ascending: false } }
+    );
+
+    if (error) {
+      setMessage(el.supplierOfferMessageBox, `Ошибка: ${error.message}`);
+      return;
+    }
+
+    state.ownSupplierOffers = data || [];
+    renderSupplierOwnOffers();
+  }
+
+  function renderSupplierOwnOffers() {
+    if (!el.supplierOwnOffersList) return;
+    el.supplierOwnOffersList.innerHTML = "";
+
+    if (!state.ownSupplierOffers.length) {
+      showEmpty(el.supplierOwnOffersList, "Ваших предложений пока нет");
+      return;
+    }
+
+    state.ownSupplierOffers.forEach((offer) => {
+      el.supplierOwnOffersList.appendChild(
+        card(
+          offer.title || "Предложение",
+          `<p>${escapeHtml(offer.category || "-")} / ${escapeHtml(money(offer.price))} ${escapeHtml(offer.unit || "")}</p><p>Статус: ${escapeHtml(statusText(offer.status))}</p><p>${escapeHtml(offer.description || "")}</p>`
+        )
+      );
+    });
+  }
+
+  async function loadSupplyRequests() {
+    setMessage(el.supplierOfferMessageBox, "Загружаем запросы заведений...");
+    const { data, error } = await selectRows(
+      "supply_requests",
+      { status: "open" },
+      { order: { column: "created_at", ascending: false } }
+    );
+
+    if (error) {
+      setMessage(el.supplierOfferMessageBox, `Ошибка: ${error.message}`);
+      return;
+    }
+
+    state.supplyRequests = data || [];
+    renderSupplyRequests();
+  }
+
+  function renderSupplyRequests() {
+    const search = value("supplyRequestsSearchInput");
+    const requests = state.supplyRequests.filter((request) => matchesSearch(request, search));
+
+    if (!el.supplyRequestsList) return;
+    el.supplyRequestsList.innerHTML = "";
+
+    if (!requests.length) {
+      showEmpty(el.supplyRequestsList, "Запросов заведений пока нет");
+      return;
+    }
+
+    requests.forEach((request) => {
+      const node = card(
+        request.title || "Запрос",
+        `
+          <p>${escapeHtml(request.category || "-")} / ${escapeHtml(request.quantity || "-")}</p>
+          <p>Бюджет: ${escapeHtml(request.budget || "-")}</p>
+          <p>Город: ${escapeHtml(request.city || "-")}</p>
+          <p>${escapeHtml(request.message || "")}</p>
+        `,
+        '<button type="button" data-action="respond-supply-request">Откликнуться</button><p class="message"></p>'
+      );
+
+      node.querySelector("[data-action='respond-supply-request']")?.addEventListener("click", (event) => {
+        respondToSupplyRequest(request, node, event.currentTarget);
+      });
+
+      el.supplyRequestsList.appendChild(node);
+    });
+  }
+
+  async function respondToSupplyRequest(request, node, button) {
+    setBusy(button, true, "Отправляем...");
+    const { error } = await insertRow("supplier_responses", {
+      request_id: request.id,
+      restaurant_id: request.restaurant_id,
+      supplier_id: state.user.id,
+      category: value("supplierOfferCategory") || request.category,
+      message: value("supplierOfferMessage") || "Отклик поставщика",
+      status: "new",
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    });
+
+    if (error) {
+      setMessage(node.querySelector(".message"), `Ошибка: ${error.message}`);
+      setBusy(button, false);
+      return;
+    }
+
+    setMessage(node.querySelector(".message"), "Отклик отправлен заведению.");
+    button.textContent = "Отклик отправлен";
+    button.disabled = true;
+  }
+
+  async function loadSupplierInquiries() {
+    setMessage(el.supplierInquiriesMessage, "Загружаем входящие заявки...");
+    const { data, error } = await selectRows(
+      "supplier_inquiries",
+      { supplier_id: state.user.id },
+      { order: { column: "created_at", ascending: false } }
+    );
+
+    if (error) {
+      setMessage(el.supplierInquiriesMessage, `Ошибка: ${error.message}`);
+      return;
+    }
+
+    state.supplierInquiries = data || [];
+    renderSupplierInquiries();
+  }
+
+  function renderSupplierInquiries() {
+    if (!el.supplierInquiriesList) return;
+    el.supplierInquiriesList.innerHTML = "";
+
+    if (!state.supplierInquiries.length) {
+      showEmpty(el.supplierInquiriesList, "Входящих заявок пока нет");
+      setMessage(el.supplierInquiriesMessage, "Входящих заявок пока нет.");
+      return;
+    }
+
+    state.supplierInquiries.forEach((inquiry) => {
+      const pending = inquiry.status === "new";
+      const node = card(
+        "Заявка от заведения",
+        `<p>${escapeHtml(inquiry.message || "Заведение заинтересовалось предложением.")}</p><p>Статус: ${escapeHtml(statusText(inquiry.status))}</p>`,
+        pending
+          ? '<button type="button" data-status="accepted">Принять</button><button class="btn" type="button" data-status="declined">Отклонить</button><p class="message"></p>'
+          : '<p class="message">Решение уже сохранено.</p>'
+      );
+
+      node.querySelectorAll("[data-status]").forEach((button) => {
+        button.addEventListener("click", () => {
+          updateSupplierInquiry(inquiry.id, button.dataset.status, node);
+        });
+      });
+
+      el.supplierInquiriesList.appendChild(node);
+    });
+
+    setMessage(el.supplierInquiriesMessage, `Заявок: ${state.supplierInquiries.length}`);
+  }
+
+  async function updateSupplierInquiry(id, status, node) {
+    const buttons = node.querySelectorAll("button");
+    buttons.forEach((button) => (button.disabled = true));
+
+    const { error } = await updateRows(
+      "supplier_inquiries",
+      { id, supplier_id: state.user.id },
+      { status, updated_at: new Date().toISOString() }
+    );
+
+    setMessage(
+      node.querySelector(".message"),
+      error ? `Ошибка: ${error.message}` : "Решение сохранено."
+    );
+
+    if (error) {
+      buttons.forEach((button) => (button.disabled = false));
+      return;
+    }
+
+    await loadSupplierInquiries();
+  }
+
+  async function loadAdminData() {
+    const tables = [
+      "profiles",
+      "worker_profiles",
+      "restaurant_profiles",
+      "supplier_profiles",
+      "shift_posts",
+      "shift_applications",
+      "shift_invites",
+      "supplier_offers",
+      "supplier_inquiries",
+      "supply_requests",
+      "supplier_responses",
+    ];
+
+    if (!el.adminDataList) return;
+    el.adminDataList.innerHTML = "";
+    setMessage(el.adminMessage, "Загружаем данные...");
+
+    for (const table of tables) {
+      const { data, error } = await db.from(table).select("*").limit(50);
+      el.adminDataList.appendChild(
+        card(table, `<p>${error ? escapeHtml(error.message) : `Записей в выборке: ${(data || []).length}`}</p>`)
+      );
+    }
+
+    setMessage(el.adminMessage, "Данные обновлены.");
+  }
+
+  async function loadProfile() {
+    const { data: sessionData } = await db.auth.getSession();
+    const session = sessionData?.session;
+
+    if (!session) {
+      window.location.href = "auth.html";
+      return null;
+    }
+
+    state.user = session.user;
+
+    const { data: existing, error: readError } = await db
+      .from("profiles")
+      .select("*")
+      .eq("id", state.user.id)
+      .maybeSingle();
+
+    if (readError) {
+      setMessage(el.userInfo, `Ошибка профиля: ${readError.message}`);
+      return null;
+    }
+
+    if (existing) {
+      state.profile = existing;
+      return existing;
+    }
+
+    const fallbackRole = normalizePublicRole(state.user.user_metadata?.role);
+    const payload = {
+      id: state.user.id,
+      role: fallbackRole,
+      name: state.user.email || "Пользователь",
+      status: "active",
+      updated_at: new Date().toISOString(),
+    };
+
+    const { error } = await db.from("profiles").upsert(payload, { onConflict: "id" });
+    if (error) {
+      setMessage(el.userInfo, `Профиль не создан: ${error.message}`);
+      state.profile = payload;
+      return payload;
+    }
+
+    state.profile = payload;
+    return payload;
+  }
+
+  async function openCabinet(profile) {
+    const label = {
+      worker: "работник",
+      restaurant: "заведение",
+      supplier: "поставщик",
+      admin: "админ",
+    }[profile.role] || profile.role;
+
+    setMessage(el.userInfo, `${state.user.email || profile.name || "Пользователь"} / ${label}`);
+    showRolePanel(profile.role);
+
+    if (profile.role === "worker") {
+      await loadWorkerProfile();
+      await Promise.all([loadWorkerInvites(), loadShiftPosts()]);
+      return;
+    }
+
+    if (profile.role === "restaurant") {
+      await loadRestaurantProfile();
+      await loadRestaurantShiftPosts();
+      return;
+    }
+
+    if (profile.role === "supplier") {
+      await loadSupplierProfile();
+      await Promise.all([loadSupplierOwnOffers(), loadSupplyRequests(), loadSupplierInquiries()]);
+      return;
+    }
+
+    if (profile.role === "admin") {
+      await loadAdminData();
+    }
+  }
+
+  function bindEvents() {
+    const onClick = (id, handler) => byId(id)?.addEventListener("click", handler);
+    const onInput = (id, handler) => byId(id)?.addEventListener("input", handler);
+
+    onClick("saveWorkerProfileBtn", saveWorkerProfile);
+    onClick("loadInvitesBtn", loadWorkerInvites);
+    onClick("loadShiftPostsBtn", loadShiftPosts);
+    onInput("shiftSearchInput", renderShiftPosts);
+
+    onClick("saveRestaurantProfileBtn", saveRestaurantProfile);
+    onClick("createShiftPostBtn", createShiftPost);
+    onClick("loadRestaurantShiftPostsBtn", loadRestaurantShiftPosts);
+    onClick("loadShiftApplicationsBtn", loadShiftApplications);
+    onClick("loadWorkersBtn", loadWorkers);
+    onInput("workerSearchInput", renderWorkers);
+    onClick("createSupplyRequestBtn", createSupplyRequest);
+    onClick("loadSupplierOffersBtn", loadSupplierOffers);
+    onInput("supplierOffersSearchInput", renderSupplierOffers);
+    onClick("loadSupplyResponsesBtn", loadSupplyResponses);
+
+    onClick("saveSupplierProfileBtn", saveSupplierProfile);
+    onClick("createSupplierOfferBtn", createSupplierOffer);
+    onClick("loadSupplierOwnOffersBtn", loadSupplierOwnOffers);
+    onClick("loadSupplyRequestsBtn", loadSupplyRequests);
+    onInput("supplyRequestsSearchInput", renderSupplyRequests);
+    onClick("loadSupplierInquiriesBtn", loadSupplierInquiries);
+
+    onClick("loadAdminDataBtn", loadAdminData);
+
+    el.logoutBtn?.addEventListener("click", async () => {
+      await db.auth.signOut();
+      window.location.href = "auth.html";
+    });
+  }
+
+  async function init() {
+    if (!db) {
+      setMessage(el.userInfo, "Supabase не загрузился. Обновите страницу.");
+      return;
+    }
+
+    bindEvents();
+    const profile = await loadProfile();
+    if (profile) await openCabinet(profile);
+  }
+
+  init();
+})();
