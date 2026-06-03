@@ -567,6 +567,288 @@
             Обзор данных платформы: работники, приглашения, запросы заведений и
             предложения поставщиков.
           </p>
+
+          <h3>Настройки сайта</h3>
+          <p>
+            Эти настройки меняют логотип, hero-картинки, верхнее меню и основные
+            надписи на страницах. Если Supabase доступен и роль пользователя
+            admin, изменения сохраняются глобально.
+          </p>
+          <form id="siteSettingsForm" class="settings-form">
+            <label class="full"
+              >Логотип
+              <input
+                name="logo"
+                type="text"
+                list="siteAssetOptions"
+                placeholder="assets/logo-full.png"
+              />
+            </label>
+            <label class="full upload-label"
+              >Загрузить новый логотип
+              <input type="file" accept="image/*" data-upload-target="logo" />
+            </label>
+
+            <datalist id="siteAssetOptions">
+              <option value="assets/logo-full.png"></option>
+              <option value="assets/logo-mark.png"></option>
+              <option value="assets/hero-home.webp"></option>
+              <option value="assets/hero-workers.webp"></option>
+              <option value="assets/hero-restaurants.webp"></option>
+              <option value="assets/hero-suppliers.webp"></option>
+            </datalist>
+
+            <div class="settings-subhead full">Hero-картинки</div>
+            <label
+              >Главная
+              <input name="home.hero" type="text" list="siteAssetOptions" />
+            </label>
+            <label
+              >Загрузить главную
+              <input type="file" accept="image/*" data-upload-target="home.hero" />
+            </label>
+            <label
+              >Сотрудники
+              <input name="workers.hero" type="text" list="siteAssetOptions" />
+            </label>
+            <label
+              >Загрузить сотрудников
+              <input type="file" accept="image/*" data-upload-target="workers.hero" />
+            </label>
+            <label
+              >Заведения
+              <input name="restaurants.hero" type="text" list="siteAssetOptions" />
+            </label>
+            <label
+              >Загрузить заведения
+              <input type="file" accept="image/*" data-upload-target="restaurants.hero" />
+            </label>
+            <label
+              >Поставщики
+              <input name="suppliers.hero" type="text" list="siteAssetOptions" />
+            </label>
+            <label
+              >Загрузить поставщиков
+              <input type="file" accept="image/*" data-upload-target="suppliers.hero" />
+            </label>
+            <label
+              >Вход
+              <input name="auth.hero" type="text" list="siteAssetOptions" />
+            </label>
+            <label
+              >Кабинет
+              <input name="cabinet.hero" type="text" list="siteAssetOptions" />
+            </label>
+            <label
+              >Админка
+              <input name="admin.hero" type="text" list="siteAssetOptions" />
+            </label>
+
+            <div class="asset-preview-grid full" aria-label="Текущие изображения сайта">
+              <figure class="asset-preview-card asset-preview-card-logo">
+                <img
+                  data-setting-preview="logo"
+                  src="assets/logo-full.png"
+                  alt="Текущий логотип"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <figcaption>Логотип</figcaption>
+              </figure>
+              <figure class="asset-preview-card">
+                <img
+                  data-setting-preview="home.hero"
+                  src="assets/hero-home.webp"
+                  alt="Hero главной"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <figcaption>Главная</figcaption>
+              </figure>
+              <figure class="asset-preview-card">
+                <img
+                  data-setting-preview="workers.hero"
+                  src="assets/hero-workers.webp"
+                  alt="Hero сотрудников"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <figcaption>Сотрудники</figcaption>
+              </figure>
+              <figure class="asset-preview-card">
+                <img
+                  data-setting-preview="restaurants.hero"
+                  src="assets/hero-restaurants.webp"
+                  alt="Hero заведений"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <figcaption>Заведения</figcaption>
+              </figure>
+              <figure class="asset-preview-card">
+                <img
+                  data-setting-preview="suppliers.hero"
+                  src="assets/hero-suppliers.webp"
+                  alt="Hero поставщиков"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <figcaption>Поставщики</figcaption>
+              </figure>
+            </div>
+
+            <div class="settings-subhead full">Верхняя панель</div>
+            <label
+              >Сотрудникам
+              <input name="nav.workers" type="text" />
+            </label>
+            <label
+              >Заведениям
+              <input name="nav.restaurants" type="text" />
+            </label>
+            <label
+              >Поставщикам
+              <input name="nav.suppliers" type="text" />
+            </label>
+            <label
+              >Контакты
+              <input name="nav.contacts" type="text" />
+            </label>
+            <label
+              >Как работает
+              <input name="nav.workflow" type="text" />
+            </label>
+            <label
+              >Кнопка входа
+              <input name="nav.login" type="text" />
+            </label>
+
+            <div class="settings-subhead full">Главная</div>
+            <label class="full"
+              >Подпись
+              <input name="home.eyebrow" type="text" />
+            </label>
+            <label class="full"
+              >Заголовок
+              <input name="home.title" type="text" />
+            </label>
+            <label class="full"
+              >Описание
+              <textarea name="home.lead"></textarea>
+            </label>
+            <label
+              >Кнопка 1
+              <input name="home.ctaPrimary" type="text" />
+            </label>
+            <label
+              >Кнопка 2
+              <input name="home.ctaSecondary" type="text" />
+            </label>
+
+            <div class="settings-subhead full">Сотрудники</div>
+            <label class="full"
+              >Подпись
+              <input name="workers.eyebrow" type="text" />
+            </label>
+            <label class="full"
+              >Заголовок
+              <input name="workers.title" type="text" />
+            </label>
+            <label class="full"
+              >Описание
+              <textarea name="workers.lead"></textarea>
+            </label>
+            <label
+              >Кнопка 1
+              <input name="workers.ctaPrimary" type="text" />
+            </label>
+            <label
+              >Кнопка 2
+              <input name="workers.ctaSecondary" type="text" />
+            </label>
+
+            <div class="settings-subhead full">Заведения</div>
+            <label class="full"
+              >Подпись
+              <input name="restaurants.eyebrow" type="text" />
+            </label>
+            <label class="full"
+              >Заголовок
+              <input name="restaurants.title" type="text" />
+            </label>
+            <label class="full"
+              >Описание
+              <textarea name="restaurants.lead"></textarea>
+            </label>
+            <label
+              >Кнопка 1
+              <input name="restaurants.ctaPrimary" type="text" />
+            </label>
+            <label
+              >Кнопка 2
+              <input name="restaurants.ctaSecondary" type="text" />
+            </label>
+
+            <div class="settings-subhead full">Поставщики</div>
+            <label class="full"
+              >Подпись
+              <input name="suppliers.eyebrow" type="text" />
+            </label>
+            <label class="full"
+              >Заголовок
+              <input name="suppliers.title" type="text" />
+            </label>
+            <label class="full"
+              >Описание
+              <textarea name="suppliers.lead"></textarea>
+            </label>
+            <label
+              >Кнопка 1
+              <input name="suppliers.ctaPrimary" type="text" />
+            </label>
+            <label
+              >Кнопка 2
+              <input name="suppliers.ctaSecondary" type="text" />
+            </label>
+
+            <div class="settings-subhead full">Вход, кабинет и админка</div>
+            <label class="full"
+              >Заголовок входа
+              <input name="auth.title" type="text" />
+            </label>
+            <label class="full"
+              >Описание входа
+              <textarea name="auth.lead"></textarea>
+            </label>
+            <label class="full"
+              >Заголовок кабинета
+              <input name="cabinet.title" type="text" />
+            </label>
+            <label class="full"
+              >Описание кабинета
+              <textarea name="cabinet.lead"></textarea>
+            </label>
+            <label class="full"
+              >Заголовок админки
+              <input name="admin.title" type="text" />
+            </label>
+            <label class="full"
+              >Описание админки
+              <textarea name="admin.lead"></textarea>
+            </label>
+
+            <div class="cabinet-actions form-actions">
+              <button type="submit">Сохранить настройки</button>
+              <button id="resetSiteSettings" class="btn" type="button">
+                Сбросить
+              </button>
+            </div>
+            <p id="siteSettingsMessage" class="message"></p>
+          </form>
+
+          <hr class="section-divider" />
+
+          <h3>Данные платформы</h3>
           <div class="cabinet-actions">
             <button id="loadAdminDataBtn" type="button">Обновить данные</button>
           </div>
@@ -586,6 +868,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase.js"></script>
     <script src="script.js?v=1009"></script>
-    <script src="cabinet.js?v=1004"></script>
+    <script src="cabinet.js?v=1005"></script>
   </body>
 </html>
