@@ -592,6 +592,7 @@
 
     async function ensureProfileAfterAuth(user, role) {
       if (!user) return;
+      const profileRole = user.user_metadata?.role || role || "worker";
       const { data: existing, error: readError } = await window.supabaseClient
         .from("profiles")
         .select("id")
@@ -603,7 +604,7 @@
       await window.supabaseClient.from("profiles").upsert(
         {
           id: user.id,
-          role,
+          role: profileRole,
           name: user.email || "Пользователь",
           status: "active",
           updated_at: new Date().toISOString(),
