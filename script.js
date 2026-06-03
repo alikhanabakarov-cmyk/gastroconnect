@@ -3,7 +3,7 @@
   const SITE_SETTINGS_KEY = "gc_site_settings";
   const SITE_SETTINGS_ROW = "public_site";
   const SITE_ASSETS_BUCKET = "site-assets";
-  const SUPABASE_CONFIG_URL = "supabase.js?v=1001";
+  const SUPABASE_CONFIG_URL = "supabase.js?v=1002";
 
   const roleLabels = {
     worker: "Работник",
@@ -183,6 +183,12 @@
         url: client.supabaseUrl,
         key: client.supabaseKey,
       };
+      return window.__gcSupabaseRestConfig;
+    }
+
+    const config = window.__gcSupabaseConfig;
+    if (config?.url && config?.key) {
+      window.__gcSupabaseRestConfig = config;
       return window.__gcSupabaseRestConfig;
     }
 
