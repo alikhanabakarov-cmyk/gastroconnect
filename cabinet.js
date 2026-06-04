@@ -193,6 +193,38 @@
     return publicRoles.includes(role) ? role : "worker";
   }
 
+  function relatedProfile(row, relation = "profiles") {
+    const value = row?.[relation];
+    return Array.isArray(value) ? value[0] : value || {};
+  }
+
+  function displayName(profile, fallback = "-") {
+    return profile?.name || profile?.email || fallback;
+  }
+
+  function displayPlace(profile) {
+    return [profile?.city, profile?.district].filter(Boolean).join(", ");
+  }
+
+  function fillMainProfileFields(role) {
+    if (role !== "worker") return;
+    if (byId("workerName")) byId("workerName").value = state.profile?.name || "";
+    if (byId("workerCity")) byId("workerCity").value = state.profile?.city || "";
+    if (byId("workerDistrict")) byId("workerDistrict").value = state.profile?.district || "";
+  }
+
+  async function updateMainProfile(payload) {
+    const { data, error } = await db
+      .from("profiles")
+      .update({ ...payload, updated_at: new Date().toISOString() })
+      .eq("id", state.user.id)
+      .select("*")
+      .maybeSingle();
+
+    if (!error && data) state.profile = data;
+    return { error };
+  }
+
   function collectProfile(fields) {
     const payload = {};
 
@@ -273,6 +305,15 @@
     return query;
   }
 
+  async function selectRowsWithFallback(table, filters = {}, options = {}) {
+    const result = await selectRows(table, filters, options);
+    if (!result.error || !options.select || options.select === "*") return result;
+
+    const fallback = await selectRows(table, filters, { ...options, select: "*" });
+    if (fallback.error) return result;
+    return { ...fallback, warning: result.error.message };
+  }
+
   async function rowExists(table, filters) {
     const { data, error } = await selectRows(table, filters, { select: "id", limit: 1 });
     return { exists: Boolean(data?.length), error };
@@ -282,6 +323,12 @@
     const button = event?.currentTarget;
     setBusy(button, true);
 
+    const mainProfile = {
+      name: value("workerName") || state.profile?.name || state.user.email || "Работник",
+      city: value("workerCity"),
+      district: value("workerDistrict"),
+    };
+
     const payload = {
       user_id: state.user.id,
       ...collectProfile(profileFields.worker),
@@ -290,15 +337,22 @@
       updated_at: new Date().toISOString(),
     };
 
-    const { error } = await upsertProfile("worker_profiles", payload);
+    const [{ error: mainError }, { error }] = await Promise.all([
+      updateMainProfile(mainProfile),
+      upsertProfile("worker_profiles", payload),
+    ]);
+    const errors = [mainError, error].filter(Boolean);
     setMessage(
       el.workerProfileMessage,
-      error ? `Ошибка: ${error.message}` : "Профиль работника сохранен."
+      errors.length
+        ? `Ошибка: ${errors.map((item) => item.message).join("; ")}`
+        : "Профиль работника сохранен."
     );
     setBusy(button, false);
   }
 
   async function loadWorkerProfile() {
+    fillMainProfileFields("worker");
     const { data, error } = await db
       .from("worker_profiles")
       .select("*")
@@ -315,10 +369,13 @@
 
   async function loadShiftPosts() {
     setMessage(el.shiftPostsMessage, "Загружаем смены...");
-    const { data, error } = await selectRows(
+    const { data, error } = await selectRowsWithFallback(
       "shift_posts",
       { status: "open" },
-      { order: { column: "created_at", ascending: false } }
+      {
+        select: "*, restaurant:profiles!shift_posts_restaurant_id_fkey(name, city)",
+        order: { column: "created_at", ascending: false },
+      }
     );
 
     if (error) {
@@ -344,9 +401,11 @@
     }
 
     shifts.forEach((shift) => {
+      const restaurant = relatedProfile(shift, "restaurant");
       const node = card(
         shift.title || "Смена",
         `
+          <p>Заведение: ${escapeHtml(displayName(restaurant, "не указано"))}</p>
           <p>${escapeHtml(shift.profession || "-")} / ${escapeHtml(shift.city || "-")}</p>
           <p>${escapeHtml(shift.date_from || "")} ${escapeHtml(shift.time_from || "")}-${escapeHtml(shift.time_to || "")}</p>
           <p>Ставка: ${escapeHtml(money(shift.rate))}</p>
@@ -485,15 +544,30 @@
     const button = event?.currentTarget;
     setBusy(button, true);
 
-    const { error } = await upsertProfile("restaurant_profiles", {
-      user_id: state.user.id,
-      ...collectProfile(profileFields.restaurant),
-      updated_at: new Date().toISOString(),
-    });
+    const profilePayload = collectProfile(profileFields.restaurant);
+    const [{ error: mainError }, { error }] = await Promise.all([
+      updateMainProfile({
+        name:
+          profilePayload.business_name ||
+          profilePayload.contact_person ||
+          state.profile?.name ||
+          state.user.email ||
+          "Заведение",
+        city: profilePayload.city || state.profile?.city || "",
+      }),
+      upsertProfile("restaurant_profiles", {
+        user_id: state.user.id,
+        ...profilePayload,
+        updated_at: new Date().toISOString(),
+      }),
+    ]);
+    const errors = [mainError, error].filter(Boolean);
 
     setMessage(
       el.restaurantProfileMessage,
-      error ? `Ошибка: ${error.message}` : "Профиль заведения сохранен."
+      errors.length
+        ? `Ошибка: ${errors.map((item) => item.message).join("; ")}`
+        : "Профиль заведения сохранен."
     );
     setBusy(button, false);
   }
@@ -572,10 +646,14 @@
 
   async function loadShiftApplications() {
     setMessage(el.shiftPostMessage, "Загружаем отклики работников...");
-    const { data, error } = await selectRows(
+    const { data, error } = await selectRowsWithFallback(
       "shift_applications",
       { restaurant_id: state.user.id },
-      { order: { column: "created_at", ascending: false } }
+      {
+        select:
+          "*, worker:profiles!shift_applications_worker_id_fkey(name, city, district), shift:shift_posts!shift_applications_shift_id_fkey(title, profession, city, date_from)",
+        order: { column: "created_at", ascending: false },
+      }
     );
 
     if (error) {
@@ -594,9 +672,12 @@
 
     data.forEach((application) => {
       const pending = application.status === "pending";
+      const worker = relatedProfile(application, "worker");
+      const shift = relatedProfile(application, "shift");
+      const workerPlace = displayPlace(worker);
       const node = card(
-        "Отклик работника",
-        `<p>Работник: ${escapeHtml(application.worker_id)}</p><p>Статус: ${escapeHtml(statusText(application.status))}</p><p>${escapeHtml(application.message || "")}</p>`,
+        shift.title || "Отклик работника",
+        `<p>Работник: ${escapeHtml(displayName(worker, application.worker_id))}</p><p>${escapeHtml(workerPlace || shift.city || "-")}</p><p>Смена: ${escapeHtml(shift.profession || application.shift_id || "-")}</p><p>Статус: ${escapeHtml(statusText(application.status))}</p><p>${escapeHtml(application.message || "")}</p>`,
         pending
           ? '<button type="button" data-status="accepted">Принять</button><button class="btn" type="button" data-status="declined">Отклонить</button><p class="message"></p>'
           : '<p class="message">Решение уже сохранено.</p>'
@@ -639,10 +720,13 @@
 
   async function loadWorkers() {
     setMessage(el.workersMessage, "Загружаем анкеты работников...");
-    const { data, error } = await selectRows(
+    const { data, error } = await selectRowsWithFallback(
       "worker_profiles",
       {},
-      { order: { column: "updated_at", ascending: false } }
+      {
+        select: "*, profile:profiles!worker_profiles_user_id_fkey(name, city, district, is_verified)",
+        order: { column: "updated_at", ascending: false },
+      }
     );
 
     if (error) {
@@ -668,9 +752,14 @@
     }
 
     workers.forEach((worker) => {
+      const profile = relatedProfile(worker, "profile");
+      const place = displayPlace(profile);
+      const professions = listText(worker.professions);
       const node = card(
-        listText(worker.professions) || "Работник",
+        displayName(profile, professions === "-" ? "Работник" : professions),
         `
+          <p>${escapeHtml(professions)}</p>
+          <p>${escapeHtml(place || "Город не указан")}</p>
           <p>${escapeHtml(worker.experience || "Опыт не указан")}</p>
           <p>Дни: ${escapeHtml(listText(worker.available_days))}</p>
           <p>Ставка: ${escapeHtml(money(worker.min_rate))}</p>
@@ -768,10 +857,13 @@
 
   async function loadSupplierOffers() {
     setMessage(el.supplyRequestMessageBox, "Загружаем предложения поставщиков...");
-    const { data, error } = await selectRows(
+    const { data, error } = await selectRowsWithFallback(
       "supplier_offers",
       { status: "active" },
-      { order: { column: "created_at", ascending: false } }
+      {
+        select: "*, supplier:profiles!supplier_offers_supplier_id_fkey(name, city)",
+        order: { column: "created_at", ascending: false },
+      }
     );
 
     if (error) {
@@ -796,12 +888,15 @@
     }
 
     offers.forEach((offer) => {
+      const supplier = relatedProfile(offer, "supplier");
+      const delivery = listText(offer.delivery_cities);
       const node = card(
         offer.title || "Предложение",
         `
+          <p>Поставщик: ${escapeHtml(displayName(supplier, "не указан"))}</p>
           <p>${escapeHtml(offer.category || "-")} / ${escapeHtml(money(offer.price))} ${escapeHtml(offer.unit || "")}</p>
           <p>Минимум: ${escapeHtml(offer.min_order || "-")}</p>
-          <p>Доставка: ${escapeHtml(listText(offer.delivery_cities))}</p>
+          <p>Доставка: ${escapeHtml(delivery === "-" ? supplier.city || "-" : delivery)}</p>
           <p>${escapeHtml(offer.description || "")}</p>
         `,
         '<button type="button" data-action="send-supplier-inquiry">Отправить запрос</button><p class="message"></p>'
@@ -859,10 +954,14 @@
 
   async function loadSupplyResponses() {
     setMessage(el.supplyResponsesMessage, "Загружаем отклики поставщиков...");
-    const { data, error } = await selectRows(
+    const { data, error } = await selectRowsWithFallback(
       "supplier_responses",
       { restaurant_id: state.user.id },
-      { order: { column: "created_at", ascending: false } }
+      {
+        select:
+          "*, supplier:profiles!supplier_responses_supplier_id_fkey(name, city), request:supply_requests!supplier_responses_request_id_fkey(title, category, quantity)",
+        order: { column: "created_at", ascending: false },
+      }
     );
 
     if (error) {
@@ -886,9 +985,11 @@
 
     state.supplierResponses.forEach((response) => {
       const pending = response.status === "new";
+      const supplier = relatedProfile(response, "supplier");
+      const request = relatedProfile(response, "request");
       const node = card(
-        "Отклик поставщика",
-        `<p>Поставщик: ${escapeHtml(response.supplier_id)}</p><p>Категория: ${escapeHtml(response.category || "-")}</p><p>${escapeHtml(response.message || "")}</p><p>Статус: ${escapeHtml(statusText(response.status))}</p>`,
+        request.title || "Отклик поставщика",
+        `<p>Поставщик: ${escapeHtml(displayName(supplier, response.supplier_id))}</p><p>Запрос: ${escapeHtml(request.category || response.category || "-")} / ${escapeHtml(request.quantity || "-")}</p><p>${escapeHtml(response.message || "")}</p><p>Статус: ${escapeHtml(statusText(response.status))}</p>`,
         pending
           ? '<button type="button" data-status="accepted">Принять</button><button class="btn" type="button" data-status="declined">Отклонить</button><p class="message"></p>'
           : '<p class="message">Решение уже сохранено.</p>'
@@ -933,15 +1034,30 @@
     const button = event?.currentTarget;
     setBusy(button, true);
 
-    const { error } = await upsertProfile("supplier_profiles", {
-      user_id: state.user.id,
-      ...collectProfile(profileFields.supplier),
-      updated_at: new Date().toISOString(),
-    });
+    const profilePayload = collectProfile(profileFields.supplier);
+    const [{ error: mainError }, { error }] = await Promise.all([
+      updateMainProfile({
+        name:
+          profilePayload.company_name ||
+          profilePayload.contact_person ||
+          state.profile?.name ||
+          state.user.email ||
+          "Поставщик",
+        city: profilePayload.city || state.profile?.city || "",
+      }),
+      upsertProfile("supplier_profiles", {
+        user_id: state.user.id,
+        ...profilePayload,
+        updated_at: new Date().toISOString(),
+      }),
+    ]);
+    const errors = [mainError, error].filter(Boolean);
 
     setMessage(
       el.supplierProfileMessage,
-      error ? `Ошибка: ${error.message}` : "Профиль поставщика сохранен."
+      errors.length
+        ? `Ошибка: ${errors.map((item) => item.message).join("; ")}`
+        : "Профиль поставщика сохранен."
     );
     setBusy(button, false);
   }
@@ -1026,10 +1142,13 @@
 
   async function loadSupplyRequests() {
     setMessage(el.supplierOfferMessageBox, "Загружаем запросы заведений...");
-    const { data, error } = await selectRows(
+    const { data, error } = await selectRowsWithFallback(
       "supply_requests",
       { status: "open" },
-      { order: { column: "created_at", ascending: false } }
+      {
+        select: "*, restaurant:profiles!supply_requests_restaurant_id_fkey(name, city)",
+        order: { column: "created_at", ascending: false },
+      }
     );
 
     if (error) {
@@ -1054,12 +1173,14 @@
     }
 
     requests.forEach((request) => {
+      const restaurant = relatedProfile(request, "restaurant");
       const node = card(
         request.title || "Запрос",
         `
+          <p>Заведение: ${escapeHtml(displayName(restaurant, "не указано"))}</p>
           <p>${escapeHtml(request.category || "-")} / ${escapeHtml(request.quantity || "-")}</p>
           <p>Бюджет: ${escapeHtml(request.budget || "-")}</p>
-          <p>Город: ${escapeHtml(request.city || "-")}</p>
+          <p>Город: ${escapeHtml(request.city || restaurant.city || "-")}</p>
           <p>${escapeHtml(request.message || "")}</p>
         `,
         '<button type="button" data-action="respond-supply-request">Откликнуться</button><p class="message"></p>'
@@ -1118,10 +1239,14 @@
 
   async function loadSupplierInquiries() {
     setMessage(el.supplierInquiriesMessage, "Загружаем входящие заявки...");
-    const { data, error } = await selectRows(
+    const { data, error } = await selectRowsWithFallback(
       "supplier_inquiries",
       { supplier_id: state.user.id },
-      { order: { column: "created_at", ascending: false } }
+      {
+        select:
+          "*, restaurant:profiles!supplier_inquiries_restaurant_id_fkey(name, city), offer:supplier_offers!supplier_inquiries_offer_id_fkey(title, category)",
+        order: { column: "created_at", ascending: false },
+      }
     );
 
     if (error) {
@@ -1145,9 +1270,11 @@
 
     state.supplierInquiries.forEach((inquiry) => {
       const pending = inquiry.status === "new";
+      const restaurant = relatedProfile(inquiry, "restaurant");
+      const offer = relatedProfile(inquiry, "offer");
       const node = card(
-        "Заявка от заведения",
-        `<p>${escapeHtml(inquiry.message || "Заведение заинтересовалось предложением.")}</p><p>Статус: ${escapeHtml(statusText(inquiry.status))}</p>`,
+        offer.title || "Заявка от заведения",
+        `<p>Заведение: ${escapeHtml(displayName(restaurant, "не указано"))}</p><p>${escapeHtml(offer.category || "-")}</p><p>${escapeHtml(inquiry.message || "Заведение заинтересовалось предложением.")}</p><p>Статус: ${escapeHtml(statusText(inquiry.status))}</p>`,
         pending
           ? '<button type="button" data-status="accepted">Принять</button><button class="btn" type="button" data-status="declined">Отклонить</button><p class="message"></p>'
           : '<p class="message">Решение уже сохранено.</p>'
