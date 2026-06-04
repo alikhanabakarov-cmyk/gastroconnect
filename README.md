@@ -1,1 +1,44 @@
-# gastroconnect
+﻿# GastroConnect
+
+Static GitHub Pages site for the GastroConnect HoReCa marketplace.
+
+## Main Pages
+
+- `index.html` — home page
+- `workers.html` — worker landing page
+- `restaurants.html` — restaurant landing page
+- `suppliers.html` — supplier landing page
+- `auth.html` — role-based login and registration
+- `cabinet.html` — worker, restaurant, supplier and admin cabinet
+- `manage.html` — public admin settings page
+- `admin.html` — protected admin entry, if server auth is enabled
+
+## Assets
+
+Hero images are local and preloaded from:
+
+- `assets/hero-home.webp`
+- `assets/hero-workers.webp`
+- `assets/hero-restaurants.webp`
+- `assets/hero-suppliers.webp`
+
+Default logos:
+
+- `assets/logo-full.png`
+- `assets/logo-mark.png`
+
+## Checks Before Publish
+
+Run:
+
+```powershell
+node --check script.js
+node --check cabinet.js
+```
+
+Then verify the live pages with a cache-busting query, for example:
+
+```text
+https://gastroconnect.ru/index.html?v=check
+https://gastroconnect.ru/cabinet.html?v=check
+```
