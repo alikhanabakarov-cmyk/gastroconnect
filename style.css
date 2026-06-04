@@ -1050,40 +1050,6 @@ textarea:focus {
   background: rgba(255, 253, 248, 0.72);
 }
 
-.asset-preview-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 12px;
-}
-
-.asset-preview-card {
-  margin: 0;
-  overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  background: rgba(255, 253, 248, 0.86);
-}
-
-.asset-preview-card img {
-  display: block;
-  width: 100%;
-  height: 118px;
-  object-fit: cover;
-  background: rgba(6, 76, 59, 0.06);
-}
-
-.asset-preview-card-logo img {
-  object-fit: contain;
-  padding: 18px;
-}
-
-.asset-preview-card figcaption {
-  padding: 10px 12px;
-  color: var(--green);
-  font-size: 13px;
-  font-weight: 950;
-}
-
 .stats {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1211,10 +1177,6 @@ th {
     grid-template-columns: 1fr;
   }
 
-  .asset-preview-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .form-section,
   .section,
   .metrics-band,
@@ -1319,7 +1281,4 @@ th {
     grid-template-columns: 1fr;
   }
 
-  .asset-preview-grid {
-    grid-template-columns: 1fr;
-  }
 }

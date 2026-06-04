@@ -230,7 +230,7 @@
     }
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3000);
+    const timeoutId = setTimeout(() => controller.abort(), 1500);
     let response;
 
     try {
@@ -255,7 +255,7 @@
     const { url, key } = await getSupabaseRestConfig();
     const endpoint = `${url}/rest/v1/site_settings?setting_key=eq.${encodeURIComponent(SITE_SETTINGS_ROW)}&select=settings&limit=1`;
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 4000);
+    const timeoutId = setTimeout(() => controller.abort(), 1500);
     let response;
 
     try {
