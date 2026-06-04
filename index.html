@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
@@ -12,16 +12,7 @@
     <link rel="manifest" href="site.webmanifest" />
     <link rel="preload" href="assets/logo-full.png" as="image" type="image/png" />
     <link rel="preload" href="assets/hero-home.webp" as="image" type="image/webp" fetchpriority="high" />
-    <style>
-      :root{--cream:#fffaf2;--cream-2:#f6ecdf;--green:#064c3b;--gold:#c99a3f;--ink:#101312;--text:#2d3431;--line:rgba(201,154,63,.28);--shadow:0 24px 70px rgba(42,33,18,.12)}*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;color:var(--ink);background:linear-gradient(180deg,var(--cream) 0%,var(--cream-2) 100%);overflow-x:hidden}img{max-width:100%}.site-header{position:sticky;top:0;z-index:50;min-height:88px;padding:14px 56px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:34px;background:rgba(255,250,242,.95);border-bottom:1px solid var(--line)}.brand{display:flex;align-items:center;width:250px;max-width:32vw;color:var(--green);text-decoration:none}.brand-logo{width:100%;max-width:240px;height:auto;aspect-ratio:4/1;display:block;object-fit:contain}.main-nav{display:flex;justify-content:center;align-items:center;gap:28px}.main-nav a{text-decoration:none;color:var(--ink);font-size:17px;font-weight:900}.header-cta,.btn,button{min-height:54px;padding:0 24px;border:1px solid var(--gold);border-radius:14px;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,250,242,.9);color:#b37a1f;text-decoration:none;font:inherit;font-size:17px;font-weight:900}.header-cta,.btn.primary,button.primary{border-color:var(--green);background:var(--green);color:#fff}.poster-hero{width:100%;min-height:min(760px,calc(100vh - 88px));padding:64px 56px 70px;display:grid;grid-template-columns:minmax(360px,44%) minmax(420px,56%);align-items:center;gap:36px;overflow:hidden;background:linear-gradient(90deg,#fffaf2 0%,#fff8ef 45%,#f6ecdf 100%)}.poster-copy{position:relative;z-index:2;min-width:0;width:100%;max-width:680px}.eyebrow{margin:0 0 18px;color:var(--gold);font-size:14px;font-weight:900;text-transform:uppercase;letter-spacing:.06em}.poster-copy h1{margin:0 0 24px;color:var(--green);font-size:clamp(48px,5vw,78px);line-height:1.03;font-weight:950;overflow-wrap:break-word}.poster-copy p{max-width:560px;margin:0 0 34px;color:var(--text);font-size:22px;line-height:1.45}.hero-actions{display:flex;flex-wrap:wrap;gap:18px;margin-bottom:38px}.hero-actions .btn{min-width:210px;min-height:62px;font-size:19px}.hero-benefits{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;max-width:650px}.hero-benefits span{color:#18342d;font-size:15px;font-weight:900}.poster-visual{position:relative;z-index:1;width:100%;min-width:0;min-height:520px;overflow:hidden;border-radius:26px;border:1px solid rgba(201,154,63,.24);box-shadow:var(--shadow);background:#eadfce}.poster-image{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:cover;object-position:center}.poster-image-home{object-position:right center}.hero-dashboard{position:absolute;right:28px;bottom:28px;z-index:3;width:min(360px,calc(100% - 56px));display:grid;gap:12px}.poster-visual-with-dashboard .hero-dashboard{left:28px;right:auto}.dash-card{padding:16px 18px;border-radius:18px;background:rgba(255,250,242,.88)}@media (max-width:1050px){.site-header{padding:16px 22px;grid-template-columns:1fr;gap:16px}.main-nav{justify-content:flex-start;flex-wrap:wrap;gap:14px}.poster-hero{grid-template-columns:1fr;min-height:auto;padding:42px 22px 58px}.poster-copy h1{font-size:42px}.poster-visual{min-height:360px}.hero-dashboard{position:relative;left:auto;right:auto;bottom:auto;width:100%;align-self:end}}@media (max-width:620px){.site-header{display:flex;flex-direction:column;align-items:stretch;padding:14px 20px}.brand{width:220px;max-width:100%}.main-nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 14px}.poster-hero{padding:34px 20px 48px}.poster-copy h1{font-size:30px;line-height:1.08}.poster-copy p{font-size:17px}.hero-actions .btn,.btn,.header-cta,button{width:100%;min-width:0}}
-    </style>
-    <link
-      rel="preload"
-      href="style.css?v=1011"
-      as="style"
-      onload="this.onload=null;this.rel='stylesheet'"
-    />
-    <noscript><link rel="stylesheet" href="style.css?v=1011" /></noscript>
+    <link rel="stylesheet" href="style.css?v=1012" />
   </head>
   <body>
     <div class="page-shell">
@@ -128,16 +119,16 @@
 
         <section class="metrics-band" aria-label="Показатели платформы">
           <article>
-            <strong>24/7</strong><span>публикация смен и заявок</span>
+            <strong data-site-setting="home.metric1Value">24/7</strong><span data-site-setting="home.metric1Text">публикация смен и заявок</span>
           </article>
           <article>
-            <strong>3 роли</strong><span>работник, заведение, поставщик</span>
+            <strong data-site-setting="home.metric2Value">3 роли</strong><span data-site-setting="home.metric2Text">работник, заведение, поставщик</span>
           </article>
           <article>
-            <strong>1 кабинет</strong><span>профили, отклики, приглашения</span>
+            <strong data-site-setting="home.metric3Value">1 кабинет</strong><span data-site-setting="home.metric3Text">профили, отклики, приглашения</span>
           </article>
           <article>
-            <strong>HoReCa</strong><span>фокус на кафе, рестораны и кухни</span>
+            <strong data-site-setting="home.metric4Value">HoReCa</strong><span data-site-setting="home.metric4Text">фокус на кафе, рестораны и кухни</span>
           </article>
         </section>
 
@@ -146,8 +137,8 @@
           aria-label="Превью рабочей платформы"
         >
           <div class="section-head">
-            <h2>Внутри не лендинг, а рабочая лента</h2>
-            <p>
+            <h2 data-site-setting="home.boardTitle">Внутри не лендинг, а рабочая лента</h2>
+            <p data-site-setting="home.boardLead">
               Заведение публикует смену, работник откликается, поставщик
               получает запрос. Всё это собрано в кабинетах по ролям.
             </p>
@@ -209,8 +200,8 @@
 
         <section class="direction-section" id="business">
           <div class="section-head">
-            <h2>Платформа работает как операционный штаб</h2>
-            <p>
+            <h2 data-site-setting="home.rolesTitle">Платформа работает как операционный штаб</h2>
+            <p data-site-setting="home.rolesLead">
               Заведение видит работников, публикует смены, получает отклики и
               держит поставщиков в одном месте.
             </p>
@@ -218,27 +209,27 @@
 
           <div class="direction-grid">
             <a class="direction-card" href="restaurants.html">
-              <span>Для заведений</span>
-              <h3>Закрывайте смены быстрее</h3>
-              <p>
+              <span data-site-setting="home.restaurantCardLabel">Для заведений</span>
+              <h3 data-site-setting="home.restaurantCardTitle">Закрывайте смены быстрее</h3>
+              <p data-site-setting="home.restaurantCardText">
                 Публикуйте заявки, приглашайте работников из базы, фильтруйте по
                 профессии, ставке, графику и готовности к выезду.
               </p>
             </a>
 
             <a class="direction-card" id="workers" href="workers.html">
-              <span>Для сотрудников</span>
-              <h3>Берите понятные смены</h3>
-              <p>
+              <span data-site-setting="home.workerCardLabel">Для сотрудников</span>
+              <h3 data-site-setting="home.workerCardTitle">Берите понятные смены</h3>
+              <p data-site-setting="home.workerCardText">
                 Заполните профиль, смотрите доступные смены, откликайтесь и
                 принимайте приглашения от заведений.
               </p>
             </a>
 
             <a class="direction-card" id="suppliers" href="suppliers.html">
-              <span>Для поставщиков</span>
-              <h3>Получайте входящие запросы</h3>
-              <p>
+              <span data-site-setting="home.supplierCardLabel">Для поставщиков</span>
+              <h3 data-site-setting="home.supplierCardTitle">Получайте входящие запросы</h3>
+              <p data-site-setting="home.supplierCardText">
                 Публикуйте предложения по товарам и услугам, а заведения
                 отправляют заявки прямо в кабинет поставщика.
               </p>
@@ -248,11 +239,11 @@
 
         <section class="market-section" id="workflow">
           <div class="market-copy">
-            <div class="eyebrow">
+            <div class="eyebrow" data-site-setting="home.workflowEyebrow">
               как Coople, Instawork и VentraGo, но под российскую HoReCa
             </div>
-            <h2>Не доска объявлений, а рабочий процесс</h2>
-            <p>
+            <h2 data-site-setting="home.workflowTitle">Не доска объявлений, а рабочий процесс</h2>
+            <p data-site-setting="home.workflowLead">
               Система собирает смены, профили, отклики, приглашения и поставки в
               одну цепочку. Минимальный MVP уже работает на статическом фронте,
               Supabase и локальном fallback.
@@ -262,26 +253,26 @@
             <article>
               <b>01</b
               ><span
-                >Заведение публикует смену или выбирает работника из базы.</span
+                data-site-setting="home.workflowStep1">Заведение публикует смену или выбирает работника из базы.</span
               >
             </article>
             <article>
               <b>02</b
               ><span
-                >Работник откликается или принимает приглашение на смену.</span
+                data-site-setting="home.workflowStep2">Работник откликается или принимает приглашение на смену.</span
               >
             </article>
             <article>
               <b>03</b
               ><span
-                >Поставщик публикует оффер, заведение отправляет запрос в
+                data-site-setting="home.workflowStep3">Поставщик публикует оффер, заведение отправляет запрос в
                 кабинет.</span
               >
             </article>
             <article>
               <b>04</b
               ><span
-                >Админ видит общий контур данных и контролирует наполнение
+                data-site-setting="home.workflowStep4">Админ видит общий контур данных и контролирует наполнение
                 платформы.</span
               >
             </article>
@@ -290,8 +281,8 @@
 
         <section class="function-section">
           <div class="section-head">
-            <h2>Что уже заложено в MVP</h2>
-            <p>
+            <h2 data-site-setting="home.mvpTitle">Что уже заложено в MVP</h2>
+            <p data-site-setting="home.mvpLead">
               Функции, которые нужны, чтобы сайт перестал быть “витриной” и
               начал работать как сервис.
             </p>
@@ -299,27 +290,27 @@
 
           <div class="function-grid">
             <article>
-              <span>Смены</span>
-              <h3>Публикация и отклики</h3>
-              <p>
+              <span data-site-setting="home.mvpCard1Label">Смены</span>
+              <h3 data-site-setting="home.mvpCard1Title">Публикация и отклики</h3>
+              <p data-site-setting="home.mvpCard1Text">
                 Заведение создаёт смену, работник видит её в кабинете и
                 отправляет отклик.
               </p>
             </article>
 
             <article>
-              <span>Профили</span>
-              <h3>Профили всех ролей</h3>
-              <p>
+              <span data-site-setting="home.mvpCard2Label">Профили</span>
+              <h3 data-site-setting="home.mvpCard2Title">Профили всех ролей</h3>
+              <p data-site-setting="home.mvpCard2Text">
                 Работники, заведения и поставщики ведут отдельные профили, чтобы
                 заявки были понятными и проверяемыми.
               </p>
             </article>
 
             <article>
-              <span>Поставки</span>
-              <h3>Офферы и заявки</h3>
-              <p>
+              <span data-site-setting="home.mvpCard3Label">Поставки</span>
+              <h3 data-site-setting="home.mvpCard3Title">Офферы и заявки</h3>
+              <p data-site-setting="home.mvpCard3Text">
                 Поставщики публикуют предложения, заведения отправляют запросы
                 по нужным позициям.
               </p>
@@ -329,8 +320,8 @@
 
         <section class="form-section" id="contacts">
           <div class="form-info">
-            <h2>Начните с регистрации</h2>
-            <p>Создайте аккаунт и откройте кабинет для своей роли.</p>
+            <h2 data-site-setting="home.finalTitle">Начните с регистрации</h2>
+            <p data-site-setting="home.finalLead">Создайте аккаунт и откройте кабинет для своей роли.</p>
           </div>
 
           <div class="form-card">
@@ -358,6 +349,6 @@
         </div>
       </footer>
     </div>
-    <script src="script.js?v=1019"></script>
+    <script src="script.js?v=1020"></script>
   </body>
 </html>

@@ -1026,6 +1026,13 @@ textarea:focus {
   font-weight: 950;
 }
 
+.settings-help {
+  margin: -6px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
 .settings-form textarea {
   min-height: 96px;
 }
