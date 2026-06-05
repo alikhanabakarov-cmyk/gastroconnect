@@ -8,6 +8,7 @@ create or replace function public.is_admin()
 returns boolean
 language sql
 stable
+set search_path = public
 as $$
   select exists (
     select 1
@@ -67,7 +68,7 @@ create table if not exists public.worker_profiles (
 
 create table if not exists public.restaurant_profiles (
   user_id uuid primary key references public.profiles(id) on delete cascade,
-  business_name text,
+  business_name text not null default '',
   business_type text,
   contact_person text,
   city text,
@@ -79,7 +80,7 @@ create table if not exists public.restaurant_profiles (
 
 create table if not exists public.supplier_profiles (
   user_id uuid primary key references public.profiles(id) on delete cascade,
-  company_name text,
+  company_name text not null default '',
   contact_person text,
   city text,
   delivery_cities text[] not null default '{}',
@@ -94,7 +95,7 @@ create table if not exists public.shift_posts (
   restaurant_id uuid not null references public.profiles(id) on delete cascade,
   title text not null,
   profession text not null,
-  city text,
+  city text not null default '',
   district text,
   address text,
   date_from date,
@@ -220,6 +221,9 @@ create trigger on_auth_user_created
 after insert on auth.users
 for each row execute function public.handle_new_user();
 
+revoke execute on function public.handle_new_user() from public;
+revoke execute on function public.handle_new_user() from anon, authenticated;
+
 alter table public.profiles enable row level security;
 alter table public.worker_profiles enable row level security;
 alter table public.restaurant_profiles enable row level security;
@@ -280,9 +284,18 @@ drop policy if exists site_settings_public_read on public.site_settings;
 create policy site_settings_public_read on public.site_settings for select to anon, authenticated using (true);
 
 drop policy if exists site_settings_admin_write on public.site_settings;
-create policy site_settings_admin_write on public.site_settings for all to authenticated
-using (public.is_admin())
-with check (public.is_admin());
+drop policy if exists site_settings_admin_insert on public.site_settings;
+create policy site_settings_admin_insert on public.site_settings for insert to authenticated
+with check ((select public.is_admin()));
+
+drop policy if exists site_settings_admin_update on public.site_settings;
+create policy site_settings_admin_update on public.site_settings for update to authenticated
+using ((select public.is_admin()))
+with check ((select public.is_admin()));
+
+drop policy if exists site_settings_admin_delete on public.site_settings;
+create policy site_settings_admin_delete on public.site_settings for delete to authenticated
+using ((select public.is_admin()));
 
 drop policy if exists public_submissions_insert_anon on public.public_submissions;
 create policy public_submissions_insert_anon on public.public_submissions for insert to anon, authenticated
@@ -303,25 +316,48 @@ using ((select public.is_admin()));
 
 drop policy if exists worker_profiles_insert_own_or_admin on public.worker_profiles;
 create policy worker_profiles_insert_own_or_admin on public.worker_profiles for insert to authenticated
-with check (user_id = auth.uid() or public.is_admin());
+with check (
+  public.is_admin()
+  or (
+    user_id = auth.uid()
+    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'worker')
+  )
+);
 
 drop policy if exists worker_profiles_update_own_or_admin on public.worker_profiles;
 create policy worker_profiles_update_own_or_admin on public.worker_profiles for update to authenticated
 using (user_id = auth.uid() or public.is_admin())
-with check (user_id = auth.uid() or public.is_admin());
+with check (
+  public.is_admin()
+  or (
+    user_id = auth.uid()
+    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'worker')
+  )
+);
 
 drop policy if exists restaurant_profiles_all_own on public.restaurant_profiles;
 create policy restaurant_profiles_all_own on public.restaurant_profiles for all to authenticated
 using (user_id = auth.uid() or public.is_admin())
-with check (user_id = auth.uid() or public.is_admin());
+with check (
+  public.is_admin()
+  or (
+    user_id = auth.uid()
+    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'restaurant')
+  )
+);
 
 drop policy if exists supplier_profiles_select_authenticated on public.supplier_profiles;
-create policy supplier_profiles_select_authenticated on public.supplier_profiles for select to authenticated using (true);
 
 drop policy if exists supplier_profiles_all_own on public.supplier_profiles;
 create policy supplier_profiles_all_own on public.supplier_profiles for all to authenticated
 using (user_id = auth.uid() or public.is_admin())
-with check (user_id = auth.uid() or public.is_admin());
+with check (
+  public.is_admin()
+  or (
+    user_id = auth.uid()
+    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'supplier')
+  )
+);
 
 drop policy if exists shift_posts_select_authenticated on public.shift_posts;
 drop policy if exists shift_posts_select_by_role on public.shift_posts;
@@ -340,12 +376,24 @@ using (
 
 drop policy if exists shift_posts_insert_restaurant_or_admin on public.shift_posts;
 create policy shift_posts_insert_restaurant_or_admin on public.shift_posts for insert to authenticated
-with check (restaurant_id = auth.uid() or public.is_admin());
+with check (
+  public.is_admin()
+  or (
+    restaurant_id = auth.uid()
+    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'restaurant')
+  )
+);
 
 drop policy if exists shift_posts_update_restaurant_or_admin on public.shift_posts;
 create policy shift_posts_update_restaurant_or_admin on public.shift_posts for update to authenticated
 using (restaurant_id = auth.uid() or public.is_admin())
-with check (restaurant_id = auth.uid() or public.is_admin());
+with check (
+  public.is_admin()
+  or (
+    restaurant_id = auth.uid()
+    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'restaurant')
+  )
+);
 
 drop policy if exists shift_applications_select_related on public.shift_applications;
 create policy shift_applications_select_related on public.shift_applications for select to authenticated
@@ -353,7 +401,10 @@ using (worker_id = auth.uid() or restaurant_id = auth.uid() or public.is_admin()
 
 drop policy if exists shift_applications_insert_worker on public.shift_applications;
 create policy shift_applications_insert_worker on public.shift_applications for insert to authenticated
-with check (worker_id = auth.uid());
+with check (
+  worker_id = auth.uid()
+  and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'worker')
+);
 
 drop policy if exists shift_applications_update_related on public.shift_applications;
 drop policy if exists shift_applications_update_restaurant_or_admin on public.shift_applications;
@@ -368,7 +419,13 @@ using (restaurant_id = auth.uid() or worker_id = auth.uid() or public.is_admin()
 drop policy if exists shift_invites_insert_own_restaurant on public.shift_invites;
 drop policy if exists shift_invites_insert_restaurant on public.shift_invites;
 create policy shift_invites_insert_own_restaurant on public.shift_invites for insert to authenticated
-with check (restaurant_id = auth.uid() or public.is_admin());
+with check (
+  public.is_admin()
+  or (
+    restaurant_id = auth.uid()
+    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'restaurant')
+  )
+);
 
 drop policy if exists shift_invites_update_own on public.shift_invites;
 drop policy if exists shift_invites_update_worker on public.shift_invites;
@@ -393,12 +450,24 @@ using (
 
 drop policy if exists supplier_offers_insert_supplier_or_admin on public.supplier_offers;
 create policy supplier_offers_insert_supplier_or_admin on public.supplier_offers for insert to authenticated
-with check (supplier_id = auth.uid() or public.is_admin());
+with check (
+  public.is_admin()
+  or (
+    supplier_id = auth.uid()
+    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'supplier')
+  )
+);
 
 drop policy if exists supplier_offers_update_supplier_or_admin on public.supplier_offers;
 create policy supplier_offers_update_supplier_or_admin on public.supplier_offers for update to authenticated
 using (supplier_id = auth.uid() or public.is_admin())
-with check (supplier_id = auth.uid() or public.is_admin());
+with check (
+  public.is_admin()
+  or (
+    supplier_id = auth.uid()
+    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'supplier')
+  )
+);
 
 drop policy if exists supplier_inquiries_select_related on public.supplier_inquiries;
 create policy supplier_inquiries_select_related on public.supplier_inquiries for select to authenticated
@@ -406,7 +475,10 @@ using (restaurant_id = auth.uid() or supplier_id = auth.uid() or public.is_admin
 
 drop policy if exists supplier_inquiries_insert_restaurant on public.supplier_inquiries;
 create policy supplier_inquiries_insert_restaurant on public.supplier_inquiries for insert to authenticated
-with check (restaurant_id = auth.uid());
+with check (
+  restaurant_id = auth.uid()
+  and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'restaurant')
+);
 
 drop policy if exists supplier_inquiries_update_supplier_or_admin on public.supplier_inquiries;
 create policy supplier_inquiries_update_supplier_or_admin on public.supplier_inquiries for update to authenticated
@@ -433,13 +505,25 @@ using (
 drop policy if exists supply_requests_insert_restaurant on public.supply_requests;
 drop policy if exists "restaurants can create supply requests" on public.supply_requests;
 create policy supply_requests_insert_restaurant on public.supply_requests for insert to authenticated
-with check (restaurant_id = auth.uid() or public.is_admin());
+with check (
+  public.is_admin()
+  or (
+    restaurant_id = auth.uid()
+    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'restaurant')
+  )
+);
 
 drop policy if exists supply_requests_update_restaurant on public.supply_requests;
 drop policy if exists "restaurants can update own supply requests" on public.supply_requests;
 create policy supply_requests_update_restaurant on public.supply_requests for update to authenticated
 using (restaurant_id = auth.uid() or public.is_admin())
-with check (restaurant_id = auth.uid() or public.is_admin());
+with check (
+  public.is_admin()
+  or (
+    restaurant_id = auth.uid()
+    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'restaurant')
+  )
+);
 
 drop policy if exists supplier_responses_select_related on public.supplier_responses;
 drop policy if exists "supplier responses related users can read" on public.supplier_responses;
@@ -449,7 +533,13 @@ using (restaurant_id = auth.uid() or supplier_id = auth.uid() or public.is_admin
 drop policy if exists supplier_responses_insert_supplier on public.supplier_responses;
 drop policy if exists "suppliers can create supplier responses" on public.supplier_responses;
 create policy supplier_responses_insert_supplier on public.supplier_responses for insert to authenticated
-with check (supplier_id = auth.uid() or public.is_admin());
+with check (
+  public.is_admin()
+  or (
+    supplier_id = auth.uid()
+    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'supplier')
+  )
+);
 
 drop policy if exists supplier_responses_update_related on public.supplier_responses;
 drop policy if exists "restaurants can update supplier responses" on public.supplier_responses;
@@ -458,12 +548,14 @@ using (restaurant_id = auth.uid() or supplier_id = auth.uid() or public.is_admin
 with check (restaurant_id = auth.uid() or supplier_id = auth.uid() or public.is_admin());
 
 create index if not exists shift_posts_status_idx on public.shift_posts(status);
+create index if not exists shift_posts_restaurant_id_idx on public.shift_posts(restaurant_id);
 create index if not exists shift_posts_city_idx on public.shift_posts(city);
 create index if not exists shift_posts_profession_idx on public.shift_posts(profession);
 create index if not exists shift_applications_restaurant_id_idx on public.shift_applications(restaurant_id);
 create index if not exists shift_applications_worker_id_idx on public.shift_applications(worker_id);
 create index if not exists shift_invites_worker_id_idx on public.shift_invites(worker_id);
 create unique index if not exists shift_invites_pending_unique_idx on public.shift_invites(restaurant_id, worker_id) where status = 'pending';
+create index if not exists supplier_offers_supplier_id_idx on public.supplier_offers(supplier_id);
 create index if not exists supplier_offers_category_idx on public.supplier_offers(category);
 create index if not exists supplier_inquiries_supplier_id_idx on public.supplier_inquiries(supplier_id);
 create index if not exists supply_requests_status_idx on public.supply_requests(status);

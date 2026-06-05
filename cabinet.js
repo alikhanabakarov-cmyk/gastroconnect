@@ -248,6 +248,15 @@
     return payload;
   }
 
+  function requireValues(fields, messageTarget) {
+    const missing = fields.filter((field) => !value(field.id));
+    if (!missing.length) return true;
+
+    setMessage(messageTarget, `Заполните: ${missing.map((field) => field.label).join(", ")}.`);
+    byId(missing[0].id)?.focus();
+    return false;
+  }
+
   function fillProfile(fields, data) {
     Object.entries(fields).forEach(([fieldId, column]) => {
       const input = byId(fieldId);
@@ -542,6 +551,15 @@
 
   async function saveRestaurantProfile(event) {
     const button = event?.currentTarget;
+    if (
+      !requireValues(
+        [{ id: "restaurantBusinessName", label: "название заведения" }],
+        el.restaurantProfileMessage
+      )
+    ) {
+      return;
+    }
+
     setBusy(button, true);
 
     const profilePayload = collectProfile(profileFields.restaurant);
@@ -585,9 +603,10 @@
     const button = event?.currentTarget;
     const title = value("shiftTitle");
     const profession = value("shiftProfession");
+    const city = value("shiftCity");
 
-    if (!title || !profession) {
-      setMessage(el.shiftPostMessage, "Заполните название смены и профессию.");
+    if (!title || !profession || !city) {
+      setMessage(el.shiftPostMessage, "Заполните название смены, профессию и город.");
       return;
     }
 
@@ -596,7 +615,7 @@
       restaurant_id: state.user.id,
       title,
       profession,
-      city: value("shiftCity"),
+      city,
       district: value("shiftDistrict"),
       address: value("shiftAddress"),
       date_from: value("shiftDateFrom") || null,
@@ -1032,6 +1051,15 @@
 
   async function saveSupplierProfile(event) {
     const button = event?.currentTarget;
+    if (
+      !requireValues(
+        [{ id: "supplierCompanyName", label: "название компании" }],
+        el.supplierProfileMessage
+      )
+    ) {
+      return;
+    }
+
     setBusy(button, true);
 
     const profilePayload = collectProfile(profileFields.supplier);
