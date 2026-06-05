@@ -35,6 +35,20 @@ create table if not exists public.site_settings (
   updated_at timestamptz not null default now()
 );
 
+create table if not exists public.public_submissions (
+  id uuid primary key default gen_random_uuid(),
+  type text not null check (type in ('worker', 'restaurant', 'supplier')),
+  title text not null,
+  phone text,
+  telegram text,
+  city text,
+  data jsonb not null default '{}'::jsonb,
+  source text not null default 'site',
+  status text not null default 'new' check (status in ('new', 'in_progress', 'done', 'archived')),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 create table if not exists public.worker_profiles (
   user_id uuid primary key references public.profiles(id) on delete cascade,
   professions text[] not null default '{}',
@@ -218,10 +232,13 @@ alter table public.supplier_inquiries enable row level security;
 alter table public.supply_requests enable row level security;
 alter table public.supplier_responses enable row level security;
 alter table public.site_settings enable row level security;
+alter table public.public_submissions enable row level security;
 
 grant select, insert, update on all tables in schema public to authenticated;
 grant select on public.site_settings to anon, authenticated;
 grant insert, update, delete on public.site_settings to authenticated;
+grant insert on public.public_submissions to anon;
+grant select, update, delete on public.public_submissions to authenticated;
 
 drop policy if exists profiles_select on public.profiles;
 create policy profiles_select on public.profiles for select to authenticated
@@ -266,6 +283,23 @@ drop policy if exists site_settings_admin_write on public.site_settings;
 create policy site_settings_admin_write on public.site_settings for all to authenticated
 using (public.is_admin())
 with check (public.is_admin());
+
+drop policy if exists public_submissions_insert_anon on public.public_submissions;
+create policy public_submissions_insert_anon on public.public_submissions for insert to anon, authenticated
+with check (type in ('worker', 'restaurant', 'supplier'));
+
+drop policy if exists public_submissions_admin_read on public.public_submissions;
+create policy public_submissions_admin_read on public.public_submissions for select to authenticated
+using ((select public.is_admin()));
+
+drop policy if exists public_submissions_admin_update on public.public_submissions;
+create policy public_submissions_admin_update on public.public_submissions for update to authenticated
+using ((select public.is_admin()))
+with check ((select public.is_admin()));
+
+drop policy if exists public_submissions_admin_delete on public.public_submissions;
+create policy public_submissions_admin_delete on public.public_submissions for delete to authenticated
+using ((select public.is_admin()));
 
 drop policy if exists worker_profiles_insert_own_or_admin on public.worker_profiles;
 create policy worker_profiles_insert_own_or_admin on public.worker_profiles for insert to authenticated
@@ -438,6 +472,9 @@ create index if not exists supplier_responses_restaurant_id_idx on public.suppli
 create index if not exists supplier_responses_supplier_id_idx on public.supplier_responses(supplier_id);
 create index if not exists supplier_responses_status_idx on public.supplier_responses(status);
 create unique index if not exists supplier_responses_request_supplier_unique_idx on public.supplier_responses(request_id, supplier_id);
+create index if not exists public_submissions_type_idx on public.public_submissions(type);
+create index if not exists public_submissions_status_idx on public.public_submissions(status);
+create index if not exists public_submissions_created_at_idx on public.public_submissions(created_at desc);
 
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values (
