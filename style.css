@@ -280,7 +280,8 @@ button:disabled {
   z-index: 1;
   width: 100%;
   min-width: 0;
-  min-height: 520px;
+  min-height: clamp(420px, 38vw, 540px);
+  aspect-ratio: 16 / 10;
   overflow: hidden;
   border-radius: 26px;
   border: 1px solid rgba(201, 154, 63, 0.24);
@@ -1157,8 +1158,25 @@ th {
   }
 
   .poster-visual {
-    min-height: 360px;
+    min-height: 340px;
+    aspect-ratio: 16 / 10;
     background-position: center;
+  }
+
+  .poster-visual-with-dashboard {
+    display: grid;
+    grid-template-rows: minmax(260px, 1fr) auto;
+    background: var(--card);
+  }
+
+  .poster-visual-with-dashboard .poster-image {
+    position: relative;
+    grid-row: 1;
+    min-height: 260px;
+  }
+
+  .poster-visual-with-dashboard::after {
+    display: none;
   }
 
   .hero-dashboard {
@@ -1167,8 +1185,9 @@ th {
     right: auto;
     bottom: auto;
     width: 100%;
-    padding: 22px;
-    align-self: end;
+    padding: 18px;
+    align-self: stretch;
+    background: var(--card);
   }
 
   .hero-benefits,
