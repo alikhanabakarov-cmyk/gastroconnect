@@ -152,9 +152,18 @@
 
     const params = new URLSearchParams(window.location.search);
     let mode = params.get("mode") === "login" ? "login" : "signup";
+    let roleWasExplicit = roles.includes(params.get("role"));
     roleInput.value = normalizeRole(params.get("role"));
 
     const cabinetUrl = () => `cabinet.html?role=${encodeURIComponent(roleInput.value)}`;
+    const profileCabinetUrl = (profile) => {
+      const role = profile?.role || roleInput.value;
+      return `cabinet.html?role=${encodeURIComponent(role)}`;
+    };
+
+    function roleFromUser(user) {
+      return roles.find((role) => role === user?.app_metadata?.role || role === user?.user_metadata?.role) || "";
+    }
 
     function setBusy(isBusy, text) {
       [registerBtn, loginBtn, showLoginBtn, showRegisterBtn].forEach((button) => {
@@ -191,14 +200,17 @@
 
     async function ensureProfile(user, role) {
       if (!user) return null;
-      const profileRole = normalizeRole(user.user_metadata?.role || role);
+      const profileRole = roleFromUser(user) || (roles.includes(role) ? role : "");
       const { data: existing, error: readError } = await window.supabaseClient
         .from("profiles")
         .select("id, role")
         .eq("id", user.id)
         .maybeSingle();
-      if (existing) return existing;
       if (readError) throw readError;
+      if (existing) return existing;
+      if (!profileRole) {
+        throw new Error("Профиль не найден. Откройте регистрацию, выберите роль и создайте профиль.");
+      }
       const payload = {
         id: user.id,
         role: profileRole,
@@ -218,8 +230,16 @@
       if (!client || !cabinetShortcut) return;
       const { data } = await client.auth.getSession();
       if (data?.session?.user) {
+        let sessionProfile = null;
+        try {
+          sessionProfile = await ensureProfile(data.session.user, roleWasExplicit ? roleInput.value : "");
+        } catch (error) {
+          cabinetShortcut.hidden = true;
+          message.textContent = error.message;
+          return;
+        }
         cabinetShortcut.hidden = false;
-        cabinetShortcut.href = cabinetUrl();
+        cabinetShortcut.href = profileCabinetUrl(sessionProfile);
         message.textContent = "Вы уже вошли. Можно открыть кабинет.";
       }
     }
@@ -245,8 +265,8 @@
       }
       if (data?.session?.user) {
         try {
-          await ensureProfile(data.session.user, role);
-          window.location.href = cabinetUrl();
+          const profile = await ensureProfile(data.session.user, role);
+          window.location.href = profileCabinetUrl(profile);
           return;
         } catch (profileError) {
           setBusy(false);
@@ -272,8 +292,8 @@
         return (message.textContent = `Ошибка входа: ${error.message}`);
       }
       try {
-        await ensureProfile(data.user, roleInput.value);
-        window.location.href = cabinetUrl();
+        const profile = await ensureProfile(data.user, roleWasExplicit ? roleInput.value : "");
+        window.location.href = profileCabinetUrl(profile);
       } catch (profileError) {
         setBusy(false);
         message.textContent = `Вход выполнен, но профиль не проверен: ${profileError.message}`;
@@ -282,7 +302,10 @@
 
     showLoginBtn?.addEventListener("click", () => setMode("login"));
     showRegisterBtn?.addEventListener("click", () => setMode("signup"));
-    roleInput.addEventListener("change", () => setMode(mode));
+    roleInput.addEventListener("change", () => {
+      roleWasExplicit = true;
+      setMode(mode);
+    });
     passwordInput.addEventListener("keydown", (event) => {
       if (event.key !== "Enter") return;
       event.preventDefault();
