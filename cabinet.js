@@ -15,6 +15,8 @@
     "workersList",
     "workersMessage",
     "workerSearchInput",
+    "restaurantInvitesList",
+    "restaurantInvitesMessage",
     "invitesList",
     "invitesMessage",
     "shiftPostsList",
@@ -50,6 +52,7 @@
     supplierResponses: [],
     supplierInquiries: [],
     ownSupplierOffers: [],
+    restaurantInvites: [],
   };
 
   const rolePanels = {
@@ -630,7 +633,24 @@
 
     setMessage(el.shiftPostMessage, error ? `Ошибка: ${error.message}` : "Смена опубликована.");
     setBusy(button, false);
-    if (!error) await loadRestaurantShiftPosts();
+    if (!error) {
+      [
+        "shiftTitle",
+        "shiftProfession",
+        "shiftCity",
+        "shiftDistrict",
+        "shiftAddress",
+        "shiftDateFrom",
+        "shiftTimeFrom",
+        "shiftTimeTo",
+        "shiftRate",
+        "shiftRequirements",
+      ].forEach((id) => {
+        const input = byId(id);
+        if (input) input.value = "";
+      });
+      await Promise.all([loadRestaurantShiftPosts(), loadShiftApplications()]);
+    }
   }
 
   async function loadRestaurantShiftPosts() {
@@ -842,6 +862,50 @@
     setMessage(message, "Приглашение отправлено работнику.");
     button.textContent = "Приглашение отправлено";
     button.disabled = true;
+    await loadRestaurantInvites();
+  }
+
+  async function loadRestaurantInvites() {
+    setMessage(el.restaurantInvitesMessage, "Загружаем приглашения...");
+    const { data, error } = await selectRows(
+      "shift_invites",
+      { restaurant_id: state.user.id },
+      { order: { column: "created_at", ascending: false } }
+    );
+
+    if (error) {
+      setMessage(el.restaurantInvitesMessage, `Ошибка: ${error.message}`);
+      return;
+    }
+
+    state.restaurantInvites = data || [];
+    if (!el.restaurantInvitesList) return;
+    el.restaurantInvitesList.innerHTML = "";
+
+    if (!state.restaurantInvites.length) {
+      showEmpty(el.restaurantInvitesList, "Приглашений пока нет", "Найдите работника и отправьте приглашение.");
+      setMessage(el.restaurantInvitesMessage, "Приглашений пока нет.");
+      return;
+    }
+
+    const workerIds = [...new Set(state.restaurantInvites.map((invite) => invite.worker_id).filter(Boolean))];
+    let profilesById = new Map();
+    if (workerIds.length) {
+      const { data: profiles } = await db.from("profiles").select("id, name, city, district").in("id", workerIds);
+      profilesById = new Map((profiles || []).map((profile) => [profile.id, profile]));
+    }
+
+    state.restaurantInvites.forEach((invite) => {
+      const worker = profilesById.get(invite.worker_id) || {};
+      el.restaurantInvitesList.appendChild(
+        card(
+          displayName(worker, "Работник"),
+          `<p>Статус: ${escapeHtml(statusText(invite.status))}</p><p>${escapeHtml(displayPlace(worker) || "-")}</p><p>${escapeHtml(invite.message || "")}</p>`
+        )
+      );
+    });
+
+    setMessage(el.restaurantInvitesMessage, `Приглашений: ${state.restaurantInvites.length}`);
   }
 
   async function createSupplyRequest(event) {
@@ -1419,6 +1483,21 @@
     return payload;
   }
 
+  async function loadRestaurantWorkspace() {
+    await Promise.all([
+      loadRestaurantShiftPosts(),
+      loadShiftApplications(),
+      loadWorkers(),
+      loadRestaurantInvites(),
+      loadSupplierOffers(),
+      loadSupplyResponses(),
+    ]);
+  }
+
+  async function loadSupplierWorkspace() {
+    await Promise.all([loadSupplierOwnOffers(), loadSupplyRequests(), loadSupplierInquiries()]);
+  }
+
   async function openCabinet(profile) {
     const label = {
       worker: "работник",
@@ -1438,13 +1517,13 @@
 
     if (profile.role === "restaurant") {
       await loadRestaurantProfile();
-      await loadRestaurantShiftPosts();
+      await loadRestaurantWorkspace();
       return;
     }
 
     if (profile.role === "supplier") {
       await loadSupplierProfile();
-      await Promise.all([loadSupplierOwnOffers(), loadSupplyRequests(), loadSupplierInquiries()]);
+      await loadSupplierWorkspace();
       return;
     }
 
@@ -1467,6 +1546,7 @@
     onClick("loadRestaurantShiftPostsBtn", loadRestaurantShiftPosts);
     onClick("loadShiftApplicationsBtn", loadShiftApplications);
     onClick("loadWorkersBtn", loadWorkers);
+    onClick("loadRestaurantInvitesBtn", loadRestaurantInvites);
     onInput("workerSearchInput", renderWorkers);
     onClick("createSupplyRequestBtn", createSupplyRequest);
     onClick("loadSupplierOffersBtn", loadSupplierOffers);
