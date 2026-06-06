@@ -27,6 +27,8 @@
     "shiftPostMessage",
     "supplierOffersList",
     "supplierOffersSearchInput",
+    "restaurantSupplyRequestsMessage",
+    "restaurantSupplyRequestsList",
     "supplyRequestMessageBox",
     "supplyResponsesMessage",
     "supplyResponsesList",
@@ -48,6 +50,7 @@
     workers: [],
     shifts: [],
     supplierOffers: [],
+    restaurantSupplyRequests: [],
     supplyRequests: [],
     supplierResponses: [],
     supplierInquiries: [],
@@ -117,6 +120,13 @@
       .split(",")
       .map((item) => item.trim())
       .filter(Boolean);
+  }
+
+  function clearValues(ids) {
+    ids.forEach((id) => {
+      const field = byId(id);
+      if (field) field.value = "";
+    });
   }
 
   function escapeHtml(input) {
@@ -975,6 +985,96 @@
       error ? `Ошибка: ${error.message}` : "Запрос опубликован для поставщиков."
     );
     setBusy(button, false);
+    if (!error) {
+      clearValues([
+        "supplyRequestTitle",
+        "supplyRequestCategory",
+        "supplyRequestQuantity",
+        "supplyRequestBudget",
+        "supplyRequestCity",
+        "supplyRequestMessage",
+      ]);
+      await loadRestaurantSupplyRequests();
+    }
+  }
+
+  async function loadRestaurantSupplyRequests() {
+    setMessage(el.restaurantSupplyRequestsMessage, "Загружаем ваши запросы поставщикам...");
+    const { data, error } = await selectRows(
+      "supply_requests",
+      { restaurant_id: state.user.id },
+      { order: { column: "created_at", ascending: false } }
+    );
+
+    if (error) {
+      setMessage(el.restaurantSupplyRequestsMessage, `Ошибка: ${error.message}`);
+      return;
+    }
+
+    state.restaurantSupplyRequests = data || [];
+    renderRestaurantSupplyRequests();
+  }
+
+  function renderRestaurantSupplyRequests() {
+    if (!el.restaurantSupplyRequestsList) return;
+    el.restaurantSupplyRequestsList.innerHTML = "";
+
+    if (!state.restaurantSupplyRequests.length) {
+      showEmpty(
+        el.restaurantSupplyRequestsList,
+        "Запросов поставщикам пока нет",
+        "Опубликуйте запрос, и он появится у поставщиков в кабинете."
+      );
+      setMessage(el.restaurantSupplyRequestsMessage, "Запросов поставщикам пока нет.");
+      return;
+    }
+
+    state.restaurantSupplyRequests.forEach((request) => {
+      const isOpen = request.status === "open";
+      const node = card(
+        request.title || "Запрос поставщику",
+        `
+          <p>Категория: ${escapeHtml(request.category || "-")}</p>
+          <p>Количество: ${escapeHtml(request.quantity || "-")}</p>
+          <p>Бюджет: ${escapeHtml(request.budget || "-")}</p>
+          <p>Город: ${escapeHtml(request.city || "-")}</p>
+          <p>Статус: ${escapeHtml(statusText(request.status))}</p>
+          <p>${escapeHtml(request.message || "")}</p>
+        `,
+        isOpen ? '<button class="btn" type="button" data-action="close-supply-request">Закрыть запрос</button><p class="message"></p>' : ""
+      );
+
+      node.querySelector("[data-action='close-supply-request']")?.addEventListener("click", () => {
+        closeSupplyRequest(request.id, node);
+      });
+
+      el.restaurantSupplyRequestsList.appendChild(node);
+    });
+
+    setMessage(el.restaurantSupplyRequestsMessage, `Ваших запросов: ${state.restaurantSupplyRequests.length}`);
+  }
+
+  async function closeSupplyRequest(id, node) {
+    const buttons = node.querySelectorAll("button");
+    buttons.forEach((button) => (button.disabled = true));
+
+    const { error } = await updateRows(
+      "supply_requests",
+      { id, restaurant_id: state.user.id },
+      { status: "closed", updated_at: new Date().toISOString() }
+    );
+
+    setMessage(
+      node.querySelector(".message"),
+      error ? `Ошибка: ${error.message}` : "Запрос закрыт."
+    );
+
+    if (error) {
+      buttons.forEach((button) => (button.disabled = false));
+      return;
+    }
+
+    await loadRestaurantSupplyRequests();
   }
 
   async function loadSupplierOffers() {
@@ -1528,6 +1628,7 @@
       loadShiftApplications(),
       loadWorkers(),
       loadRestaurantInvites(),
+      loadRestaurantSupplyRequests(),
       loadSupplierOffers(),
       loadSupplyResponses(),
     ]);
@@ -1588,6 +1689,7 @@
     onClick("loadRestaurantInvitesBtn", loadRestaurantInvites);
     onInput("workerSearchInput", renderWorkers);
     onClick("createSupplyRequestBtn", createSupplyRequest);
+    onClick("loadRestaurantSupplyRequestsBtn", loadRestaurantSupplyRequests);
     onClick("loadSupplierOffersBtn", loadSupplierOffers);
     onInput("supplierOffersSearchInput", renderSupplierOffers);
     onClick("loadSupplyResponsesBtn", loadSupplyResponses);

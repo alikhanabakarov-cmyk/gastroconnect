@@ -485,8 +485,18 @@ using (restaurant_id = auth.uid() or supplier_id = auth.uid() or public.is_admin
 drop policy if exists supplier_inquiries_insert_restaurant on public.supplier_inquiries;
 create policy supplier_inquiries_insert_restaurant on public.supplier_inquiries for insert to authenticated
 with check (
-  restaurant_id = auth.uid()
-  and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'restaurant')
+  public.is_admin()
+  or (
+    restaurant_id = auth.uid()
+    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'restaurant')
+    and exists (
+      select 1
+      from public.supplier_offers offer
+      where offer.id = supplier_inquiries.offer_id
+        and offer.supplier_id = supplier_inquiries.supplier_id
+        and offer.status = 'active'
+    )
+  )
 );
 
 drop policy if exists supplier_inquiries_update_supplier_or_admin on public.supplier_inquiries;
@@ -547,6 +557,13 @@ with check (
   or (
     supplier_id = auth.uid()
     and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'supplier')
+    and exists (
+      select 1
+      from public.supply_requests request
+      where request.id = supplier_responses.request_id
+        and request.restaurant_id = supplier_responses.restaurant_id
+        and request.status = 'open'
+    )
   )
 );
 
