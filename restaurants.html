@@ -13,18 +13,45 @@
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="GastroConnect" />
     <meta property="og:locale" content="ru_RU" />
-    <meta property="og:url" content="https://gastroconnect.ru/restaurants.html" />
-    <meta property="og:title" content="Заведения HoReCa — поиск персонала | GastroConnect" />
-    <meta property="og:description" content="Поиск работников HoReCa, анкеты и приглашения на смены для ресторанов, кафе и баров." />
-    <meta property="og:image" content="https://gastroconnect.ru/assets/hero-restaurants.webp" />
+    <meta
+      property="og:url"
+      content="https://gastroconnect.ru/restaurants.html"
+    />
+    <meta
+      property="og:title"
+      content="Заведения HoReCa — поиск персонала | GastroConnect"
+    />
+    <meta
+      property="og:description"
+      content="Поиск работников HoReCa, анкеты и приглашения на смены для ресторанов, кафе и баров."
+    />
+    <meta
+      property="og:image"
+      content="https://gastroconnect.ru/assets/hero-restaurants.webp"
+    />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Заведения HoReCa — поиск персонала | GastroConnect" />
-    <meta name="twitter:description" content="Поиск работников HoReCa, анкеты и приглашения на смены для ресторанов, кафе и баров." />
-    <meta name="twitter:image" content="https://gastroconnect.ru/assets/hero-restaurants.webp" />
+    <meta
+      name="twitter:title"
+      content="Заведения HoReCa — поиск персонала | GastroConnect"
+    />
+    <meta
+      name="twitter:description"
+      content="Поиск работников HoReCa, анкеты и приглашения на смены для ресторанов, кафе и баров."
+    />
+    <meta
+      name="twitter:image"
+      content="https://gastroconnect.ru/assets/hero-restaurants.webp"
+    />
     <link rel="icon" href="favicon.ico" sizes="any" />
     <link rel="manifest" href="site.webmanifest" />
-    <link rel="preload" href="assets/hero-restaurants.webp" as="image" type="image/webp" fetchpriority="high" />
-    <link rel="stylesheet" href="style.css?v=1013" />
+    <link
+      rel="preload"
+      href="assets/hero-restaurants.webp"
+      as="image"
+      type="image/webp"
+      fetchpriority="high"
+    />
+    <link rel="stylesheet" href="style.css?v=1014" />
   </head>
   <body>
     <div class="page-shell">
@@ -42,16 +69,28 @@
         </a>
         <nav class="main-nav" aria-label="Главное меню">
           <a href="workers.html" data-site-setting="nav.workers">Сотрудникам</a>
-          <a href="restaurants.html" data-site-setting="nav.restaurants">Заведениям</a>
-          <a href="suppliers.html" data-site-setting="nav.suppliers">Поставщикам</a>
+          <a href="restaurants.html" data-site-setting="nav.restaurants"
+            >Заведениям</a
+          >
+          <a href="suppliers.html" data-site-setting="nav.suppliers"
+            >Поставщикам</a
+          >
           <a href="#contacts" data-site-setting="nav.contacts">Контакты</a>
         </nav>
-        <a
-          class="header-cta"
-          href="auth.html?role=restaurant"
-          data-site-setting="nav.login"
-          >Войти / регистрация</a
-        >
+        <div class="header-actions">
+          <a
+            class="btn header-login"
+            href="auth.html?mode=login&role=restaurant"
+            data-site-setting="nav.login"
+            >Войти</a
+          >
+          <a
+            class="header-cta"
+            href="auth.html?mode=signup&role=restaurant"
+            data-site-setting="nav.signup"
+            >Регистрация</a
+          >
+        </div>
       </header>
 
       <main>
@@ -82,8 +121,12 @@
               >
             </div>
             <div class="hero-benefits">
-              <span data-site-setting="restaurants.benefit1">Публикация смен</span>
-              <span data-site-setting="restaurants.benefit2">Отклики работников</span>
+              <span data-site-setting="restaurants.benefit1"
+                >Публикация смен</span
+              >
+              <span data-site-setting="restaurants.benefit2"
+                >Отклики работников</span
+              >
               <span data-site-setting="restaurants.benefit3">База анкет</span>
             </div>
           </div>
@@ -107,7 +150,9 @@
 
         <section class="direction-section">
           <div class="section-head">
-            <h2 data-site-setting="restaurants.stepsTitle">Что получает заведение</h2>
+            <h2 data-site-setting="restaurants.stepsTitle">
+              Что получает заведение
+            </h2>
             <p data-site-setting="restaurants.stepsLead">
               Операционный экран для управляющего, шефа или HR: смены, анкеты,
               отклики и поставщики.
@@ -116,7 +161,9 @@
           <div class="direction-grid">
             <article class="direction-card">
               <span data-site-setting="restaurants.step1Label">Смены</span>
-              <h3 data-site-setting="restaurants.step1Title">Создавайте задания</h3>
+              <h3 data-site-setting="restaurants.step1Title">
+                Создавайте задания
+              </h3>
               <p data-site-setting="restaurants.step1Text">
                 Дата, время, ставка, профессия, район, адрес и требования
                 попадают в ленту работников.
@@ -132,7 +179,9 @@
             </article>
             <article class="direction-card">
               <span data-site-setting="restaurants.step3Label">Поставки</span>
-              <h3 data-site-setting="restaurants.step3Title">Отправляйте запросы</h3>
+              <h3 data-site-setting="restaurants.step3Title">
+                Отправляйте запросы
+              </h3>
               <p data-site-setting="restaurants.step3Text">
                 Смотрите предложения поставщиков и отправляйте заявку прямо из
                 кабинета заведения.
@@ -225,6 +274,6 @@
         </div>
       </footer>
     </div>
-    <script src="script.js?v=1023"></script>
+    <script src="public.min.js?v=1001"></script>
   </body>
 </html>

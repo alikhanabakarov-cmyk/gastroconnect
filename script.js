@@ -18,7 +18,8 @@
       suppliers: "Поставщикам",
       contacts: "Контакты",
       workflow: "Как работает",
-      login: "Войти / регистрация",
+      login: "Войти",
+      signup: "Регистрация",
       home: "На главную",
       request: "Оставить заявку",
     },
@@ -391,16 +392,14 @@
         reason: "Войдите как admin, чтобы сохранить глобально.",
       };
     }
-    const { error } = await client
-      .from("site_settings")
-      .upsert(
-        {
-          setting_key: SITE_SETTINGS_ROW,
-          settings,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: "setting_key" },
-      );
+    const { error } = await client.from("site_settings").upsert(
+      {
+        setting_key: SITE_SETTINGS_ROW,
+        settings,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "setting_key" },
+    );
     return error ? { saved: false, reason: error.message } : { saved: true };
   }
   function safeAssetName(fileName) {
@@ -723,105 +722,220 @@
     const emailInput = document.getElementById("email");
     const passwordInput = document.getElementById("password");
     const roleInput = document.getElementById("role");
+    const roleField = document.getElementById("roleField");
     const message = document.getElementById("authMessage");
     const registerBtn = document.getElementById("registerBtn");
     const loginBtn = document.getElementById("loginBtn");
-    const authTitle = document.getElementById("authTitle");
-    const authLead = document.getElementById("authLead");
+    const showLoginBtn = document.getElementById("showLoginBtn");
+    const showRegisterBtn = document.getElementById("showRegisterBtn");
+    const authFormTitle = document.getElementById("authFormTitle");
+    const authModeHint = document.getElementById("authModeHint");
+    const cabinetShortcut = document.getElementById("cabinetShortcut");
     if (!emailInput || !passwordInput || !roleInput || !message) return;
-    const roleCopy = {
-      worker: {
-        title: "Регистрация работника",
-        lead: "Создайте аккаунт работника, заполните профиль и откликайтесь на смены в кабинете.",
-      },
-      restaurant: {
-        title: "Регистрация заведения",
-        lead: "Создайте аккаунт заведения, публикуйте смены, смотрите работников и заявки поставщикам.",
-      },
-      supplier: {
-        title: "Регистрация поставщика",
-        lead: "Создайте аккаунт поставщика, публикуйте предложения и принимайте заявки от заведений.",
-      },
-    };
+
     const publicAuthRoles = ["worker", "restaurant", "supplier"];
     const normalizeAuthRole = (role) =>
       publicAuthRoles.includes(role) ? role : "worker";
-    const requestedRole = new URLSearchParams(window.location.search).get(
-      "role",
-    );
-    if (roleCopy[requestedRole]) roleInput.value = requestedRole;
-    function updateRoleText() {
-      const copy = roleCopy[roleInput.value] || roleCopy.worker;
-      if (authTitle && !authTitle.dataset.siteSetting)
-        authTitle.textContent = copy.title;
-      if (authLead && !authLead.dataset.siteSetting)
-        authLead.textContent = copy.lead;
+    const roleLabelsFull = {
+      worker: "работника",
+      restaurant: "заведения",
+      supplier: "поставщика",
+    };
+    const modeCopy = {
+      signup: {
+        title: "Регистрация",
+        hint: "Выберите роль, создайте аккаунт и сразу переходите в свой кабинет.",
+      },
+      login: {
+        title: "Вход",
+        hint: "Введите email и пароль. Роль подтянется из вашего профиля.",
+      },
+    };
+    const params = new URLSearchParams(window.location.search);
+    const requestedRole = normalizeAuthRole(params.get("role"));
+    let authMode = params.get("mode") === "login" ? "login" : "signup";
+    roleInput.value = requestedRole;
+
+    function cabinetUrl() {
+      return `cabinet.html?role=${encodeURIComponent(roleInput.value)}`;
     }
+
+    function setAuthBusy(isBusy, text = "Проверяем...") {
+      [registerBtn, loginBtn, showLoginBtn, showRegisterBtn].forEach(
+        (button) => {
+          if (!button) return;
+          button.disabled = isBusy;
+        },
+      );
+      if (isBusy) message.textContent = text;
+    }
+
+    function updateRoleHint() {
+      if (!authModeHint) return;
+      if (authMode === "signup") {
+        authModeHint.textContent = `Будет создан кабинет ${roleLabelsFull[roleInput.value]}.`;
+        return;
+      }
+      authModeHint.textContent = modeCopy.login.hint;
+    }
+
+    function setAuthMode(nextMode, updateUrl = true) {
+      authMode = nextMode === "login" ? "login" : "signup";
+      const copy = modeCopy[authMode];
+      if (authFormTitle) authFormTitle.textContent = copy.title;
+      if (roleField) roleField.hidden = authMode === "login";
+      if (registerBtn) registerBtn.hidden = authMode !== "signup";
+      if (loginBtn) loginBtn.hidden = authMode !== "login";
+      if (passwordInput) {
+        passwordInput.autocomplete =
+          authMode === "login" ? "current-password" : "new-password";
+      }
+      showLoginBtn?.classList.toggle("is-active", authMode === "login");
+      showRegisterBtn?.classList.toggle("is-active", authMode === "signup");
+      updateRoleHint();
+
+      if (updateUrl) {
+        const nextParams = new URLSearchParams(window.location.search);
+        nextParams.set("mode", authMode);
+        nextParams.set("role", roleInput.value);
+        window.history.replaceState(null, "", `auth.html?${nextParams}`);
+      }
+    }
+
     async function ensureProfileAfterAuth(user, role) {
-      if (!user) return;
+      if (!user) return null;
       const profileRole = normalizeAuthRole(user.user_metadata?.role || role);
       const { data: existing, error: readError } = await window.supabaseClient
         .from("profiles")
-        .select("id")
+        .select("id, role")
         .eq("id", user.id)
         .maybeSingle();
-      if (existing || readError) return;
-      await window.supabaseClient
+      if (existing) return existing;
+      if (readError) throw readError;
+
+      const payload = {
+        id: user.id,
+        role: profileRole,
+        name: user.email || "Пользователь",
+        status: "active",
+        updated_at: new Date().toISOString(),
+      };
+      const { error } = await window.supabaseClient
         .from("profiles")
-        .upsert(
-          {
-            id: user.id,
-            role: profileRole,
-            name: user.email || "Пользователь",
-            status: "active",
-            updated_at: new Date().toISOString(),
-          },
-          { onConflict: "id" },
-        );
+        .upsert(payload, { onConflict: "id" });
+      if (error) throw error;
+      return payload;
     }
+
+    async function refreshSessionState() {
+      const client = window.supabaseClient;
+      if (!client) return;
+      const { data } = await client.auth.getSession();
+      if (data?.session?.user && cabinetShortcut) {
+        cabinetShortcut.hidden = false;
+        cabinetShortcut.href = cabinetUrl();
+        message.textContent =
+          "Вы уже вошли. Можно открыть кабинет или выйти из аккаунта в кабинете.";
+      }
+    }
+
     registerBtn?.addEventListener("click", async () => {
       const client = window.supabaseClient;
       const email = emailInput.value.trim();
       const password = passwordInput.value;
       const role = normalizeAuthRole(roleInput.value);
-      if (!client)
-        return void (message.textContent =
-          "Supabase не загрузился. Обновите страницу.");
-      if (!email || !password)
-        return void (message.textContent = "Введите email и пароль.");
-      message.textContent = "Регистрируем...";
+      if (!client) {
+        message.textContent = "Supabase не загрузился. Обновите страницу.";
+        return;
+      }
+      if (!email || !password) {
+        message.textContent = "Введите email и пароль.";
+        return;
+      }
+      if (password.length < 6) {
+        message.textContent = "Пароль должен быть минимум 6 символов.";
+        return;
+      }
+
+      setAuthBusy(true, "Создаем аккаунт...");
       const { data, error } = await client.auth.signUp({
         email,
         password,
         options: { data: { role } },
       });
-      if (!error && data?.session?.user)
-        await ensureProfileAfterAuth(data.session.user, role);
-      message.textContent = error
-        ? `Ошибка регистрации: ${error.message}`
-        : "Регистрация успешна. Теперь попробуйте войти.";
+      if (error) {
+        setAuthBusy(false);
+        message.textContent = `Ошибка регистрации: ${error.message}`;
+        return;
+      }
+
+      if (data?.session?.user) {
+        try {
+          await ensureProfileAfterAuth(data.session.user, role);
+          window.location.href = cabinetUrl();
+          return;
+        } catch (profileError) {
+          setAuthBusy(false);
+          message.textContent = `Аккаунт создан, но профиль не сохранен: ${profileError.message}`;
+          return;
+        }
+      }
+
+      setAuthBusy(false);
+      message.textContent =
+        "Аккаунт создан. Если Supabase просит подтверждение email, подтвердите почту и войдите.";
+      setAuthMode("login");
     });
+
     loginBtn?.addEventListener("click", async () => {
       const client = window.supabaseClient;
       const email = emailInput.value.trim();
       const password = passwordInput.value;
-      if (!client)
-        return void (message.textContent =
-          "Supabase не загрузился. Обновите страницу.");
-      if (!email || !password)
-        return void (message.textContent = "Введите email и пароль.");
-      message.textContent = "Входим...";
+      if (!client) {
+        message.textContent = "Supabase не загрузился. Обновите страницу.";
+        return;
+      }
+      if (!email || !password) {
+        message.textContent = "Введите email и пароль.";
+        return;
+      }
+
+      setAuthBusy(true, "Входим...");
       const { data, error } = await client.auth.signInWithPassword({
         email,
         password,
       });
-      if (error)
-        return void (message.textContent = `Ошибка входа: ${error.message}`);
-      await ensureProfileAfterAuth(data.user, roleInput.value);
-      window.location.href = "cabinet.html";
+      if (error) {
+        setAuthBusy(false);
+        message.textContent = `Ошибка входа: ${error.message}`;
+        return;
+      }
+
+      try {
+        await ensureProfileAfterAuth(data.user, roleInput.value);
+        window.location.href = cabinetUrl();
+      } catch (profileError) {
+        setAuthBusy(false);
+        message.textContent = `Вход выполнен, но профиль не проверен: ${profileError.message}`;
+      }
     });
-    roleInput.addEventListener("change", updateRoleText);
-    updateRoleText();
+
+    showLoginBtn?.addEventListener("click", () => setAuthMode("login"));
+    showRegisterBtn?.addEventListener("click", () => setAuthMode("signup"));
+    roleInput.addEventListener("change", () => {
+      updateRoleHint();
+      if (cabinetShortcut) cabinetShortcut.href = cabinetUrl();
+      setAuthMode(authMode);
+    });
+    passwordInput.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter") return;
+      event.preventDefault();
+      if (authMode === "login") loginBtn?.click();
+      else registerBtn?.click();
+    });
+
+    setAuthMode(authMode, false);
+    refreshSessionState();
   }
   let adminRowsCache = [];
   async function readRemoteRows() {

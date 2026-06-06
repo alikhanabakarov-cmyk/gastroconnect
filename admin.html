@@ -13,8 +13,14 @@
     <link rel="icon" href="favicon.ico" sizes="any" />
     <link rel="manifest" href="site.webmanifest" />
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-    <link rel="preload" href="assets/hero-home.webp" as="image" type="image/webp" fetchpriority="high" />
-    <link rel="stylesheet" href="style.css?v=1013" />
+    <link
+      rel="preload"
+      href="assets/hero-home.webp"
+      as="image"
+      type="image/webp"
+      fetchpriority="high"
+    />
+    <link rel="stylesheet" href="style.css?v=1014" />
   </head>
   <body>
     <div class="page-shell">
@@ -32,8 +38,12 @@
         </a>
         <nav class="main-nav" aria-label="Главное меню">
           <a href="workers.html" data-site-setting="nav.workers">Сотрудникам</a>
-          <a href="restaurants.html" data-site-setting="nav.restaurants">Заведениям</a>
-          <a href="suppliers.html" data-site-setting="nav.suppliers">Поставщикам</a>
+          <a href="restaurants.html" data-site-setting="nav.restaurants"
+            >Заведениям</a
+          >
+          <a href="suppliers.html" data-site-setting="nav.suppliers"
+            >Поставщикам</a
+          >
           <a href="#contacts" data-site-setting="nav.contacts">Контакты</a>
         </nav>
         <a
@@ -54,8 +64,7 @@
               Панель управления GastroConnect
             </h1>
             <p data-site-setting="admin.lead">
-              Панель для заявок, изображений, логотипа и главных надписей
-              сайта.
+              Панель для заявок, изображений, логотипа и главных надписей сайта.
             </p>
             <div class="admin-actions">
               <button id="exportJson" type="button">Экспорт JSON</button>
@@ -122,7 +131,11 @@
             </label>
             <label
               >Загрузить hero главной
-              <input type="file" accept="image/*" data-upload-target="home.hero" />
+              <input
+                type="file"
+                accept="image/*"
+                data-upload-target="home.hero"
+              />
             </label>
             <label
               >Hero сотрудников
@@ -135,7 +148,11 @@
             </label>
             <label
               >Загрузить hero сотрудников
-              <input type="file" accept="image/*" data-upload-target="workers.hero" />
+              <input
+                type="file"
+                accept="image/*"
+                data-upload-target="workers.hero"
+              />
             </label>
             <label
               >Hero заведений
@@ -148,7 +165,11 @@
             </label>
             <label
               >Загрузить hero заведений
-              <input type="file" accept="image/*" data-upload-target="restaurants.hero" />
+              <input
+                type="file"
+                accept="image/*"
+                data-upload-target="restaurants.hero"
+              />
             </label>
             <label
               >Hero поставщиков
@@ -161,7 +182,11 @@
             </label>
             <label
               >Загрузить hero поставщиков
-              <input type="file" accept="image/*" data-upload-target="suppliers.hero" />
+              <input
+                type="file"
+                accept="image/*"
+                data-upload-target="suppliers.hero"
+              />
             </label>
             <label
               >Hero входа
@@ -174,7 +199,11 @@
             </label>
             <label
               >Загрузить hero входа
-              <input type="file" accept="image/*" data-upload-target="auth.hero" />
+              <input
+                type="file"
+                accept="image/*"
+                data-upload-target="auth.hero"
+              />
             </label>
             <label
               >Hero кабинета
@@ -187,7 +216,11 @@
             </label>
             <label
               >Загрузить hero кабинета
-              <input type="file" accept="image/*" data-upload-target="cabinet.hero" />
+              <input
+                type="file"
+                accept="image/*"
+                data-upload-target="cabinet.hero"
+              />
             </label>
             <label
               >Hero админки
@@ -200,7 +233,11 @@
             </label>
             <label
               >Загрузить hero админки
-              <input type="file" accept="image/*" data-upload-target="admin.hero" />
+              <input
+                type="file"
+                accept="image/*"
+                data-upload-target="admin.hero"
+              />
             </label>
             <datalist id="siteAssetOptions">
               <option value="assets/logo-full.png"></option>
@@ -234,6 +271,10 @@
             <label
               >Кнопка входа
               <input name="nav.login" type="text" />
+            </label>
+            <label
+              >Кнопка регистрации
+              <input name="nav.signup" type="text" />
             </label>
             <label
               >Кнопка на главную
@@ -314,47 +355,170 @@
               <input name="home.dashboard3Text" type="text" />
             </label>
             <div class="settings-subhead full">Главная: нижние блоки</div>
-            <label><span>Метрика 1: число</span><input name="home.metric1Value" type="text" /></label>
-            <label><span>Метрика 1: текст</span><input name="home.metric1Text" type="text" /></label>
-            <label><span>Метрика 2: число</span><input name="home.metric2Value" type="text" /></label>
-            <label><span>Метрика 2: текст</span><input name="home.metric2Text" type="text" /></label>
-            <label><span>Метрика 3: число</span><input name="home.metric3Value" type="text" /></label>
-            <label><span>Метрика 3: текст</span><input name="home.metric3Text" type="text" /></label>
-            <label><span>Метрика 4: число</span><input name="home.metric4Value" type="text" /></label>
-            <label><span>Метрика 4: текст</span><input name="home.metric4Text" type="text" /></label>
-            <label class="full"><span>Заголовок рабочей ленты</span><input name="home.boardTitle" type="text" /></label>
-            <label class="full"><span>Описание рабочей ленты</span><textarea name="home.boardLead"></textarea></label>
-            <label class="full"><span>Заголовок блока ролей</span><input name="home.rolesTitle" type="text" /></label>
-            <label class="full"><span>Описание блока ролей</span><textarea name="home.rolesLead"></textarea></label>
-            <label><span>Карточка заведения: подпись</span><input name="home.restaurantCardLabel" type="text" /></label>
-            <label><span>Карточка заведения: заголовок</span><input name="home.restaurantCardTitle" type="text" /></label>
-            <label class="full"><span>Карточка заведения: текст</span><textarea name="home.restaurantCardText"></textarea></label>
-            <label><span>Карточка работника: подпись</span><input name="home.workerCardLabel" type="text" /></label>
-            <label><span>Карточка работника: заголовок</span><input name="home.workerCardTitle" type="text" /></label>
-            <label class="full"><span>Карточка работника: текст</span><textarea name="home.workerCardText"></textarea></label>
-            <label><span>Карточка поставщика: подпись</span><input name="home.supplierCardLabel" type="text" /></label>
-            <label><span>Карточка поставщика: заголовок</span><input name="home.supplierCardTitle" type="text" /></label>
-            <label class="full"><span>Карточка поставщика: текст</span><textarea name="home.supplierCardText"></textarea></label>
-            <label class="full"><span>Подпись workflow</span><input name="home.workflowEyebrow" type="text" /></label>
-            <label class="full"><span>Заголовок workflow</span><input name="home.workflowTitle" type="text" /></label>
-            <label class="full"><span>Описание workflow</span><textarea name="home.workflowLead"></textarea></label>
-            <label><span>Workflow шаг 1</span><input name="home.workflowStep1" type="text" /></label>
-            <label><span>Workflow шаг 2</span><input name="home.workflowStep2" type="text" /></label>
-            <label><span>Workflow шаг 3</span><input name="home.workflowStep3" type="text" /></label>
-            <label><span>Workflow шаг 4</span><input name="home.workflowStep4" type="text" /></label>
-            <label class="full"><span>Заголовок MVP</span><input name="home.mvpTitle" type="text" /></label>
-            <label class="full"><span>Описание MVP</span><textarea name="home.mvpLead"></textarea></label>
-            <label><span>MVP 1: подпись</span><input name="home.mvpCard1Label" type="text" /></label>
-            <label><span>MVP 1: заголовок</span><input name="home.mvpCard1Title" type="text" /></label>
-            <label class="full"><span>MVP 1: текст</span><textarea name="home.mvpCard1Text"></textarea></label>
-            <label><span>MVP 2: подпись</span><input name="home.mvpCard2Label" type="text" /></label>
-            <label><span>MVP 2: заголовок</span><input name="home.mvpCard2Title" type="text" /></label>
-            <label class="full"><span>MVP 2: текст</span><textarea name="home.mvpCard2Text"></textarea></label>
-            <label><span>MVP 3: подпись</span><input name="home.mvpCard3Label" type="text" /></label>
-            <label><span>MVP 3: заголовок</span><input name="home.mvpCard3Title" type="text" /></label>
-            <label class="full"><span>MVP 3: текст</span><textarea name="home.mvpCard3Text"></textarea></label>
-            <label><span>Финальный заголовок</span><input name="home.finalTitle" type="text" /></label>
-            <label class="full"><span>Финальное описание</span><textarea name="home.finalLead"></textarea></label>
+            <label
+              ><span>Метрика 1: число</span
+              ><input name="home.metric1Value" type="text"
+            /></label>
+            <label
+              ><span>Метрика 1: текст</span
+              ><input name="home.metric1Text" type="text"
+            /></label>
+            <label
+              ><span>Метрика 2: число</span
+              ><input name="home.metric2Value" type="text"
+            /></label>
+            <label
+              ><span>Метрика 2: текст</span
+              ><input name="home.metric2Text" type="text"
+            /></label>
+            <label
+              ><span>Метрика 3: число</span
+              ><input name="home.metric3Value" type="text"
+            /></label>
+            <label
+              ><span>Метрика 3: текст</span
+              ><input name="home.metric3Text" type="text"
+            /></label>
+            <label
+              ><span>Метрика 4: число</span
+              ><input name="home.metric4Value" type="text"
+            /></label>
+            <label
+              ><span>Метрика 4: текст</span
+              ><input name="home.metric4Text" type="text"
+            /></label>
+            <label class="full"
+              ><span>Заголовок рабочей ленты</span
+              ><input name="home.boardTitle" type="text"
+            /></label>
+            <label class="full"
+              ><span>Описание рабочей ленты</span
+              ><textarea name="home.boardLead"></textarea>
+            </label>
+            <label class="full"
+              ><span>Заголовок блока ролей</span
+              ><input name="home.rolesTitle" type="text"
+            /></label>
+            <label class="full"
+              ><span>Описание блока ролей</span
+              ><textarea name="home.rolesLead"></textarea>
+            </label>
+            <label
+              ><span>Карточка заведения: подпись</span
+              ><input name="home.restaurantCardLabel" type="text"
+            /></label>
+            <label
+              ><span>Карточка заведения: заголовок</span
+              ><input name="home.restaurantCardTitle" type="text"
+            /></label>
+            <label class="full"
+              ><span>Карточка заведения: текст</span
+              ><textarea name="home.restaurantCardText"></textarea>
+            </label>
+            <label
+              ><span>Карточка работника: подпись</span
+              ><input name="home.workerCardLabel" type="text"
+            /></label>
+            <label
+              ><span>Карточка работника: заголовок</span
+              ><input name="home.workerCardTitle" type="text"
+            /></label>
+            <label class="full"
+              ><span>Карточка работника: текст</span
+              ><textarea name="home.workerCardText"></textarea>
+            </label>
+            <label
+              ><span>Карточка поставщика: подпись</span
+              ><input name="home.supplierCardLabel" type="text"
+            /></label>
+            <label
+              ><span>Карточка поставщика: заголовок</span
+              ><input name="home.supplierCardTitle" type="text"
+            /></label>
+            <label class="full"
+              ><span>Карточка поставщика: текст</span
+              ><textarea name="home.supplierCardText"></textarea>
+            </label>
+            <label class="full"
+              ><span>Подпись workflow</span
+              ><input name="home.workflowEyebrow" type="text"
+            /></label>
+            <label class="full"
+              ><span>Заголовок workflow</span
+              ><input name="home.workflowTitle" type="text"
+            /></label>
+            <label class="full"
+              ><span>Описание workflow</span
+              ><textarea name="home.workflowLead"></textarea>
+            </label>
+            <label
+              ><span>Workflow шаг 1</span
+              ><input name="home.workflowStep1" type="text"
+            /></label>
+            <label
+              ><span>Workflow шаг 2</span
+              ><input name="home.workflowStep2" type="text"
+            /></label>
+            <label
+              ><span>Workflow шаг 3</span
+              ><input name="home.workflowStep3" type="text"
+            /></label>
+            <label
+              ><span>Workflow шаг 4</span
+              ><input name="home.workflowStep4" type="text"
+            /></label>
+            <label class="full"
+              ><span>Заголовок MVP</span
+              ><input name="home.mvpTitle" type="text"
+            /></label>
+            <label class="full"
+              ><span>Описание MVP</span
+              ><textarea name="home.mvpLead"></textarea>
+            </label>
+            <label
+              ><span>MVP 1: подпись</span
+              ><input name="home.mvpCard1Label" type="text"
+            /></label>
+            <label
+              ><span>MVP 1: заголовок</span
+              ><input name="home.mvpCard1Title" type="text"
+            /></label>
+            <label class="full"
+              ><span>MVP 1: текст</span
+              ><textarea name="home.mvpCard1Text"></textarea>
+            </label>
+            <label
+              ><span>MVP 2: подпись</span
+              ><input name="home.mvpCard2Label" type="text"
+            /></label>
+            <label
+              ><span>MVP 2: заголовок</span
+              ><input name="home.mvpCard2Title" type="text"
+            /></label>
+            <label class="full"
+              ><span>MVP 2: текст</span
+              ><textarea name="home.mvpCard2Text"></textarea>
+            </label>
+            <label
+              ><span>MVP 3: подпись</span
+              ><input name="home.mvpCard3Label" type="text"
+            /></label>
+            <label
+              ><span>MVP 3: заголовок</span
+              ><input name="home.mvpCard3Title" type="text"
+            /></label>
+            <label class="full"
+              ><span>MVP 3: текст</span
+              ><textarea name="home.mvpCard3Text"></textarea>
+            </label>
+            <label
+              ><span>Финальный заголовок</span
+              ><input name="home.finalTitle" type="text"
+            /></label>
+            <label class="full"
+              ><span>Финальное описание</span
+              ><textarea name="home.finalLead"></textarea>
+            </label>
             <div class="settings-subhead full">Сотрудники</div>
             <label class="full"
               >Подпись сотрудников
@@ -723,6 +887,6 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase.js?v=1002"></script>
-    <script src="script.js?v=1023"></script>
+    <script src="script.min.js?v=1025"></script>
   </body>
 </html>

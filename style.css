@@ -127,6 +127,13 @@ img {
   vertical-align: middle;
 }
 
+.header-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+}
+
 .header-cta,
 .btn,
 button {
@@ -160,6 +167,10 @@ button.primary,
   background: var(--green);
   color: #fff;
   box-shadow: 0 16px 34px rgba(6, 76, 59, 0.22);
+}
+
+.header-login {
+  min-width: 96px;
 }
 
 .btn:hover,
@@ -875,6 +886,26 @@ textarea:focus {
   padding: 34px;
 }
 
+.auth-mode-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.auth-mode-tabs button {
+  width: 100%;
+  min-height: 48px;
+  box-shadow: none;
+}
+
+.auth-mode-tabs button.is-active {
+  border-color: var(--green);
+  background: var(--green);
+  color: #fff;
+  box-shadow: 0 12px 26px rgba(6, 76, 59, 0.18);
+}
+
 .auth-card h2,
 .admin-hero h1 {
   margin: 0 0 16px;
@@ -918,6 +949,10 @@ textarea:focus {
 
 .auth-message {
   margin-top: 20px;
+}
+
+.auth-mode-hint {
+  margin: 0 0 18px;
 }
 
 .role-panel {
@@ -1128,6 +1163,11 @@ th {
     justify-self: start;
   }
 
+  .header-actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
   .poster-hero {
     grid-template-columns: 1fr;
     min-height: auto;
@@ -1298,13 +1338,18 @@ th {
   .hero-actions .btn,
   .btn,
   .header-cta,
+  .header-actions,
   button {
     width: 100%;
     min-width: 0;
   }
 
-  .form-grid {
+  .header-actions {
+    display: grid;
     grid-template-columns: 1fr;
   }
 
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
 }

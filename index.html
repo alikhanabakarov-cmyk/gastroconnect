@@ -15,16 +15,34 @@
     <meta property="og:locale" content="ru_RU" />
     <meta property="og:url" content="https://gastroconnect.ru/" />
     <meta property="og:title" content="GastroConnect — платформа для HoReCa" />
-    <meta property="og:description" content="GastroConnect соединяет сотрудников, заведения и поставщиков HoReCa в одной системе." />
-    <meta property="og:image" content="https://gastroconnect.ru/assets/hero-home.webp" />
+    <meta
+      property="og:description"
+      content="GastroConnect соединяет сотрудников, заведения и поставщиков HoReCa в одной системе."
+    />
+    <meta
+      property="og:image"
+      content="https://gastroconnect.ru/assets/hero-home.webp"
+    />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="GastroConnect — платформа для HoReCa" />
-    <meta name="twitter:description" content="GastroConnect соединяет сотрудников, заведения и поставщиков HoReCa в одной системе." />
-    <meta name="twitter:image" content="https://gastroconnect.ru/assets/hero-home.webp" />
+    <meta
+      name="twitter:description"
+      content="GastroConnect соединяет сотрудников, заведения и поставщиков HoReCa в одной системе."
+    />
+    <meta
+      name="twitter:image"
+      content="https://gastroconnect.ru/assets/hero-home.webp"
+    />
     <link rel="icon" href="favicon.ico" sizes="any" />
     <link rel="manifest" href="site.webmanifest" />
-    <link rel="preload" href="assets/hero-home.webp" as="image" type="image/webp" fetchpriority="high" />
-    <link rel="stylesheet" href="style.css?v=1013" />
+    <link
+      rel="preload"
+      href="assets/hero-home.webp"
+      as="image"
+      type="image/webp"
+      fetchpriority="high"
+    />
+    <link rel="stylesheet" href="style.css?v=1014" />
   </head>
   <body>
     <div class="page-shell">
@@ -48,9 +66,20 @@
           <a href="#workflow" data-site-setting="nav.workflow">Как работает</a>
         </nav>
 
-        <a class="header-cta" href="auth.html" data-site-setting="nav.login"
-          >Войти / регистрация</a
-        >
+        <div class="header-actions">
+          <a
+            class="btn header-login"
+            href="auth.html?mode=login"
+            data-site-setting="nav.login"
+            >Войти</a
+          >
+          <a
+            class="header-cta"
+            href="auth.html?mode=signup"
+            data-site-setting="nav.signup"
+            >Регистрация</a
+          >
+        </div>
       </header>
 
       <main>
@@ -108,7 +137,9 @@
             <div class="hero-dashboard">
               <div class="dash-card dash-card-main">
                 <span data-site-setting="home.dashboard1Label">Сегодня</span>
-                <strong data-site-setting="home.dashboard1Value">18 смен</strong>
+                <strong data-site-setting="home.dashboard1Value"
+                  >18 смен</strong
+                >
                 <p data-site-setting="home.dashboard1Text">
                   повара, официанты, бариста
                 </p>
@@ -116,11 +147,15 @@
               <div class="dash-card">
                 <span data-site-setting="home.dashboard2Label">Заполнено</span>
                 <strong data-site-setting="home.dashboard2Value">82%</strong>
-                <p data-site-setting="home.dashboard2Text">по активным заявкам</p>
+                <p data-site-setting="home.dashboard2Text">
+                  по активным заявкам
+                </p>
               </div>
               <div class="dash-card">
                 <span data-site-setting="home.dashboard3Label">Поставки</span>
-                <strong data-site-setting="home.dashboard3Value">47 офферов</strong>
+                <strong data-site-setting="home.dashboard3Value"
+                  >47 офферов</strong
+                >
                 <p data-site-setting="home.dashboard3Text">
                   продукты, клининг, оборудование
                 </p>
@@ -131,16 +166,28 @@
 
         <section class="metrics-band" aria-label="Показатели платформы">
           <article>
-            <strong data-site-setting="home.metric1Value">24/7</strong><span data-site-setting="home.metric1Text">публикация смен и заявок</span>
+            <strong data-site-setting="home.metric1Value">24/7</strong
+            ><span data-site-setting="home.metric1Text"
+              >публикация смен и заявок</span
+            >
           </article>
           <article>
-            <strong data-site-setting="home.metric2Value">3 роли</strong><span data-site-setting="home.metric2Text">работник, заведение, поставщик</span>
+            <strong data-site-setting="home.metric2Value">3 роли</strong
+            ><span data-site-setting="home.metric2Text"
+              >работник, заведение, поставщик</span
+            >
           </article>
           <article>
-            <strong data-site-setting="home.metric3Value">1 кабинет</strong><span data-site-setting="home.metric3Text">профили, отклики, приглашения</span>
+            <strong data-site-setting="home.metric3Value">1 кабинет</strong
+            ><span data-site-setting="home.metric3Text"
+              >профили, отклики, приглашения</span
+            >
           </article>
           <article>
-            <strong data-site-setting="home.metric4Value">HoReCa</strong><span data-site-setting="home.metric4Text">фокус на кафе, рестораны и кухни</span>
+            <strong data-site-setting="home.metric4Value">HoReCa</strong
+            ><span data-site-setting="home.metric4Text"
+              >фокус на кафе, рестораны и кухни</span
+            >
           </article>
         </section>
 
@@ -149,7 +196,9 @@
           aria-label="Превью рабочей платформы"
         >
           <div class="section-head">
-            <h2 data-site-setting="home.boardTitle">Внутри не лендинг, а рабочая лента</h2>
+            <h2 data-site-setting="home.boardTitle">
+              Внутри не лендинг, а рабочая лента
+            </h2>
             <p data-site-setting="home.boardLead">
               Заведение публикует смену, работник откликается, поставщик
               получает запрос. Всё это собрано в кабинетах по ролям.
@@ -212,7 +261,9 @@
 
         <section class="direction-section" id="business">
           <div class="section-head">
-            <h2 data-site-setting="home.rolesTitle">Платформа работает как операционный штаб</h2>
+            <h2 data-site-setting="home.rolesTitle">
+              Платформа работает как операционный штаб
+            </h2>
             <p data-site-setting="home.rolesLead">
               Заведение видит работников, публикует смены, получает отклики и
               держит поставщиков в одном месте.
@@ -221,8 +272,12 @@
 
           <div class="direction-grid">
             <a class="direction-card" href="restaurants.html">
-              <span data-site-setting="home.restaurantCardLabel">Для заведений</span>
-              <h3 data-site-setting="home.restaurantCardTitle">Закрывайте смены быстрее</h3>
+              <span data-site-setting="home.restaurantCardLabel"
+                >Для заведений</span
+              >
+              <h3 data-site-setting="home.restaurantCardTitle">
+                Закрывайте смены быстрее
+              </h3>
               <p data-site-setting="home.restaurantCardText">
                 Публикуйте заявки, приглашайте работников из базы, фильтруйте по
                 профессии, ставке, графику и готовности к выезду.
@@ -230,8 +285,12 @@
             </a>
 
             <a class="direction-card" id="workers" href="workers.html">
-              <span data-site-setting="home.workerCardLabel">Для сотрудников</span>
-              <h3 data-site-setting="home.workerCardTitle">Берите понятные смены</h3>
+              <span data-site-setting="home.workerCardLabel"
+                >Для сотрудников</span
+              >
+              <h3 data-site-setting="home.workerCardTitle">
+                Берите понятные смены
+              </h3>
               <p data-site-setting="home.workerCardText">
                 Заполните профиль, смотрите доступные смены, откликайтесь и
                 принимайте приглашения от заведений.
@@ -239,8 +298,12 @@
             </a>
 
             <a class="direction-card" id="suppliers" href="suppliers.html">
-              <span data-site-setting="home.supplierCardLabel">Для поставщиков</span>
-              <h3 data-site-setting="home.supplierCardTitle">Получайте входящие запросы</h3>
+              <span data-site-setting="home.supplierCardLabel"
+                >Для поставщиков</span
+              >
+              <h3 data-site-setting="home.supplierCardTitle">
+                Получайте входящие запросы
+              </h3>
               <p data-site-setting="home.supplierCardText">
                 Публикуйте предложения по товарам и услугам, а заведения
                 отправляют заявки прямо в кабинет поставщика.
@@ -254,7 +317,9 @@
             <div class="eyebrow" data-site-setting="home.workflowEyebrow">
               как Coople, Instawork и VentraGo, но под российскую HoReCa
             </div>
-            <h2 data-site-setting="home.workflowTitle">Не доска объявлений, а рабочий процесс</h2>
+            <h2 data-site-setting="home.workflowTitle">
+              Не доска объявлений, а рабочий процесс
+            </h2>
             <p data-site-setting="home.workflowLead">
               Система собирает смены, профили, отклики, приглашения и поставки в
               одну цепочку. Минимальный MVP уже работает на статическом фронте,
@@ -264,27 +329,27 @@
           <div class="workflow-list">
             <article>
               <b>01</b
-              ><span
-                data-site-setting="home.workflowStep1">Заведение публикует смену или выбирает работника из базы.</span
+              ><span data-site-setting="home.workflowStep1"
+                >Заведение публикует смену или выбирает работника из базы.</span
               >
             </article>
             <article>
               <b>02</b
-              ><span
-                data-site-setting="home.workflowStep2">Работник откликается или принимает приглашение на смену.</span
+              ><span data-site-setting="home.workflowStep2"
+                >Работник откликается или принимает приглашение на смену.</span
               >
             </article>
             <article>
               <b>03</b
-              ><span
-                data-site-setting="home.workflowStep3">Поставщик публикует оффер, заведение отправляет запрос в
+              ><span data-site-setting="home.workflowStep3"
+                >Поставщик публикует оффер, заведение отправляет запрос в
                 кабинет.</span
               >
             </article>
             <article>
               <b>04</b
-              ><span
-                data-site-setting="home.workflowStep4">Админ видит общий контур данных и контролирует наполнение
+              ><span data-site-setting="home.workflowStep4"
+                >Админ видит общий контур данных и контролирует наполнение
                 платформы.</span
               >
             </article>
@@ -303,7 +368,9 @@
           <div class="function-grid">
             <article>
               <span data-site-setting="home.mvpCard1Label">Смены</span>
-              <h3 data-site-setting="home.mvpCard1Title">Публикация и отклики</h3>
+              <h3 data-site-setting="home.mvpCard1Title">
+                Публикация и отклики
+              </h3>
               <p data-site-setting="home.mvpCard1Text">
                 Заведение создаёт смену, работник видит её в кабинете и
                 отправляет отклик.
@@ -333,11 +400,24 @@
         <section class="form-section" id="contacts">
           <div class="form-info">
             <h2 data-site-setting="home.finalTitle">Начните с регистрации</h2>
-            <p data-site-setting="home.finalLead">Создайте аккаунт и откройте кабинет для своей роли.</p>
+            <p data-site-setting="home.finalLead">
+              Создайте аккаунт и откройте кабинет для своей роли.
+            </p>
           </div>
 
           <div class="form-card">
-            <a class="btn primary" href="auth.html">Войти / регистрация</a>
+            <a
+              class="btn primary"
+              href="auth.html?mode=signup"
+              data-site-setting="nav.signup"
+              >Регистрация</a
+            >
+            <a
+              class="btn"
+              href="auth.html?mode=login"
+              data-site-setting="nav.login"
+              >Войти</a
+            >
           </div>
         </section>
       </main>
@@ -361,6 +441,6 @@
         </div>
       </footer>
     </div>
-    <script src="script.js?v=1023"></script>
+    <script src="public.min.js?v=1001"></script>
   </body>
 </html>
