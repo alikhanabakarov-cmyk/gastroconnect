@@ -129,6 +129,7 @@ create table if not exists public.shift_invites (
   id uuid primary key default gen_random_uuid(),
   restaurant_id uuid not null references auth.users(id) on delete cascade,
   worker_id uuid not null references auth.users(id) on delete cascade,
+  shift_id uuid references public.shift_posts(id) on delete set null,
   status text not null default 'pending' check (status in ('pending', 'accepted', 'declined', 'cancelled')),
   message text,
   created_at timestamptz not null default now(),
@@ -420,11 +421,19 @@ drop policy if exists shift_invites_insert_own_restaurant on public.shift_invite
 drop policy if exists shift_invites_insert_restaurant on public.shift_invites;
 create policy shift_invites_insert_own_restaurant on public.shift_invites for insert to authenticated
 with check (
-  public.is_admin()
-  or (
+  (
     restaurant_id = auth.uid()
-    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'restaurant')
+    and (
+      shift_id is null
+      or exists (
+        select 1
+        from public.shift_posts
+        where shift_posts.id = shift_invites.shift_id
+          and shift_posts.restaurant_id = auth.uid()
+      )
+    )
   )
+  or public.is_admin()
 );
 
 drop policy if exists shift_invites_update_own on public.shift_invites;
@@ -554,7 +563,10 @@ create index if not exists shift_posts_profession_idx on public.shift_posts(prof
 create index if not exists shift_applications_restaurant_id_idx on public.shift_applications(restaurant_id);
 create index if not exists shift_applications_worker_id_idx on public.shift_applications(worker_id);
 create index if not exists shift_invites_worker_id_idx on public.shift_invites(worker_id);
-create unique index if not exists shift_invites_pending_unique_idx on public.shift_invites(restaurant_id, worker_id) where status = 'pending';
+create index if not exists shift_invites_shift_id_idx on public.shift_invites(shift_id);
+drop index if exists public.shift_invites_pending_unique_idx;
+create unique index if not exists shift_invites_pending_shift_unique_idx on public.shift_invites(restaurant_id, worker_id, shift_id) where status = 'pending' and shift_id is not null;
+create unique index if not exists shift_invites_pending_general_unique_idx on public.shift_invites(restaurant_id, worker_id) where status = 'pending' and shift_id is null;
 create index if not exists supplier_offers_supplier_id_idx on public.supplier_offers(supplier_id);
 create index if not exists supplier_offers_category_idx on public.supplier_offers(category);
 create index if not exists supplier_inquiries_supplier_id_idx on public.supplier_inquiries(supplier_id);

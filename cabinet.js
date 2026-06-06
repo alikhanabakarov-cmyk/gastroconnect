@@ -53,6 +53,7 @@
     supplierInquiries: [],
     ownSupplierOffers: [],
     restaurantInvites: [],
+    restaurantShifts: [],
   };
 
   const rolePanels = {
@@ -207,6 +208,10 @@
 
   function displayPlace(profile) {
     return [profile?.city, profile?.district].filter(Boolean).join(", ");
+  }
+
+  function shiftSummary(shift) {
+    return [shift?.title, shift?.profession, shift?.city, shift?.date_from].filter(Boolean).join(" / ") || "Смена";
   }
 
   function fillMainProfileFields(role) {
@@ -480,10 +485,14 @@
 
   async function loadWorkerInvites() {
     setMessage(el.invitesMessage, "Загружаем приглашения...");
-    const { data, error } = await selectRows(
+    const { data, error } = await selectRowsWithFallback(
       "shift_invites",
       { worker_id: state.user.id },
-      { order: { column: "created_at", ascending: false } }
+      {
+        select:
+          "*, shift:shift_posts!shift_invites_shift_id_fkey(title, profession, city, date_from, time_from, time_to, rate)",
+        order: { column: "created_at", ascending: false },
+      }
     );
 
     if (error) {
@@ -506,10 +515,15 @@
 
     invites.forEach((invite) => {
       const pending = invite.status === "pending";
+      const shift = relatedProfile(invite, "shift");
+      const shiftTitle = shiftSummary(shift);
       const node = card(
-        "Приглашение на смену",
+        shiftTitle,
         `
           <p>Статус: ${escapeHtml(statusText(invite.status))}</p>
+          <p>Смена: ${escapeHtml(shift.profession || "-")} / ${escapeHtml(shift.city || "-")}</p>
+          <p>${escapeHtml(shift.date_from || "")} ${escapeHtml(shift.time_from || "")}-${escapeHtml(shift.time_to || "")}</p>
+          <p>Ставка: ${escapeHtml(money(shift.rate))}</p>
           <p>${escapeHtml(invite.message || "Заведение приглашает вас на смену.")}</p>
         `,
         pending
@@ -665,15 +679,18 @@
       return;
     }
 
+    state.restaurantShifts = data || [];
+    if (state.workers.length) renderWorkers();
+
     if (!el.restaurantShiftPostsList) return;
     el.restaurantShiftPostsList.innerHTML = "";
 
-    if (!data?.length) {
+    if (!state.restaurantShifts.length) {
       showEmpty(el.restaurantShiftPostsList, "Смены еще не опубликованы");
       return;
     }
 
-    data.forEach((shift) => {
+    state.restaurantShifts.forEach((shift) => {
       el.restaurantShiftPostsList.appendChild(
         card(
           shift.title || "Смена",
@@ -794,6 +811,13 @@
       const profile = relatedProfile(worker, "profile");
       const place = displayPlace(profile);
       const professions = listText(worker.professions);
+      const openShifts = state.restaurantShifts.filter((shift) => shift.status === "open");
+      const shiftOptions = openShifts
+        .map((shift) => `<option value="${escapeHtml(shift.id)}">${escapeHtml(shiftSummary(shift))}</option>`)
+        .join("");
+      const inviteActions = openShifts.length
+        ? `<label class="invite-shift-label">Смена<select data-invite-shift>${shiftOptions}</select></label><button type="button" data-action="invite-worker">Пригласить</button><p class="message"></p>`
+        : '<p class="message">Сначала опубликуйте открытую смену, чтобы пригласить работника.</p>';
       const node = card(
         displayName(profile, professions === "-" ? "Работник" : professions),
         `
@@ -804,7 +828,7 @@
           <p>Ставка: ${escapeHtml(money(worker.min_rate))}</p>
           <p>${worker.can_travel ? "Готов к выезду" : "Без выезда"}</p>
         `,
-        '<button type="button" data-action="invite-worker">Пригласить</button><p class="message"></p>'
+        inviteActions
       );
 
       node.querySelector("[data-action='invite-worker']")?.addEventListener("click", (event) => {
@@ -825,9 +849,18 @@
 
     setBusy(button, true, "Отправляем...");
     const message = node.querySelector(".message");
+    const shiftId = node.querySelector("[data-invite-shift]")?.value || "";
+    const shift = state.restaurantShifts.find((item) => item.id === shiftId);
+    if (!shiftId || !shift) {
+      setMessage(message, "Выберите опубликованную смену для приглашения.");
+      setBusy(button, false);
+      return;
+    }
+
     const duplicate = await rowExists("shift_invites", {
       restaurant_id: state.user.id,
       worker_id: worker.user_id,
+      shift_id: shiftId,
       status: "pending",
     });
 
@@ -847,7 +880,8 @@
     const { error } = await insertRow("shift_invites", {
       restaurant_id: state.user.id,
       worker_id: worker.user_id,
-      message: "Приглашение на смену от заведения",
+      shift_id: shiftId,
+      message: `Приглашение на смену: ${shiftSummary(shift)}`,
       status: "pending",
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
@@ -867,10 +901,14 @@
 
   async function loadRestaurantInvites() {
     setMessage(el.restaurantInvitesMessage, "Загружаем приглашения...");
-    const { data, error } = await selectRows(
+    const { data, error } = await selectRowsWithFallback(
       "shift_invites",
       { restaurant_id: state.user.id },
-      { order: { column: "created_at", ascending: false } }
+      {
+        select:
+          "*, shift:shift_posts!shift_invites_shift_id_fkey(title, profession, city, date_from, time_from, time_to, rate)",
+        order: { column: "created_at", ascending: false },
+      }
     );
 
     if (error) {
@@ -897,10 +935,11 @@
 
     state.restaurantInvites.forEach((invite) => {
       const worker = profilesById.get(invite.worker_id) || {};
+      const shift = relatedProfile(invite, "shift");
       el.restaurantInvitesList.appendChild(
         card(
           displayName(worker, "Работник"),
-          `<p>Статус: ${escapeHtml(statusText(invite.status))}</p><p>${escapeHtml(displayPlace(worker) || "-")}</p><p>${escapeHtml(invite.message || "")}</p>`
+          `<p>Статус: ${escapeHtml(statusText(invite.status))}</p><p>${escapeHtml(displayPlace(worker) || "-")}</p><p>Смена: ${escapeHtml(shiftSummary(shift))}</p><p>${escapeHtml(invite.message || "")}</p>`
         )
       );
     });

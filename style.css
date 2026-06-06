@@ -1005,6 +1005,18 @@ textarea:focus {
   font-size: 20px;
 }
 
+.invite-shift-label {
+  display: grid;
+  gap: 6px;
+  width: min(100%, 380px);
+  font-weight: 800;
+  color: var(--green);
+}
+
+.invite-shift-label select {
+  min-height: 46px;
+}
+
 .data-card p {
   margin: 8px 0;
   color: var(--text);
