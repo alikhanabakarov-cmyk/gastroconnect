@@ -51,13 +51,45 @@
     });
     document.querySelectorAll("[data-site-image]").forEach((image) => {
       const value = getPath(settings, image.dataset.siteImage);
-      if (typeof value === "string" && image.getAttribute("src") !== value) {
-        image.src = value;
-      }
+      setSafeLocalImage(image, value);
     });
     document.querySelectorAll("[data-site-logo]").forEach((image) => {
-      if (typeof settings.logo === "string") image.src = settings.logo;
+      setSafeLocalImage(image, settings.logo);
     });
+  }
+
+  function safeLocalAsset(src) {
+    const value = String(src || "").trim();
+    if (!value) return "";
+    const lower = value.toLowerCase();
+    if (
+      lower.startsWith("javascript:") ||
+      lower.startsWith("data:") ||
+      (lower.includes("githubusercontent") && lower.includes("raw"))
+    ) {
+      return "";
+    }
+    if (lower.startsWith("assets/")) return value;
+    if (lower.startsWith("/assets/")) return value.slice(1);
+    try {
+      const url = new URL(value, window.location.href);
+      return url.origin === window.location.origin && url.pathname.startsWith("/assets/")
+        ? `${url.pathname.slice(1)}${url.search}`
+        : "";
+    } catch {
+      return "";
+    }
+  }
+
+  function setSafeLocalImage(image, src) {
+    if (!image || typeof src !== "string") return;
+    const nextSrc = safeLocalAsset(src);
+    if (!nextSrc || image.getAttribute("src") === nextSrc) return;
+    const fallback = image.getAttribute("src") || nextSrc;
+    image.onerror = () => {
+      if (fallback && image.getAttribute("src") !== fallback) image.src = fallback;
+    };
+    image.src = nextSrc;
   }
 
   async function refreshSettings() {
