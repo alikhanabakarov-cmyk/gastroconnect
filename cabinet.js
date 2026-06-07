@@ -19,6 +19,8 @@
     "restaurantInvitesMessage",
     "invitesList",
     "invitesMessage",
+    "workerApplicationsList",
+    "workerApplicationsMessage",
     "shiftPostsList",
     "shiftPostsMessage",
     "shiftSearchInput",
@@ -54,6 +56,7 @@
     supplierOffers: [],
     restaurantSupplyRequests: [],
     supplyRequests: [],
+    workerApplications: [],
     supplierResponses: [],
     ownSupplierResponses: [],
     supplierInquiries: [],
@@ -420,6 +423,9 @@
   function renderShiftPosts() {
     const search = value("shiftSearchInput");
     const shifts = state.shifts.filter((item) => matchesSearch(item, search));
+    const applicationsByShift = new Map(
+      state.workerApplications.map((application) => [application.shift_id, application])
+    );
 
     if (!el.shiftPostsList) return;
     el.shiftPostsList.innerHTML = "";
@@ -432,6 +438,7 @@
 
     shifts.forEach((shift) => {
       const restaurant = relatedProfile(shift, "restaurant");
+      const application = applicationsByShift.get(shift.id);
       const node = card(
         shift.title || "Смена",
         `
@@ -441,7 +448,9 @@
           <p>Ставка: ${escapeHtml(money(shift.rate))}</p>
           <p>${escapeHtml(shift.requirements || "")}</p>
         `,
-        '<button type="button" data-action="apply-shift">Откликнуться</button><p class="message"></p>'
+        application
+          ? `<p class="message">Вы уже откликнулись. Статус: ${escapeHtml(statusText(application.status))}</p>`
+          : '<button type="button" data-action="apply-shift">Откликнуться</button><p class="message"></p>'
       );
 
       node.querySelector("[data-action='apply-shift']")?.addEventListener("click", (event) => {
@@ -494,6 +503,64 @@
     setMessage(message, "Отклик отправлен заведению.");
     button.textContent = "Отклик отправлен";
     button.disabled = true;
+    await loadWorkerApplications();
+    renderShiftPosts();
+  }
+
+  async function loadWorkerApplications() {
+    setMessage(el.workerApplicationsMessage, "Загружаем ваши отклики...");
+    const { data, error } = await selectRowsWithFallback(
+      "shift_applications",
+      { worker_id: state.user.id },
+      {
+        select:
+          "*, restaurant:profiles!shift_applications_restaurant_id_fkey(name, city), shift:shift_posts!shift_applications_shift_id_fkey(title, profession, city, district, date_from, time_from, time_to, rate)",
+        order: { column: "created_at", ascending: false },
+      }
+    );
+
+    if (error) {
+      setMessage(el.workerApplicationsMessage, `Ошибка: ${error.message}`);
+      return;
+    }
+
+    state.workerApplications = data || [];
+    renderWorkerApplications();
+  }
+
+  function renderWorkerApplications() {
+    if (!el.workerApplicationsList) return;
+    el.workerApplicationsList.innerHTML = "";
+
+    if (!state.workerApplications.length) {
+      showEmpty(
+        el.workerApplicationsList,
+        "Откликов пока нет",
+        "Откликнитесь на смену, и статус появится здесь."
+      );
+      setMessage(el.workerApplicationsMessage, "Откликов пока нет.");
+      return;
+    }
+
+    state.workerApplications.forEach((application) => {
+      const shift = relatedProfile(application, "shift");
+      const restaurant = relatedProfile(application, "restaurant");
+      el.workerApplicationsList.appendChild(
+        card(
+          shift.title || "Отклик на смену",
+          `
+            <p>Заведение: ${escapeHtml(displayName(restaurant, application.restaurant_id))}</p>
+            <p>Смена: ${escapeHtml(shift.profession || application.shift_id || "-")} / ${escapeHtml(shift.city || restaurant.city || "-")}</p>
+            <p>${escapeHtml(shift.date_from || "")} ${escapeHtml(shift.time_from || "")}-${escapeHtml(shift.time_to || "")}</p>
+            <p>Ставка: ${escapeHtml(money(shift.rate))}</p>
+            <p>Статус: ${escapeHtml(statusText(application.status))}</p>
+            <p>${escapeHtml(application.message || "")}</p>
+          `
+        )
+      );
+    });
+
+    setMessage(el.workerApplicationsMessage, `Ваших откликов: ${state.workerApplications.length}`);
   }
 
   async function loadWorkerInvites() {
@@ -1718,7 +1785,8 @@
 
     if (profile.role === "worker") {
       await loadWorkerProfile();
-      await Promise.all([loadWorkerInvites(), loadShiftPosts()]);
+      await Promise.all([loadWorkerInvites(), loadWorkerApplications()]);
+      await loadShiftPosts();
       return;
     }
 
@@ -1745,6 +1813,7 @@
 
     onClick("saveWorkerProfileBtn", saveWorkerProfile);
     onClick("loadInvitesBtn", loadWorkerInvites);
+    onClick("loadWorkerApplicationsBtn", loadWorkerApplications);
     onClick("loadShiftPostsBtn", loadShiftPosts);
     onInput("shiftSearchInput", renderShiftPosts);
 
