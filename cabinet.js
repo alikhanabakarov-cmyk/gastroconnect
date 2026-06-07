@@ -36,6 +36,8 @@
     "supplyRequestsSearchInput",
     "supplierOfferMessageBox",
     "supplierOwnOffersList",
+    "supplierResponsesMessage",
+    "supplierResponsesList",
     "supplierInquiriesMessage",
     "supplierInquiriesList",
     "adminMessage",
@@ -53,6 +55,7 @@
     restaurantSupplyRequests: [],
     supplyRequests: [],
     supplierResponses: [],
+    ownSupplierResponses: [],
     supplierInquiries: [],
     ownSupplierOffers: [],
     restaurantInvites: [],
@@ -1394,6 +1397,9 @@
   function renderSupplyRequests() {
     const search = value("supplyRequestsSearchInput");
     const requests = state.supplyRequests.filter((request) => matchesSearch(request, search));
+    const responsesByRequest = new Map(
+      state.ownSupplierResponses.map((response) => [response.request_id, response])
+    );
 
     if (!el.supplyRequestsList) return;
     el.supplyRequestsList.innerHTML = "";
@@ -1405,6 +1411,7 @@
 
     requests.forEach((request) => {
       const restaurant = relatedProfile(request, "restaurant");
+      const response = responsesByRequest.get(request.id);
       const node = card(
         request.title || "Запрос",
         `
@@ -1414,7 +1421,9 @@
           <p>Город: ${escapeHtml(request.city || restaurant.city || "-")}</p>
           <p>${escapeHtml(request.message || "")}</p>
         `,
-        '<button type="button" data-action="respond-supply-request">Откликнуться</button><p class="message"></p>'
+        response
+          ? `<p class="message">Вы уже откликнулись. Статус: ${escapeHtml(statusText(response.status))}</p>`
+          : '<button type="button" data-action="respond-supply-request">Откликнуться</button><p class="message"></p>'
       );
 
       node.querySelector("[data-action='respond-supply-request']")?.addEventListener("click", (event) => {
@@ -1466,6 +1475,63 @@
     setMessage(message, "Отклик отправлен заведению.");
     button.textContent = "Отклик отправлен";
     button.disabled = true;
+    await loadSupplierOwnResponses();
+    renderSupplyRequests();
+  }
+
+  async function loadSupplierOwnResponses() {
+    setMessage(el.supplierResponsesMessage, "Загружаем ваши отклики...");
+    const { data, error } = await selectRowsWithFallback(
+      "supplier_responses",
+      { supplier_id: state.user.id },
+      {
+        select:
+          "*, request:supply_requests!supplier_responses_request_id_fkey(title, category, quantity, city), restaurant:profiles!supplier_responses_restaurant_id_fkey(name, city)",
+        order: { column: "created_at", ascending: false },
+      }
+    );
+
+    if (error) {
+      setMessage(el.supplierResponsesMessage, `Ошибка: ${error.message}`);
+      return;
+    }
+
+    state.ownSupplierResponses = data || [];
+    renderSupplierOwnResponses();
+  }
+
+  function renderSupplierOwnResponses() {
+    if (!el.supplierResponsesList) return;
+    el.supplierResponsesList.innerHTML = "";
+
+    if (!state.ownSupplierResponses.length) {
+      showEmpty(
+        el.supplierResponsesList,
+        "Откликов на запросы пока нет",
+        "Откликнитесь на запрос заведения, и статус появится здесь."
+      );
+      setMessage(el.supplierResponsesMessage, "Откликов на запросы пока нет.");
+      return;
+    }
+
+    state.ownSupplierResponses.forEach((response) => {
+      const request = relatedProfile(response, "request");
+      const restaurant = relatedProfile(response, "restaurant");
+      el.supplierResponsesList.appendChild(
+        card(
+          request.title || "Отклик на запрос",
+          `
+            <p>Заведение: ${escapeHtml(displayName(restaurant, response.restaurant_id))}</p>
+            <p>Запрос: ${escapeHtml(request.category || response.category || "-")} / ${escapeHtml(request.quantity || "-")}</p>
+            <p>Город: ${escapeHtml(request.city || restaurant.city || "-")}</p>
+            <p>Статус: ${escapeHtml(statusText(response.status))}</p>
+            <p>${escapeHtml(response.message || "")}</p>
+          `
+        )
+      );
+    });
+
+    setMessage(el.supplierResponsesMessage, `Ваших откликов: ${state.ownSupplierResponses.length}`);
   }
 
   async function loadSupplierInquiries() {
@@ -1635,7 +1701,8 @@
   }
 
   async function loadSupplierWorkspace() {
-    await Promise.all([loadSupplierOwnOffers(), loadSupplyRequests(), loadSupplierInquiries()]);
+    await Promise.all([loadSupplierOwnOffers(), loadSupplierOwnResponses(), loadSupplierInquiries()]);
+    await loadSupplyRequests();
   }
 
   async function openCabinet(profile) {
@@ -1698,6 +1765,7 @@
     onClick("createSupplierOfferBtn", createSupplierOffer);
     onClick("loadSupplierOwnOffersBtn", loadSupplierOwnOffers);
     onClick("loadSupplyRequestsBtn", loadSupplyRequests);
+    onClick("loadSupplierResponsesBtn", loadSupplierOwnResponses);
     onInput("supplyRequestsSearchInput", renderSupplyRequests);
     onClick("loadSupplierInquiriesBtn", loadSupplierInquiries);
 
