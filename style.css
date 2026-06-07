@@ -290,6 +290,8 @@ button:disabled {
 }
 
 .poster-visual {
+  --hero-image: url("assets/hero-home.webp");
+  --hero-position: center center;
   position: relative;
   z-index: 1;
   width: 100%;
@@ -300,28 +302,34 @@ button:disabled {
   border-radius: 26px;
   border: 1px solid rgba(201, 154, 63, 0.24);
   box-shadow: var(--shadow);
-  background:
-    linear-gradient(
-      135deg,
-      rgba(255, 250, 242, 0.95),
-      rgba(219, 209, 190, 0.86)
-    ),
-    #eadfce;
+  background-color: #eadfce;
+  background-image:
+    linear-gradient(135deg, rgba(255, 250, 242, 0.18), rgba(219, 209, 190, 0.1)),
+    var(--hero-image);
+  background-position:
+    center center,
+    var(--hero-position);
+  background-size:
+    cover,
+    cover;
+  background-repeat: no-repeat;
 }
 
-.poster-image {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-  object-fit: cover;
-  object-position: center;
+.poster-visual-home {
+  --hero-image: url("assets/hero-home.webp");
+  --hero-position: right center;
 }
 
-.poster-image-home {
-  object-position: right center;
+.poster-visual-workers {
+  --hero-image: url("assets/hero-workers.webp");
+}
+
+.poster-visual-restaurants {
+  --hero-image: url("assets/hero-restaurants.webp");
+}
+
+.poster-visual-suppliers {
+  --hero-image: url("assets/hero-suppliers.webp");
 }
 
 .poster-visual::after {
@@ -869,23 +877,29 @@ textarea:focus {
 }
 
 .service-hero-media {
+  --hero-image: url("assets/hero-home.webp");
+  --hero-position: center center;
   position: relative;
   min-height: 360px;
   overflow: hidden;
   border: 1px solid rgba(201, 154, 63, 0.24);
   border-radius: 24px;
-  background: #eadfce;
+  background-color: #eadfce;
+  background-image:
+    linear-gradient(135deg, rgba(255, 250, 242, 0.16), rgba(219, 209, 190, 0.1)),
+    var(--hero-image);
+  background-position:
+    center center,
+    var(--hero-position);
+  background-size:
+    cover,
+    cover;
+  background-repeat: no-repeat;
   box-shadow: var(--shadow);
 }
 
-.service-hero-image {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-  object-fit: cover;
-  object-position: center;
+.service-hero-media-home {
+  --hero-image: url("assets/hero-home.webp");
 }
 
 .auth-card {
@@ -1226,13 +1240,6 @@ th {
   .poster-visual-with-dashboard {
     display: grid;
     grid-template-rows: minmax(260px, 1fr) auto;
-    background: var(--card);
-  }
-
-  .poster-visual-with-dashboard .poster-image {
-    position: relative;
-    grid-row: 1;
-    min-height: 260px;
   }
 
   .poster-visual-with-dashboard::after {

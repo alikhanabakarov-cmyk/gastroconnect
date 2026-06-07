@@ -53,6 +53,10 @@
       const value = getPath(settings, image.dataset.siteImage);
       setSafeLocalImage(image, value);
     });
+    document.querySelectorAll("[data-site-bg]").forEach((node) => {
+      const value = getPath(settings, node.dataset.siteBg);
+      setSafeLocalBackground(node, value);
+    });
     document.querySelectorAll("[data-site-logo]").forEach((image) => {
       setSafeLocalImage(image, settings.logo);
     });
@@ -90,6 +94,14 @@
       if (fallback && image.getAttribute("src") !== fallback) image.src = fallback;
     };
     image.src = nextSrc;
+  }
+
+  function setSafeLocalBackground(node, src) {
+    if (!node || typeof src !== "string") return;
+    const nextSrc = safeLocalAsset(src);
+    if (!nextSrc) return;
+    const escaped = nextSrc.replace(/["\\]/g, "\\$&");
+    node.style.setProperty("--hero-image", `url("${escaped}")`);
   }
 
   async function refreshSettings() {
