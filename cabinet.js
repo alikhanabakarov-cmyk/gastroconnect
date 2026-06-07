@@ -63,6 +63,8 @@
     ownSupplierOffers: [],
     restaurantInvites: [],
     restaurantShifts: [],
+    restaurantApplications: [],
+    restaurantApplicationFilter: "",
   };
 
   const rolePanels = {
@@ -761,7 +763,24 @@
 
     state.restaurantShifts = data || [];
     if (state.workers.length) renderWorkers();
+    renderRestaurantShiftPosts();
+  }
 
+  function restaurantApplicationCounts() {
+    return state.restaurantApplications.reduce((counts, application) => {
+      const shiftId = application.shift_id;
+      if (!shiftId) return counts;
+
+      const current = counts.get(shiftId) || { total: 0, pending: 0, accepted: 0 };
+      current.total += 1;
+      if (application.status === "pending") current.pending += 1;
+      if (application.status === "accepted") current.accepted += 1;
+      counts.set(shiftId, current);
+      return counts;
+    }, new Map());
+  }
+
+  function renderRestaurantShiftPosts() {
     if (!el.restaurantShiftPostsList) return;
     el.restaurantShiftPostsList.innerHTML = "";
 
@@ -770,17 +789,72 @@
       return;
     }
 
+    const applicationCounts = restaurantApplicationCounts();
+
     state.restaurantShifts.forEach((shift) => {
-      el.restaurantShiftPostsList.appendChild(
-        card(
-          shift.title || "Смена",
-          `<p>${escapeHtml(shift.profession || "-")} / ${escapeHtml(shift.city || "-")}</p><p>Статус: ${escapeHtml(statusText(shift.status))}</p>`
-        )
+      const counts = applicationCounts.get(shift.id) || { total: 0, pending: 0, accepted: 0 };
+      const isOpen = shift.status === "open";
+      const node = card(
+        shift.title || "Смена",
+        `
+          <p>${escapeHtml(shift.profession || "-")} / ${escapeHtml(shift.city || "-")}</p>
+          <p>${escapeHtml(shift.date_from || "")} ${escapeHtml(shift.time_from || "")}-${escapeHtml(shift.time_to || "")}</p>
+          <p>Ставка: ${escapeHtml(money(shift.rate))}</p>
+          <p>Статус: ${escapeHtml(statusText(shift.status))}</p>
+          <p>Отклики: ${counts.total}, ждут: ${counts.pending}, принято: ${counts.accepted}</p>
+        `,
+        `
+          <button class="btn" type="button" data-action="view-shift-applications">Отклики</button>
+          ${
+            isOpen
+              ? '<button type="button" data-shift-status="closed">Закрыть</button><button class="btn" type="button" data-shift-status="cancelled">Отменить</button>'
+              : ""
+          }
+          <p class="message"></p>
+        `
       );
+
+      node.querySelector("[data-action='view-shift-applications']")?.addEventListener("click", async () => {
+        await loadShiftApplications(shift.id);
+        el.shiftApplicationsList?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+
+      node.querySelectorAll("[data-shift-status]").forEach((button) => {
+        button.addEventListener("click", () => {
+          updateRestaurantShiftStatus(shift.id, button.dataset.shiftStatus, node);
+        });
+      });
+
+      el.restaurantShiftPostsList.appendChild(node);
     });
   }
 
-  async function loadShiftApplications() {
+  async function updateRestaurantShiftStatus(id, status, node) {
+    const buttons = node.querySelectorAll("button");
+    buttons.forEach((button) => (button.disabled = true));
+
+    const { error } = await updateRows(
+      "shift_posts",
+      { id, restaurant_id: state.user.id },
+      { status, updated_at: new Date().toISOString() }
+    );
+
+    setMessage(
+      node.querySelector(".message"),
+      error ? `Ошибка: ${error.message}` : "Статус смены обновлен."
+    );
+
+    if (error) {
+      buttons.forEach((button) => (button.disabled = false));
+      return;
+    }
+
+    await Promise.all([loadRestaurantShiftPosts(), loadShiftApplications(state.restaurantApplicationFilter)]);
+  }
+
+  async function loadShiftApplications(filterShiftId = "") {
+    const selectedShiftId = typeof filterShiftId === "string" ? filterShiftId : "";
+    state.restaurantApplicationFilter = selectedShiftId;
     setMessage(el.shiftPostMessage, "Загружаем отклики работников...");
     const { data, error } = await selectRowsWithFallback(
       "shift_applications",
@@ -797,16 +871,34 @@
       return;
     }
 
+    state.restaurantApplications = data || [];
+    renderShiftApplications(selectedShiftId);
+    if (state.restaurantShifts.length) renderRestaurantShiftPosts();
+  }
+
+  function renderShiftApplications(filterShiftId = state.restaurantApplicationFilter) {
+    const selectedShiftId = typeof filterShiftId === "string" ? filterShiftId : "";
+    state.restaurantApplicationFilter = selectedShiftId;
+    const applications = selectedShiftId
+      ? state.restaurantApplications.filter((application) => application.shift_id === selectedShiftId)
+      : state.restaurantApplications;
+
     if (!el.shiftApplicationsList) return;
     el.shiftApplicationsList.innerHTML = "";
 
-    if (!data?.length) {
-      showEmpty(el.shiftApplicationsList, "Откликов работников пока нет");
-      setMessage(el.shiftPostMessage, "Откликов работников пока нет.");
+    if (!applications.length) {
+      showEmpty(
+        el.shiftApplicationsList,
+        selectedShiftId ? "Откликов по этой смене пока нет" : "Откликов работников пока нет"
+      );
+      setMessage(
+        el.shiftPostMessage,
+        selectedShiftId ? "Откликов по выбранной смене пока нет." : "Откликов работников пока нет."
+      );
       return;
     }
 
-    data.forEach((application) => {
+    applications.forEach((application) => {
       const pending = application.status === "pending";
       const worker = relatedProfile(application, "worker");
       const shift = relatedProfile(application, "shift");
@@ -828,7 +920,12 @@
       el.shiftApplicationsList.appendChild(node);
     });
 
-    setMessage(el.shiftPostMessage, `Откликов работников: ${data.length}`);
+    setMessage(
+      el.shiftPostMessage,
+      selectedShiftId
+        ? `Откликов по смене: ${applications.length}`
+        : `Откликов работников: ${applications.length}`
+    );
   }
 
   async function updateShiftApplication(id, status, node) {
@@ -851,7 +948,7 @@
       return;
     }
 
-    await loadShiftApplications();
+    await loadShiftApplications(state.restaurantApplicationFilter);
   }
 
   async function loadWorkers() {
