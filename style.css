@@ -290,7 +290,7 @@ button:disabled {
 }
 
 .poster-visual {
-  --hero-image: url("assets/hero-home.webp");
+  --hero-image: none;
   --hero-position: center center;
   position: relative;
   z-index: 1;
@@ -316,20 +316,7 @@ button:disabled {
 }
 
 .poster-visual-home {
-  --hero-image: url("assets/hero-home.webp");
   --hero-position: right center;
-}
-
-.poster-visual-workers {
-  --hero-image: url("assets/hero-workers.webp");
-}
-
-.poster-visual-restaurants {
-  --hero-image: url("assets/hero-restaurants.webp");
-}
-
-.poster-visual-suppliers {
-  --hero-image: url("assets/hero-suppliers.webp");
 }
 
 .poster-visual::after {
@@ -877,7 +864,7 @@ textarea:focus {
 }
 
 .service-hero-media {
-  --hero-image: url("assets/hero-home.webp");
+  --hero-image: none;
   --hero-position: center center;
   position: relative;
   min-height: 360px;
@@ -896,10 +883,6 @@ textarea:focus {
     cover;
   background-repeat: no-repeat;
   box-shadow: var(--shadow);
-}
-
-.service-hero-media-home {
-  --hero-image: url("assets/hero-home.webp");
 }
 
 .auth-card {

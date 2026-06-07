@@ -4,6 +4,7 @@
   const SUBMISSIONS_KEY = "gc_public_submissions";
   const SUBMISSIONS_TABLE = "public_submissions";
   const roles = ["worker", "restaurant", "supplier"];
+  let allowBackgrounds = false;
   const roleName = {
     worker: "работника",
     restaurant: "заведения",
@@ -53,10 +54,12 @@
       const value = getPath(settings, image.dataset.siteImage);
       setSafeLocalImage(image, value);
     });
-    document.querySelectorAll("[data-site-bg]").forEach((node) => {
-      const value = getPath(settings, node.dataset.siteBg);
-      setSafeLocalBackground(node, value);
-    });
+    if (allowBackgrounds) {
+      document.querySelectorAll("[data-site-bg]").forEach((node) => {
+        const value = getPath(settings, node.dataset.siteBg);
+        setSafeLocalBackground(node, value);
+      });
+    }
     document.querySelectorAll("[data-site-logo]").forEach((image) => {
       setSafeLocalImage(image, settings.logo);
     });
@@ -102,6 +105,23 @@
     if (!nextSrc) return;
     const escaped = nextSrc.replace(/["\\]/g, "\\$&");
     node.style.setProperty("--hero-image", `url("${escaped}")`);
+  }
+
+  function applyDefaultBackgrounds() {
+    allowBackgrounds = true;
+    document.querySelectorAll("[data-bg-default]").forEach((node) => {
+      setSafeLocalBackground(node, node.dataset.bgDefault);
+    });
+    applySettings(readJson(SETTINGS_KEY, {}));
+  }
+
+  function scheduleBackgrounds() {
+    const run = () => setTimeout(applyDefaultBackgrounds, 0);
+    if (document.readyState === "complete") {
+      run();
+    } else {
+      window.addEventListener("load", run, { once: true });
+    }
   }
 
   async function refreshSettings() {
@@ -361,6 +381,7 @@
   }
 
   applySettings(readJson(SETTINGS_KEY, {}));
+  scheduleBackgrounds();
   initPublicForms();
   initAuthPage();
   window.addEventListener("load", () => setTimeout(refreshSettings, 400), { once: true });
