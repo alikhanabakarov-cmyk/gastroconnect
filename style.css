@@ -63,6 +63,7 @@ img {
 .brand {
   display: flex;
   align-items: center;
+  gap: 12px;
   width: 250px;
   max-width: 32vw;
   color: var(--green);
@@ -100,6 +101,8 @@ img {
 .brand-text {
   display: inline-block;
   min-width: 0;
+  font-size: 30px;
+  font-weight: 950;
 }
 
 .main-nav {
@@ -796,6 +799,7 @@ textarea:focus {
   display: flex;
   align-items: center;
   gap: 12px;
+  color: var(--green);
   font-size: 18px;
   font-weight: 950;
 }
@@ -813,6 +817,10 @@ textarea:focus {
   width: 42px;
   height: 42px;
   font-size: 15px;
+}
+
+.footer-brand .brand-text {
+  font-size: 24px;
 }
 
 .footer-links {
@@ -1291,6 +1299,10 @@ th {
 
   .brand-logo {
     max-width: 220px;
+  }
+
+  .brand-text {
+    font-size: 26px;
   }
 
   .main-nav {
