@@ -242,6 +242,19 @@
         </div>
       </footer>
     </div>
-    <script src="public.min.js?v=1005"></script>
+    <script>
+      window.addEventListener("load", function () {
+        document.querySelectorAll("[data-bg-default]").forEach(function (node) {
+          var src = node.getAttribute("data-bg-default") || "";
+          if (/^assets\/hero-[a-z-]+\.webp$/.test(src)) {
+            node.style.setProperty("--hero-image", "url(\"" + src + "\")");
+          }
+        });
+        var script = document.createElement("script");
+        script.src = "public.min.js?v=1005";
+        script.async = true;
+        document.body.appendChild(script);
+      }, { once: true });
+    </script>
   </body>
 </html>
