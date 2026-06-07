@@ -60,6 +60,7 @@
     supplierResponses: [],
     ownSupplierResponses: [],
     supplierInquiries: [],
+    supplierInquiryFilter: "",
     ownSupplierOffers: [],
     restaurantInvites: [],
     restaurantShifts: [],
@@ -1517,6 +1518,7 @@
 
     state.ownSupplierOffers = data || [];
     renderSupplierOwnOffers();
+    if (state.supplierInquiries.length) renderSupplierInquiries();
   }
 
   function renderSupplierOwnOffers() {
@@ -1529,13 +1531,67 @@
     }
 
     state.ownSupplierOffers.forEach((offer) => {
-      el.supplierOwnOffersList.appendChild(
-        card(
-          offer.title || "Предложение",
-          `<p>${escapeHtml(offer.category || "-")} / ${escapeHtml(money(offer.price))} ${escapeHtml(offer.unit || "")}</p><p>Статус: ${escapeHtml(statusText(offer.status))}</p><p>${escapeHtml(offer.description || "")}</p>`
-        )
+      const active = offer.status === "active";
+      const paused = offer.status === "paused";
+      const node = card(
+        offer.title || "Предложение",
+        `
+          <p>${escapeHtml(offer.category || "-")} / ${escapeHtml(money(offer.price))} ${escapeHtml(offer.unit || "")}</p>
+          <p>Минимум: ${escapeHtml(offer.min_order || "-")}</p>
+          <p>Доставка: ${escapeHtml(listText(offer.delivery_cities))}</p>
+          <p>Статус: ${escapeHtml(statusText(offer.status))}</p>
+          <p>${escapeHtml(offer.description || "")}</p>
+        `,
+        `
+          <button class="btn" type="button" data-action="view-offer-inquiries">Заявки</button>
+          ${active ? '<button type="button" data-offer-status="paused">Пауза</button>' : ""}
+          ${paused ? '<button type="button" data-offer-status="active">Активировать</button>' : ""}
+          ${
+            offer.status !== "closed"
+              ? '<button class="btn" type="button" data-offer-status="closed">Закрыть</button>'
+              : ""
+          }
+          <p class="message"></p>
+        `
       );
+
+      node.querySelector("[data-action='view-offer-inquiries']")?.addEventListener("click", async () => {
+        await loadSupplierInquiries(offer.id);
+        el.supplierInquiriesList?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+
+      node.querySelectorAll("[data-offer-status]").forEach((button) => {
+        button.addEventListener("click", () => {
+          updateSupplierOfferStatus(offer.id, button.dataset.offerStatus, node);
+        });
+      });
+
+      el.supplierOwnOffersList.appendChild(node);
     });
+  }
+
+  async function updateSupplierOfferStatus(id, status, node) {
+    const buttons = node.querySelectorAll("button");
+    buttons.forEach((button) => (button.disabled = true));
+
+    const { error } = await updateRows(
+      "supplier_offers",
+      { id, supplier_id: state.user.id },
+      { status, updated_at: new Date().toISOString() }
+    );
+
+    setMessage(
+      node.querySelector(".message"),
+      error ? `Ошибка: ${error.message}` : "Статус предложения обновлен."
+    );
+
+    if (error) {
+      buttons.forEach((button) => (button.disabled = false));
+      return;
+    }
+
+    await loadSupplierOwnOffers();
+    if (state.supplierInquiryFilter) await loadSupplierInquiries(state.supplierInquiryFilter);
   }
 
   async function loadSupplyRequests() {
@@ -1698,7 +1754,9 @@
     setMessage(el.supplierResponsesMessage, `Ваших откликов: ${state.ownSupplierResponses.length}`);
   }
 
-  async function loadSupplierInquiries() {
+  async function loadSupplierInquiries(filterOfferId = "") {
+    const selectedOfferId = typeof filterOfferId === "string" ? filterOfferId : "";
+    state.supplierInquiryFilter = selectedOfferId;
     setMessage(el.supplierInquiriesMessage, "Загружаем входящие заявки...");
     const { data, error } = await selectRowsWithFallback(
       "supplier_inquiries",
@@ -1716,20 +1774,32 @@
     }
 
     state.supplierInquiries = data || [];
-    renderSupplierInquiries();
+    renderSupplierInquiries(selectedOfferId);
   }
 
-  function renderSupplierInquiries() {
+  function renderSupplierInquiries(filterOfferId = state.supplierInquiryFilter) {
+    const selectedOfferId = typeof filterOfferId === "string" ? filterOfferId : "";
+    state.supplierInquiryFilter = selectedOfferId;
+    const inquiries = selectedOfferId
+      ? state.supplierInquiries.filter((inquiry) => inquiry.offer_id === selectedOfferId)
+      : state.supplierInquiries;
+
     if (!el.supplierInquiriesList) return;
     el.supplierInquiriesList.innerHTML = "";
 
-    if (!state.supplierInquiries.length) {
-      showEmpty(el.supplierInquiriesList, "Входящих заявок пока нет");
-      setMessage(el.supplierInquiriesMessage, "Входящих заявок пока нет.");
+    if (!inquiries.length) {
+      showEmpty(
+        el.supplierInquiriesList,
+        selectedOfferId ? "Заявок по этому предложению пока нет" : "Входящих заявок пока нет"
+      );
+      setMessage(
+        el.supplierInquiriesMessage,
+        selectedOfferId ? "Заявок по выбранному предложению пока нет." : "Входящих заявок пока нет."
+      );
       return;
     }
 
-    state.supplierInquiries.forEach((inquiry) => {
+    inquiries.forEach((inquiry) => {
       const pending = inquiry.status === "new";
       const restaurant = relatedProfile(inquiry, "restaurant");
       const offer = relatedProfile(inquiry, "offer");
@@ -1750,7 +1820,10 @@
       el.supplierInquiriesList.appendChild(node);
     });
 
-    setMessage(el.supplierInquiriesMessage, `Заявок: ${state.supplierInquiries.length}`);
+    setMessage(
+      el.supplierInquiriesMessage,
+      selectedOfferId ? `Заявок по предложению: ${inquiries.length}` : `Заявок: ${inquiries.length}`
+    );
   }
 
   async function updateSupplierInquiry(id, status, node) {
@@ -1773,7 +1846,7 @@
       return;
     }
 
-    await loadSupplierInquiries();
+    await loadSupplierInquiries(state.supplierInquiryFilter);
   }
 
   async function loadAdminData() {
