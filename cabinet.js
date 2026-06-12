@@ -1186,6 +1186,12 @@
   function renderRestaurantSupplyRequests() {
     if (!el.restaurantSupplyRequestsList) return;
     el.restaurantSupplyRequestsList.innerHTML = "";
+    const responsesByRequest = state.supplierResponses.reduce((counts, response) => {
+      const requestId = response.request_id;
+      if (!requestId) return counts;
+      counts.set(requestId, (counts.get(requestId) || 0) + 1);
+      return counts;
+    }, new Map());
 
     if (!state.restaurantSupplyRequests.length) {
       showEmpty(
@@ -1199,6 +1205,7 @@
 
     state.restaurantSupplyRequests.forEach((request) => {
       const isOpen = request.status === "open";
+      const responseCount = responsesByRequest.get(request.id) || 0;
       const node = card(
         request.title || "Запрос поставщику",
         `
@@ -1206,6 +1213,7 @@
           <p>Количество: ${escapeHtml(request.quantity || "-")}</p>
           <p>Бюджет: ${escapeHtml(request.budget || "-")}</p>
           <p>Город: ${escapeHtml(request.city || "-")}</p>
+          <p>Откликов поставщиков: ${escapeHtml(responseCount)}</p>
           <p>Статус: ${escapeHtml(statusText(request.status))}</p>
           <p>${escapeHtml(request.message || "")}</p>
         `,
@@ -1361,6 +1369,7 @@
 
     state.supplierResponses = data || [];
     renderSupplyResponses();
+    if (state.restaurantSupplyRequests.length) renderRestaurantSupplyRequests();
   }
 
   function renderSupplyResponses() {
@@ -1387,7 +1396,7 @@
 
       node.querySelectorAll("[data-status]").forEach((button) => {
         button.addEventListener("click", () => {
-          updateSupplierResponse(response.id, button.dataset.status, node);
+          updateSupplierResponse(response, button.dataset.status, node);
         });
       });
 
@@ -1397,13 +1406,15 @@
     setMessage(el.supplyResponsesMessage, `Откликов: ${state.supplierResponses.length}`);
   }
 
-  async function updateSupplierResponse(id, status, node) {
+  async function updateSupplierResponse(response, status, node) {
     const buttons = node.querySelectorAll("button");
     buttons.forEach((button) => (button.disabled = true));
+    const responseId = typeof response === "object" ? response.id : response;
+    const requestId = typeof response === "object" ? response.request_id : "";
 
     const { error } = await updateRows(
       "supplier_responses",
-      { id, restaurant_id: state.user.id },
+      { id: responseId, restaurant_id: state.user.id },
       { status, updated_at: new Date().toISOString() }
     );
 
@@ -1417,7 +1428,25 @@
       return;
     }
 
-    await loadSupplyResponses();
+    if (status === "accepted" && requestId) {
+      const { error: requestError } = await updateRows(
+        "supply_requests",
+        { id: requestId, restaurant_id: state.user.id },
+        { status: "closed", updated_at: new Date().toISOString() }
+      );
+
+      if (requestError) {
+        setMessage(
+          node.querySelector(".message"),
+          `Решение сохранено, но запрос не закрыт: ${requestError.message}`
+        );
+        buttons.forEach((button) => (button.disabled = false));
+        await loadSupplyResponses();
+        return;
+      }
+    }
+
+    await Promise.all([loadSupplyResponses(), loadRestaurantSupplyRequests()]);
   }
 
   async function saveSupplierProfile(event) {
