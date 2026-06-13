@@ -900,6 +900,63 @@ textarea:focus {
   font-weight: 850;
 }
 
+.seo-section {
+  max-width: 1380px;
+  margin: 0 auto;
+  padding: 78px 48px;
+}
+
+.seo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 28px;
+}
+
+.seo-grid article {
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--card);
+}
+
+.seo-grid h3 {
+  margin: 0 0 10px;
+  color: var(--green);
+  font-size: 24px;
+}
+
+.seo-grid p {
+  margin: 0;
+  color: var(--ink);
+  line-height: 1.55;
+}
+
+.faq-list {
+  margin-top: 28px;
+  border-top: 1px solid var(--line);
+}
+
+.faq-list details {
+  border-bottom: 1px solid var(--line);
+  padding: 20px 0;
+}
+
+.faq-list summary {
+  cursor: pointer;
+  color: var(--green);
+  font-size: 20px;
+  font-weight: 950;
+}
+
+.faq-list p {
+  max-width: 840px;
+  margin: 12px 0 0;
+  color: var(--ink);
+  font-size: 17px;
+  line-height: 1.6;
+}
+
 .auth-page,
 .cabinet-page {
   max-width: 1380px;
@@ -1319,6 +1376,7 @@ th {
   .live-board,
   .direction-grid,
   .function-grid,
+  .seo-grid,
   .market-section,
   .form-section,
   .cabinet-grid,
@@ -1329,6 +1387,7 @@ th {
 
   .form-section,
   .section,
+  .seo-section,
   .metrics-band,
   .live-board-section,
   .direction-section,
