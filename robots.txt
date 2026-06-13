@@ -4,5 +4,7 @@ Allow: /
 Disallow: /admin.html
 Disallow: /manage.html
 Disallow: /cabinet.html
+Disallow: /auth.html
 
+Host: https://gastroconnect.ru
 Sitemap: https://gastroconnect.ru/sitemap.xml

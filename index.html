@@ -21,7 +21,7 @@
     />
     <meta
       property="og:image"
-      content="assets/hero-home.webp"
+      content="https://gastroconnect.ru/assets/hero-home.webp"
     />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="GastroConnect — платформа для HoReCa" />
@@ -31,11 +31,53 @@
     />
     <meta
       name="twitter:image"
-      content="assets/hero-home.webp"
+      content="https://gastroconnect.ru/assets/hero-home.webp"
     />
     <link rel="icon" href="favicon.ico" sizes="any" />
     <link rel="manifest" href="site.webmanifest" />
     <link rel="stylesheet" href="style.css?v=1019" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://gastroconnect.ru/#organization",
+            "name": "GastroConnect",
+            "url": "https://gastroconnect.ru/",
+            "logo": "https://gastroconnect.ru/assets/logo-mark.png",
+            "email": "alikhanabakarov@gmail.com",
+            "telephone": "+79104334729",
+            "sameAs": ["https://t.me/gastroconnect"]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://gastroconnect.ru/#website",
+            "url": "https://gastroconnect.ru/",
+            "name": "GastroConnect",
+            "inLanguage": "ru-RU",
+            "publisher": {
+              "@id": "https://gastroconnect.ru/#organization"
+            },
+            "description": "Платформа для смен, персонала и поставок HoReCa."
+          },
+          {
+            "@type": "Service",
+            "@id": "https://gastroconnect.ru/#service",
+            "name": "GastroConnect",
+            "serviceType": "Платформа для HoReCa",
+            "areaServed": {
+              "@type": "Country",
+              "name": "Россия"
+            },
+            "provider": {
+              "@id": "https://gastroconnect.ru/#organization"
+            },
+            "description": "GastroConnect соединяет работников, заведения и поставщиков HoReCa в одной системе."
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
     <div class="page-shell">
