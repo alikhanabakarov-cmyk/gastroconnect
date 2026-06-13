@@ -1912,7 +1912,7 @@
     const session = sessionData?.session;
 
     if (!session) {
-      window.location.href = "auth.html";
+      window.location.href = "/auth/";
       return null;
     }
 
@@ -2041,7 +2041,7 @@
 
     el.logoutBtn?.addEventListener("click", async () => {
       await db.auth.signOut();
-      window.location.href = "auth.html";
+      window.location.href = "/auth/";
     });
   }
 

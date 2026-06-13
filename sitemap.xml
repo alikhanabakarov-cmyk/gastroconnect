@@ -7,73 +7,79 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://gastroconnect.ru/workers.html</loc>
+    <loc>https://gastroconnect.ru/workers/</loc>
     <lastmod>2026-06-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://gastroconnect.ru/restaurants.html</loc>
+    <loc>https://gastroconnect.ru/restaurants/</loc>
     <lastmod>2026-06-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://gastroconnect.ru/suppliers.html</loc>
+    <loc>https://gastroconnect.ru/suppliers/</loc>
     <lastmod>2026-06-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://gastroconnect.ru/staff-moscow.html</loc>
+    <loc>https://gastroconnect.ru/contacts/</loc>
     <lastmod>2026-06-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://gastroconnect.ru/waiters-moscow.html</loc>
+    <loc>https://gastroconnect.ru/personal-horeca-moskva/</loc>
     <lastmod>2026-06-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://gastroconnect.ru/cooks-moscow.html</loc>
+    <loc>https://gastroconnect.ru/podrabotka-ofitsiantom-moskva/</loc>
     <lastmod>2026-06-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://gastroconnect.ru/barista-moscow.html</loc>
+    <loc>https://gastroconnect.ru/podrabotka-povarom-moskva/</loc>
     <lastmod>2026-06-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://gastroconnect.ru/suppliers-moscow.html</loc>
+    <loc>https://gastroconnect.ru/podrabotka-barista-moskva/</loc>
     <lastmod>2026-06-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://gastroconnect.ru/food-suppliers-moscow.html</loc>
+    <loc>https://gastroconnect.ru/postavshchiki-dlya-restoranov-moskva/</loc>
+    <lastmod>2026-06-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://gastroconnect.ru/postavshchiki-produktov-dlya-restoranov-moskva/</loc>
     <lastmod>2026-06-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
-    <loc>https://gastroconnect.ru/equipment-suppliers-moscow.html</loc>
+    <loc>https://gastroconnect.ru/oborudovanie-dlya-kafe-restoranov-moskva/</loc>
     <lastmod>2026-06-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
-    <loc>https://gastroconnect.ru/privacy.html</loc>
+    <loc>https://gastroconnect.ru/privacy/</loc>
     <lastmod>2026-06-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://gastroconnect.ru/terms.html</loc>
+    <loc>https://gastroconnect.ru/terms/</loc>
     <lastmod>2026-06-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>

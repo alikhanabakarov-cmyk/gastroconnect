@@ -81,7 +81,7 @@
     try {
       const url = new URL(value, window.location.href);
       return url.origin === window.location.origin && url.pathname.startsWith("/assets/")
-        ? `${url.pathname.slice(1)}${url.search}`
+        ? `${url.pathname}${url.search}`
         : "";
     } catch {
       return "";
@@ -219,10 +219,10 @@
     let roleWasExplicit = roles.includes(params.get("role"));
     roleInput.value = normalizeRole(params.get("role"));
 
-    const cabinetUrl = () => `cabinet.html?role=${encodeURIComponent(roleInput.value)}`;
+    const cabinetUrl = () => `/cabinet/?role=${encodeURIComponent(roleInput.value)}`;
     const profileCabinetUrl = (profile) => {
       const role = profile?.role || roleInput.value;
-      return `cabinet.html?role=${encodeURIComponent(role)}`;
+      return `/cabinet/?role=${encodeURIComponent(role)}`;
     };
 
     function roleFromUser(user) {
@@ -258,7 +258,7 @@
         const next = new URLSearchParams(window.location.search);
         next.set("mode", mode);
         next.set("role", roleInput.value);
-        window.history.replaceState(null, "", `auth.html?${next}`);
+        window.history.replaceState(null, "", `/auth/?${next}`);
       }
     }
 

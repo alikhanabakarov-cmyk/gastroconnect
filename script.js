@@ -757,7 +757,7 @@
     roleInput.value = requestedRole;
 
     function cabinetUrl() {
-      return `cabinet.html?role=${encodeURIComponent(roleInput.value)}`;
+      return `/cabinet/?role=${encodeURIComponent(roleInput.value)}`;
     }
 
     function setAuthBusy(isBusy, text = "Проверяем...") {
@@ -798,7 +798,7 @@
         const nextParams = new URLSearchParams(window.location.search);
         nextParams.set("mode", authMode);
         nextParams.set("role", roleInput.value);
-        window.history.replaceState(null, "", `auth.html?${nextParams}`);
+        window.history.replaceState(null, "", `/auth/?${nextParams}`);
       }
     }
 
