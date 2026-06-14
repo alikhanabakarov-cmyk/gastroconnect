@@ -1,4 +1,4 @@
-(function () {
+﻿(function () {
   const PUBLIC_SUBMISSIONS_KEY = "gc_public_submissions";
   const PUBLIC_SUBMISSIONS_TABLE = "public_submissions";
   const SITE_SETTINGS_KEY = "gc_site_settings";
@@ -69,10 +69,10 @@
       supplierCardText:
         "Публикуйте предложения по товарам и услугам, а заведения отправляют заявки прямо в кабинет поставщика.",
       workflowEyebrow:
-        "как Coople, Instawork и VentraGo, но под российскую HoReCa",
+        "единый порядок для HoReCa",
       workflowTitle: "Не доска объявлений, а рабочий процесс",
       workflowLead:
-        "Система собирает смены, профили, отклики, приглашения и поставки в одну цепочку. Минимальный MVP уже работает на статическом фронте, Supabase и локальном fallback.",
+        "Система собирает смены, профили, отклики, приглашения и поставки в одну понятную цепочку: без хаоса в переписках, потерянных контактов и ручного контроля каждой заявки.",
       workflowStep1:
         "Заведение публикует смену или выбирает работника из базы.",
       workflowStep2: "Работник откликается или принимает приглашение на смену.",
@@ -1068,3 +1068,4 @@
   initAdminActions();
   renderAdmin();
 })();
+
