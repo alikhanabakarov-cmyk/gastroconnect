@@ -140,6 +140,25 @@
     } catch {}
   }
 
+  async function getSupabaseRestConfig() {
+    if (window.__gcSupabaseRestConfig) return window.__gcSupabaseRestConfig;
+    if (window.supabaseClient?.supabaseUrl && window.supabaseClient?.supabaseKey) {
+      window.__gcSupabaseRestConfig = {
+        url: window.supabaseClient.supabaseUrl,
+        key: window.supabaseClient.supabaseKey,
+      };
+      return window.__gcSupabaseRestConfig;
+    }
+    const response = await fetch("/supabase.js?v=1002", { cache: "force-cache" });
+    if (!response.ok) throw new Error("supabase.js не загрузился");
+    const source = await response.text();
+    const url = source.match(/SUPABASE_URL\s*=\s*['"]([^'"]+)['"]/i)?.[1];
+    const key = source.match(/SUPABASE_ANON_KEY\s*=\s*['"]([^'"]+)['"]/i)?.[1];
+    if (!url || !key) throw new Error("Supabase config не найден");
+    window.__gcSupabaseRestConfig = { url, key };
+    return window.__gcSupabaseRestConfig;
+  }
+
   function readSubmissions() {
     return readJson(SUBMISSIONS_KEY, []);
   }
@@ -150,10 +169,22 @@
     writeJson(SUBMISSIONS_KEY, rows.slice(0, 100));
   }
 
+  function createSubmissionId() {
+    if (window.crypto && typeof window.crypto.randomUUID === "function") {
+      return window.crypto.randomUUID();
+    }
+    return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (value) =>
+      (Number(value) ^ (Math.random() * 16 >> Number(value) / 4)).toString(16),
+    );
+  }
+
   function makeSubmission(type, data) {
-    const title = data.name || data.company || data.role || data.product || "Р—Р°СЏРІРєР°";
+    const title =
+      type === "callback"
+        ? `Заказ звонка: ${data.name || data.phone || "контакт"}`
+        : data.name || data.company || data.role || data.product || "Заявка";
     return {
-      id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      id: createSubmissionId(),
       type,
       title,
       phone: data.phone || "",
@@ -167,9 +198,23 @@
 
   async function saveRemoteSubmission(row) {
     const client = window.supabaseClient;
-    if (!client) return false;
-    const { error } = await client.from(SUBMISSIONS_TABLE).insert(row);
-    if (error) throw error;
+    if (client) {
+      const { error } = await client.from(SUBMISSIONS_TABLE).insert(row);
+      if (error) throw error;
+      return true;
+    }
+    const { url, key } = await getSupabaseRestConfig();
+    const response = await fetch(`${url}/rest/v1/${SUBMISSIONS_TABLE}`, {
+      method: "POST",
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+        "Content-Type": "application/json",
+        Prefer: "return=minimal",
+      },
+      body: JSON.stringify(row),
+    });
+    if (!response.ok) throw new Error(`public_submissions ${response.status}`);
     return true;
   }
 
@@ -187,9 +232,14 @@
         saveLocalSubmission(row);
         try {
           await saveRemoteSubmission(row);
-          if (box) box.textContent = "Р—Р°СЏРІРєР° РѕС‚РїСЂР°РІР»РµРЅР°. Р”Р°Р»СЊС€Рµ СЂР°Р±РѕС‚Р°Р№С‚Рµ СЃ РЅРµР№ РІ Р»РёС‡РЅРѕРј РєР°Р±РёРЅРµС‚Рµ.";
+          if (box) {
+            box.textContent =
+              form.dataset.formType === "callback"
+                ? "Заявка на звонок отправлена. Мы свяжемся с вами по указанному телефону."
+                : "Заявка отправлена. Дальше работайте с ней в личном кабинете.";
+          }
         } catch {
-          if (box) box.textContent = "Р—Р°СЏРІРєР° СЃРѕС…СЂР°РЅРµРЅР° Р»РѕРєР°Р»СЊРЅРѕ. РџРѕРїСЂРѕР±СѓР№С‚Рµ РѕС‚РїСЂР°РІРёС‚СЊ РµС‰С‘ СЂР°Р· РїРѕР·Р¶Рµ.";
+          if (box) box.textContent = "Заявка сохранена локально. Если интернет или база недоступны, попробуйте отправить еще раз позже.";
         } finally {
           if (box) box.style.display = "block";
           form.reset();

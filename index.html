@@ -37,7 +37,7 @@
     <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" sizes="120x120" />
     <link rel="alternate icon" href="/favicon.ico" sizes="any" />
     <link rel="manifest" href="/site.webmanifest" />
-    <link rel="stylesheet" href="/style.css?v=1021" />
+    <link rel="stylesheet" href="/style.css?v=1022" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -746,25 +746,60 @@
 
         <section class="form-section" id="contacts">
           <div class="form-info">
-            <h2 data-site-setting="home.finalTitle">Начните с регистрации</h2>
-            <p data-site-setting="home.finalLead">
-              Создайте аккаунт и откройте кабинет для своей роли.
+            <span class="eyebrow">Быстрая связь</span>
+            <h2>Заказать звонок</h2>
+            <p>
+              Оставьте имя и телефон. Мы сами перезвоним, уточним задачу и
+              подскажем, как быстрее начать: найти смену, закрыть персонал или
+              получить заявку от заведения.
+            </p>
+            <p class="form-note">
+              Для старта это проще и дешевле виртуальной АТС: заявка сразу
+              попадает в админку GastroConnect.
             </p>
           </div>
 
           <div class="form-card">
-            <a
-              class="btn primary"
-              href="/auth/?mode=signup"
-              data-site-setting="nav.signup"
-              >Регистрация</a
-            >
-            <a
-              class="btn"
-              href="/auth/?mode=login"
-              data-site-setting="nav.login"
-              >Войти</a
-            >
+            <form class="callback-form" data-form-type="callback">
+              <div class="form-grid">
+                <label
+                  >Имя
+                  <input
+                    name="name"
+                    type="text"
+                    placeholder="Как к вам обращаться"
+                    autocomplete="name"
+                    required
+                  />
+                </label>
+                <label
+                  >Телефон
+                  <input
+                    name="phone"
+                    type="tel"
+                    placeholder="+7 910 433-47-29"
+                    autocomplete="tel"
+                    required
+                  />
+                </label>
+              </div>
+              <input type="hidden" name="city" value="Москва и Московская область" />
+              <input type="hidden" name="request" value="Заказать звонок" />
+              <button class="primary" type="submit">Заказать звонок</button>
+              <p class="success" role="status"></p>
+              <p class="form-note">
+                Нажимая кнопку, вы соглашаетесь с
+                <a href="/privacy/">политикой обработки персональных данных</a>.
+              </p>
+            </form>
+            <div class="form-actions-row">
+              <a class="btn" href="/auth/?mode=signup" data-site-setting="nav.signup"
+                >Регистрация</a
+              >
+              <a class="btn" href="/auth/?mode=login" data-site-setting="nav.login"
+                >Войти</a
+              >
+            </div>
           </div>
         </section>
       </main>
@@ -801,7 +836,7 @@
           }
         });
         var script = document.createElement("script");
-        script.src = "/public.min.js?v=1006";
+        script.src = "/public.min.js?v=1007";
         script.async = true;
         document.body.appendChild(script);
 
@@ -809,4 +844,5 @@
     </script>
   </body>
 </html>
+
 

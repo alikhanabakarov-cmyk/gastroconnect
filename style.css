@@ -973,6 +973,24 @@ button:disabled {
   padding: 34px;
 }
 
+.callback-form {
+  display: grid;
+  gap: 20px;
+}
+
+.callback-form button {
+  justify-self: start;
+}
+
+.form-actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 24px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+}
+
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
