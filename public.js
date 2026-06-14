@@ -1,4 +1,4 @@
-(function () {
+﻿(function () {
   const SETTINGS_KEY = "gc_site_settings";
   const SETTINGS_ROW = "public_site";
   const SUBMISSIONS_KEY = "gc_public_submissions";
@@ -6,9 +6,9 @@
   const roles = ["worker", "restaurant", "supplier"];
   let allowBackgrounds = false;
   const roleName = {
-    worker: "работника",
-    restaurant: "заведения",
-    supplier: "поставщика",
+    worker: "СЂР°Р±РѕС‚РЅРёРєР°",
+    restaurant: "Р·Р°РІРµРґРµРЅРёСЏ",
+    supplier: "РїРѕСЃС‚Р°РІС‰РёРєР°",
   };
 
   const normalizeRole = (role) => (roles.includes(role) ? role : "worker");
@@ -151,7 +151,7 @@
   }
 
   function makeSubmission(type, data) {
-    const title = data.name || data.company || data.role || data.product || "Заявка";
+    const title = data.name || data.company || data.role || data.product || "Р—Р°СЏРІРєР°";
     return {
       id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
       type,
@@ -187,9 +187,9 @@
         saveLocalSubmission(row);
         try {
           await saveRemoteSubmission(row);
-          if (box) box.textContent = "Заявка отправлена. Дальше работайте с ней в личном кабинете.";
+          if (box) box.textContent = "Р—Р°СЏРІРєР° РѕС‚РїСЂР°РІР»РµРЅР°. Р”Р°Р»СЊС€Рµ СЂР°Р±РѕС‚Р°Р№С‚Рµ СЃ РЅРµР№ РІ Р»РёС‡РЅРѕРј РєР°Р±РёРЅРµС‚Рµ.";
         } catch {
-          if (box) box.textContent = "Заявка сохранена локально. Попробуйте отправить ещё раз позже.";
+          if (box) box.textContent = "Р—Р°СЏРІРєР° СЃРѕС…СЂР°РЅРµРЅР° Р»РѕРєР°Р»СЊРЅРѕ. РџРѕРїСЂРѕР±СѓР№С‚Рµ РѕС‚РїСЂР°РІРёС‚СЊ РµС‰С‘ СЂР°Р· РїРѕР·Р¶Рµ.";
         } finally {
           if (box) box.style.display = "block";
           form.reset();
@@ -200,7 +200,15 @@
   }
 
   function initAuthPage() {
+    const methodInput = document.getElementById("authMethod");
+    const nameInput = document.getElementById("displayName");
+    const cityInput = document.getElementById("city");
     const emailInput = document.getElementById("email");
+    const phoneInput = document.getElementById("phone");
+    const emailField = document.getElementById("emailField");
+    const phoneField = document.getElementById("phoneField");
+    const nameField = document.getElementById("nameField");
+    const cityField = document.getElementById("cityField");
     const passwordInput = document.getElementById("password");
     const roleInput = document.getElementById("role");
     const roleField = document.getElementById("roleField");
@@ -212,28 +220,65 @@
     const formTitle = document.getElementById("authFormTitle");
     const modeHint = document.getElementById("authModeHint");
     const cabinetShortcut = document.getElementById("cabinetShortcut");
-    if (!emailInput || !passwordInput || !roleInput || !message) return;
+    if (!methodInput || !emailInput || !phoneInput || !passwordInput || !roleInput || !message) return;
 
     const params = new URLSearchParams(window.location.search);
     let mode = params.get("mode") === "login" ? "login" : "signup";
     let roleWasExplicit = roles.includes(params.get("role"));
     roleInput.value = normalizeRole(params.get("role"));
+    methodInput.value = params.get("method") === "phone" ? "phone" : "email";
 
-    const cabinetUrl = () => `/cabinet/?role=${encodeURIComponent(roleInput.value)}`;
     const profileCabinetUrl = (profile) => {
       const role = profile?.role || roleInput.value;
       return `/cabinet/?role=${encodeURIComponent(role)}`;
     };
+
+    function cleanPhone(value) {
+      let digits = String(value || "").replace(/\D/g, "");
+      if (digits.length === 11 && digits.startsWith("8")) digits = `7${digits.slice(1)}`;
+      if (digits.length === 10) digits = `7${digits}`;
+      return digits ? `+${digits}` : "";
+    }
+
+    function emailValue() {
+      return emailInput.value.trim().toLowerCase();
+    }
+
+    function phoneValue() {
+      return cleanPhone(phoneInput.value);
+    }
 
     function roleFromUser(user) {
       return roles.find((role) => role === user?.app_metadata?.role || role === user?.user_metadata?.role) || "";
     }
 
     function setBusy(isBusy, text) {
-      [registerBtn, loginBtn, showLoginBtn, showRegisterBtn].forEach((button) => {
-        if (button) button.disabled = isBusy;
+      [registerBtn, loginBtn, showLoginBtn, showRegisterBtn, methodInput, roleInput].forEach((control) => {
+        if (control) control.disabled = isBusy;
       });
       if (text) message.textContent = text;
+    }
+
+    function updateHistory() {
+      const next = new URLSearchParams(window.location.search);
+      next.set("mode", mode);
+      next.set("role", roleInput.value);
+      next.set("method", methodInput.value);
+      window.history.replaceState(null, "", `/auth/?${next}`);
+    }
+
+    function setContactVisibility(updateUrl = true) {
+      const byPhone = methodInput.value === "phone";
+      const loginMode = mode === "login";
+      if (emailField) emailField.hidden = loginMode && byPhone;
+      if (phoneField) phoneField.hidden = loginMode && !byPhone;
+      if (nameField) nameField.hidden = loginMode;
+      if (cityField) cityField.hidden = loginMode;
+      emailInput.required = loginMode ? !byPhone : methodInput.value === "email";
+      phoneInput.required = loginMode ? byPhone : methodInput.value === "phone";
+      emailInput.placeholder = byPhone ? "Можно указать дополнительно" : "example@mail.ru";
+      phoneInput.placeholder = byPhone ? "+7 910 000-00-00" : "Можно указать дополнительно";
+      if (updateUrl) updateHistory();
     }
 
     function setMode(nextMode, updateUrl = true) {
@@ -242,50 +287,87 @@
       if (roleField) roleField.hidden = mode === "login";
       if (registerBtn) registerBtn.hidden = mode !== "signup";
       if (loginBtn) loginBtn.hidden = mode !== "login";
-      if (passwordInput) {
-        passwordInput.autocomplete = mode === "login" ? "current-password" : "new-password";
-      }
+      passwordInput.autocomplete = mode === "login" ? "current-password" : "new-password";
       showLoginBtn?.classList.toggle("is-active", mode === "login");
       showRegisterBtn?.classList.toggle("is-active", mode === "signup");
       if (modeHint) {
         modeHint.textContent =
           mode === "login"
-            ? "Введите email и пароль. Роль подтянется из вашего профиля."
-            : `Будет создан кабинет ${roleName[roleInput.value]}.`;
+            ? "Введите email или телефон и пароль. Роль подтянется из вашего профиля."
+            : `Будет создан кабинет ${roleName[roleInput.value]}. Данные сохранятся в базе и админке.`;
       }
-      if (cabinetShortcut) cabinetShortcut.href = cabinetUrl();
-      if (updateUrl) {
-        const next = new URLSearchParams(window.location.search);
-        next.set("mode", mode);
-        next.set("role", roleInput.value);
-        window.history.replaceState(null, "", `/auth/?${next}`);
-      }
+      if (cabinetShortcut) cabinetShortcut.href = profileCabinetUrl({ role: roleInput.value });
+      setContactVisibility(false);
+      if (updateUrl) updateHistory();
+    }
+
+    async function upsertAdminAccount(user, role, payload = {}) {
+      if (!user || !window.supabaseClient) return;
+      await window.supabaseClient.from("admin_user_accounts").upsert(
+        {
+          user_id: user.id,
+          role: normalizeRole(role),
+          email: user.email || payload.email || emailValue() || null,
+          phone: user.phone || payload.phone || phoneValue() || null,
+          name: payload.name || nameInput?.value.trim() || user.email || user.phone || "Пользователь",
+          city: payload.city || cityInput?.value.trim() || null,
+          auth_provider: payload.auth_provider || methodInput.value,
+          status: "active",
+          source: "auth_page",
+          raw_meta: user.user_metadata || {},
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "user_id" }
+      );
     }
 
     async function ensureProfile(user, role) {
       if (!user) return null;
       const profileRole = roleFromUser(user) || (roles.includes(role) ? role : "");
+      const authEmail = user.email || emailValue();
+      const authPhone = user.phone || phoneValue();
+      const authProvider = authPhone && !authEmail ? "phone" : "email";
+      const profileName = nameInput?.value.trim() || authEmail || authPhone || "Пользователь";
+      const profileCity = cityInput?.value.trim() || "";
       const { data: existing, error: readError } = await window.supabaseClient
         .from("profiles")
-        .select("id, role")
+        .select("*")
         .eq("id", user.id)
         .maybeSingle();
       if (readError) throw readError;
-      if (existing) return existing;
+      if (existing) {
+        const patch = {
+          email: existing.email || authEmail || null,
+          phone: existing.phone || authPhone || null,
+          auth_provider: existing.auth_provider || authProvider,
+          updated_at: new Date().toISOString(),
+        };
+        const { data: updated } = await window.supabaseClient
+          .from("profiles")
+          .update(patch)
+          .eq("id", user.id)
+          .select("*")
+          .maybeSingle();
+        await upsertAdminAccount(user, existing.role, { ...existing, ...patch });
+        return updated || existing;
+      }
       if (!profileRole) {
         throw new Error("Профиль не найден. Откройте регистрацию, выберите роль и создайте профиль.");
       }
       const payload = {
         id: user.id,
         role: profileRole,
-        name: user.email || "Пользователь",
+        name: profileName,
+        city: profileCity || null,
+        email: authEmail || null,
+        phone: authPhone || null,
+        auth_provider: authProvider,
         status: "active",
         updated_at: new Date().toISOString(),
       };
-      const { error } = await window.supabaseClient
-        .from("profiles")
-        .upsert(payload, { onConflict: "id" });
+      const { error } = await window.supabaseClient.from("profiles").upsert(payload, { onConflict: "id" });
       if (error) throw error;
+      await upsertAdminAccount(user, profileRole, payload);
       return payload;
     }
 
@@ -294,35 +376,37 @@
       if (!client || !cabinetShortcut) return;
       const { data } = await client.auth.getSession();
       if (data?.session?.user) {
-        let sessionProfile = null;
         try {
-          sessionProfile = await ensureProfile(data.session.user, roleWasExplicit ? roleInput.value : "");
+          const sessionProfile = await ensureProfile(data.session.user, roleWasExplicit ? roleInput.value : "");
+          cabinetShortcut.hidden = false;
+          cabinetShortcut.href = profileCabinetUrl(sessionProfile);
+          message.textContent = "Вы уже вошли. Можно открыть кабинет.";
         } catch (error) {
           cabinetShortcut.hidden = true;
           message.textContent = error.message;
-          return;
         }
-        cabinetShortcut.hidden = false;
-        cabinetShortcut.href = profileCabinetUrl(sessionProfile);
-        message.textContent = "Вы уже вошли. Можно открыть кабинет.";
       }
     }
 
     registerBtn?.addEventListener("click", async () => {
       const client = window.supabaseClient;
-      const email = emailInput.value.trim();
+      const method = methodInput.value === "phone" ? "phone" : "email";
+      const email = emailValue();
+      const phone = phoneValue();
       const password = passwordInput.value;
       const role = normalizeRole(roleInput.value);
+      const name = nameInput?.value.trim() || "";
+      const city = cityInput?.value.trim() || "";
       if (!client) return (message.textContent = "Supabase не загрузился. Обновите страницу.");
-      if (!email || !password) return (message.textContent = "Введите email и пароль.");
+      if (method === "email" && !email) return (message.textContent = "Введите email.");
+      if (method === "phone" && !phone) return (message.textContent = "Введите телефон в формате +7...");
+      if (!password) return (message.textContent = "Введите пароль.");
       if (password.length < 6) return (message.textContent = "Пароль должен быть минимум 6 символов.");
 
-      setBusy(true, "Создаём аккаунт...");
-      const { data, error } = await client.auth.signUp({
-        email,
-        password,
-        options: { data: { role } },
-      });
+      setBusy(true, "Создаем аккаунт...");
+      const options = { data: { role, name, city, email, phone, auth_provider: method } };
+      const signUpPayload = method === "phone" ? { phone, password, options } : { email, password, options };
+      const { data, error } = await client.auth.signUp(signUpPayload);
       if (error) {
         setBusy(false);
         return (message.textContent = `Ошибка регистрации: ${error.message}`);
@@ -334,23 +418,31 @@
           return;
         } catch (profileError) {
           setBusy(false);
-          return (message.textContent = `Аккаунт создан, но профиль не сохранён: ${profileError.message}`);
+          return (message.textContent = `Аккаунт создан, но профиль не сохранен: ${profileError.message}`);
         }
       }
       setBusy(false);
-      message.textContent = "Аккаунт создан. Если нужно подтверждение email, подтвердите почту и войдите.";
+      message.textContent =
+        method === "phone"
+          ? "Аккаунт создан. Если Supabase просит SMS-код, подтвердите телефон и войдите."
+          : "Аккаунт создан. Если Supabase просит подтверждение email, подтвердите почту и войдите.";
       setMode("login");
     });
 
     loginBtn?.addEventListener("click", async () => {
       const client = window.supabaseClient;
-      const email = emailInput.value.trim();
+      const method = methodInput.value === "phone" ? "phone" : "email";
+      const email = emailValue();
+      const phone = phoneValue();
       const password = passwordInput.value;
       if (!client) return (message.textContent = "Supabase не загрузился. Обновите страницу.");
-      if (!email || !password) return (message.textContent = "Введите email и пароль.");
+      if (method === "email" && !email) return (message.textContent = "Введите email.");
+      if (method === "phone" && !phone) return (message.textContent = "Введите телефон.");
+      if (!password) return (message.textContent = "Введите пароль.");
 
       setBusy(true, "Входим...");
-      const { data, error } = await client.auth.signInWithPassword({ email, password });
+      const credentials = method === "phone" ? { phone, password } : { email, password };
+      const { data, error } = await client.auth.signInWithPassword(credentials);
       if (error) {
         setBusy(false);
         return (message.textContent = `Ошибка входа: ${error.message}`);
@@ -370,6 +462,7 @@
       roleWasExplicit = true;
       setMode(mode);
     });
+    methodInput.addEventListener("change", () => setContactVisibility(true));
     passwordInput.addEventListener("keydown", (event) => {
       if (event.key !== "Enter") return;
       event.preventDefault();
@@ -377,6 +470,7 @@
     });
 
     setMode(mode, false);
+    setContactVisibility(false);
     refreshSession();
   }
 
@@ -386,3 +480,4 @@
   initAuthPage();
   window.addEventListener("load", () => setTimeout(refreshSettings, 400), { once: true });
 })();
+

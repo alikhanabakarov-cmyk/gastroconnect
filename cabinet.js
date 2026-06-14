@@ -80,6 +80,8 @@
   const profileFields = {
     worker: {
       workerProfessions: "professions",
+      workerPhone: "phone",
+      workerEmail: "email",
       workerAvailableDays: "available_days",
       workerExperience: "experience",
       workerAvailableTime: "available_time",
@@ -92,6 +94,8 @@
       restaurantBusinessName: "business_name",
       restaurantBusinessType: "business_type",
       restaurantContactPerson: "contact_person",
+      restaurantPhone: "phone",
+      restaurantEmail: "email",
       restaurantCity: "city",
       restaurantAddress: "address",
       restaurantAbout: "about",
@@ -100,6 +104,8 @@
       supplierCompanyName: "company_name",
       supplierProfileCategory: "category",
       supplierContactPerson: "contact_person",
+      supplierPhone: "phone",
+      supplierEmail: "email",
       supplierProfileCity: "city",
       supplierDeliveryCities: "delivery_cities",
       supplierProfileAbout: "about",
@@ -116,6 +122,13 @@
 
   function value(id) {
     return (byId(id)?.value || "").trim();
+  }
+
+  function cleanPhone(rawValue) {
+    let digits = String(rawValue || "").replace(/\D/g, "");
+    if (digits.length === 11 && digits.startsWith("8")) digits = `7${digits.slice(1)}`;
+    if (digits.length === 10) digits = `7${digits}`;
+    return digits ? `+${digits}` : "";
   }
 
   function numberValue(id) {
@@ -234,10 +247,21 @@
   }
 
   function fillMainProfileFields(role) {
-    if (role !== "worker") return;
-    if (byId("workerName")) byId("workerName").value = state.profile?.name || "";
-    if (byId("workerCity")) byId("workerCity").value = state.profile?.city || "";
-    if (byId("workerDistrict")) byId("workerDistrict").value = state.profile?.district || "";
+    if (role === "worker") {
+      if (byId("workerName")) byId("workerName").value = state.profile?.name || "";
+      if (byId("workerCity")) byId("workerCity").value = state.profile?.city || "";
+      if (byId("workerDistrict")) byId("workerDistrict").value = state.profile?.district || "";
+      if (byId("workerEmail")) byId("workerEmail").value = state.profile?.email || state.user?.email || "";
+      if (byId("workerPhone")) byId("workerPhone").value = state.profile?.phone || state.user?.phone || "";
+    }
+    if (role === "restaurant") {
+      if (byId("restaurantEmail")) byId("restaurantEmail").value = state.profile?.email || state.user?.email || "";
+      if (byId("restaurantPhone")) byId("restaurantPhone").value = state.profile?.phone || state.user?.phone || "";
+    }
+    if (role === "supplier") {
+      if (byId("supplierEmail")) byId("supplierEmail").value = state.profile?.email || state.user?.email || "";
+      if (byId("supplierPhone")) byId("supplierPhone").value = state.profile?.phone || state.user?.phone || "";
+    }
   }
 
   async function updateMainProfile(payload) {
@@ -250,6 +274,26 @@
 
     if (!error && data) state.profile = data;
     return { error };
+  }
+
+  async function saveAdminAccount(payload = {}) {
+    if (!state.user || !state.profile) return { error: null };
+    return db.from("admin_user_accounts").upsert(
+      {
+        user_id: state.user.id,
+        role: state.profile.role,
+        email: payload.email || state.profile.email || state.user.email || null,
+        phone: payload.phone || state.profile.phone || state.user.phone || null,
+        name: payload.name || state.profile.name || state.user.email || state.user.phone || "Пользователь",
+        city: payload.city || state.profile.city || null,
+        auth_provider: state.profile.auth_provider || (state.user.phone && !state.user.email ? "phone" : "email"),
+        status: state.profile.status || "active",
+        source: "cabinet",
+        raw_meta: state.user.user_metadata || {},
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id" }
+    );
   }
 
   function collectProfile(fields) {
@@ -363,6 +407,9 @@
       name: value("workerName") || state.profile?.name || state.user.email || "Работник",
       city: value("workerCity"),
       district: value("workerDistrict"),
+      email: value("workerEmail") || state.profile?.email || state.user.email || null,
+      phone: cleanPhone(value("workerPhone")) || state.profile?.phone || state.user.phone || null,
+      auth_provider: state.profile?.auth_provider || (state.user.phone && !state.user.email ? "phone" : "email"),
     };
 
     const payload = {
@@ -377,7 +424,8 @@
       updateMainProfile(mainProfile),
       upsertProfile("worker_profiles", payload),
     ]);
-    const errors = [mainError, error].filter(Boolean);
+    const { error: adminError } = await saveAdminAccount(mainProfile);
+    const errors = [mainError, error, adminError].filter(Boolean);
     setMessage(
       el.workerProfileMessage,
       errors.length
@@ -663,6 +711,10 @@
     setBusy(button, true);
 
     const profilePayload = collectProfile(profileFields.restaurant);
+    const contactPayload = {
+      email: profilePayload.email || state.profile?.email || state.user.email || null,
+      phone: cleanPhone(profilePayload.phone) || state.profile?.phone || state.user.phone || null,
+    };
     const [{ error: mainError }, { error }] = await Promise.all([
       updateMainProfile({
         name:
@@ -672,14 +724,22 @@
           state.user.email ||
           "Заведение",
         city: profilePayload.city || state.profile?.city || "",
+        ...contactPayload,
+        auth_provider: state.profile?.auth_provider || (state.user.phone && !state.user.email ? "phone" : "email"),
       }),
       upsertProfile("restaurant_profiles", {
         user_id: state.user.id,
         ...profilePayload,
+        ...contactPayload,
         updated_at: new Date().toISOString(),
       }),
     ]);
-    const errors = [mainError, error].filter(Boolean);
+    const { error: adminError } = await saveAdminAccount({
+      name: profilePayload.business_name || profilePayload.contact_person,
+      city: profilePayload.city,
+      ...contactPayload,
+    });
+    const errors = [mainError, error, adminError].filter(Boolean);
 
     setMessage(
       el.restaurantProfileMessage,
@@ -691,6 +751,7 @@
   }
 
   async function loadRestaurantProfile() {
+    fillMainProfileFields("restaurant");
     const { data } = await db
       .from("restaurant_profiles")
       .select("*")
@@ -1463,6 +1524,10 @@
     setBusy(button, true);
 
     const profilePayload = collectProfile(profileFields.supplier);
+    const contactPayload = {
+      email: profilePayload.email || state.profile?.email || state.user.email || null,
+      phone: cleanPhone(profilePayload.phone) || state.profile?.phone || state.user.phone || null,
+    };
     const [{ error: mainError }, { error }] = await Promise.all([
       updateMainProfile({
         name:
@@ -1472,14 +1537,22 @@
           state.user.email ||
           "Поставщик",
         city: profilePayload.city || state.profile?.city || "",
+        ...contactPayload,
+        auth_provider: state.profile?.auth_provider || (state.user.phone && !state.user.email ? "phone" : "email"),
       }),
       upsertProfile("supplier_profiles", {
         user_id: state.user.id,
         ...profilePayload,
+        ...contactPayload,
         updated_at: new Date().toISOString(),
       }),
     ]);
-    const errors = [mainError, error].filter(Boolean);
+    const { error: adminError } = await saveAdminAccount({
+      name: profilePayload.company_name || profilePayload.contact_person,
+      city: profilePayload.city,
+      ...contactPayload,
+    });
+    const errors = [mainError, error, adminError].filter(Boolean);
 
     setMessage(
       el.supplierProfileMessage,
@@ -1491,6 +1564,7 @@
   }
 
   async function loadSupplierProfile() {
+    fillMainProfileFields("supplier");
     const { data } = await db
       .from("supplier_profiles")
       .select("*")
@@ -1881,6 +1955,7 @@
   async function loadAdminData() {
     const tables = [
       "profiles",
+      "admin_user_accounts",
       "worker_profiles",
       "restaurant_profiles",
       "supplier_profiles",

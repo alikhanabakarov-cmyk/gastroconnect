@@ -1,4 +1,4 @@
--- GastroConnect MVP v900 full schema.
+﻿-- GastroConnect MVP v900 full schema.
 -- Use this only if the Supabase project is empty or missing the core tables.
 -- It does not change Supabase project keys.
 
@@ -22,6 +22,9 @@ create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   role text not null check (role in ('worker', 'restaurant', 'supplier', 'admin')),
   name text not null,
+  email text,
+  phone text,
+  auth_provider text,
   city text,
   district text,
   status text not null default 'active',
@@ -71,6 +74,8 @@ create table if not exists public.restaurant_profiles (
   business_name text not null default '',
   business_type text,
   contact_person text,
+  phone text,
+  email text,
   city text,
   address text,
   about text,
@@ -82,6 +87,8 @@ create table if not exists public.supplier_profiles (
   user_id uuid primary key references public.profiles(id) on delete cascade,
   company_name text not null default '',
   contact_person text,
+  phone text,
+  email text,
   city text,
   delivery_cities text[] not null default '{}',
   category text,
@@ -190,6 +197,21 @@ create table if not exists public.supplier_responses (
   updated_at timestamptz not null default now()
 );
 
+create table if not exists public.admin_user_accounts (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  role text not null check (role in ('worker', 'restaurant', 'supplier', 'admin')),
+  email text,
+  phone text,
+  name text,
+  city text,
+  auth_provider text,
+  status text not null default 'active',
+  source text not null default 'auth_signup',
+  raw_meta jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 create or replace function public.handle_new_user()
 returns trigger
 language plpgsql
@@ -197,7 +219,7 @@ security definer
 set search_path = public
 as $$
 begin
-  insert into public.profiles (id, role, name, city, status)
+  insert into public.profiles (id, role, name, email, phone, auth_provider, city, status)
   values (
     new.id,
     case
@@ -205,13 +227,45 @@ begin
         then new.raw_user_meta_data->>'role'
       else 'worker'
     end,
-    coalesce(new.raw_user_meta_data->>'name', new.email, 'Пользователь'),
+    coalesce(new.raw_user_meta_data->>'name', new.email, new.phone, 'Пользователь'),
+    new.email,
+    new.phone,
+    coalesce(new.raw_user_meta_data->>'auth_provider', case when new.phone is not null and new.email is null then 'phone' else 'email' end),
     new.raw_user_meta_data->>'city',
     'active'
   )
   on conflict (id) do update set
     role = excluded.role,
     name = excluded.name,
+    email = coalesce(public.profiles.email, excluded.email),
+    phone = coalesce(public.profiles.phone, excluded.phone),
+    auth_provider = coalesce(public.profiles.auth_provider, excluded.auth_provider),
+    updated_at = now();
+
+  insert into public.admin_user_accounts (user_id, role, email, phone, name, city, auth_provider, raw_meta, updated_at)
+  values (
+    new.id,
+    case
+      when new.raw_user_meta_data->>'role' in ('worker', 'restaurant', 'supplier')
+        then new.raw_user_meta_data->>'role'
+      else 'worker'
+    end,
+    new.email,
+    new.phone,
+    coalesce(new.raw_user_meta_data->>'name', new.email, new.phone, 'Пользователь'),
+    new.raw_user_meta_data->>'city',
+    coalesce(new.raw_user_meta_data->>'auth_provider', case when new.phone is not null and new.email is null then 'phone' else 'email' end),
+    coalesce(new.raw_user_meta_data, '{}'::jsonb),
+    now()
+  )
+  on conflict (user_id) do update set
+    role = excluded.role,
+    email = coalesce(public.admin_user_accounts.email, excluded.email),
+    phone = coalesce(public.admin_user_accounts.phone, excluded.phone),
+    name = excluded.name,
+    city = excluded.city,
+    auth_provider = excluded.auth_provider,
+    raw_meta = excluded.raw_meta,
     updated_at = now();
   return new;
 end;
@@ -236,10 +290,12 @@ alter table public.supplier_offers enable row level security;
 alter table public.supplier_inquiries enable row level security;
 alter table public.supply_requests enable row level security;
 alter table public.supplier_responses enable row level security;
+alter table public.admin_user_accounts enable row level security;
 alter table public.site_settings enable row level security;
 alter table public.public_submissions enable row level security;
 
 grant select, insert, update on all tables in schema public to authenticated;
+grant select, insert, update on public.admin_user_accounts to authenticated;
 grant select on public.site_settings to anon, authenticated;
 grant insert, update, delete on public.site_settings to authenticated;
 grant insert on public.public_submissions to anon;
@@ -314,6 +370,19 @@ with check ((select public.is_admin()));
 drop policy if exists public_submissions_admin_delete on public.public_submissions;
 create policy public_submissions_admin_delete on public.public_submissions for delete to authenticated
 using ((select public.is_admin()));
+
+drop policy if exists admin_user_accounts_select_admin_or_own on public.admin_user_accounts;
+create policy admin_user_accounts_select_admin_or_own on public.admin_user_accounts for select to authenticated
+using (user_id = auth.uid() or public.is_admin());
+
+drop policy if exists admin_user_accounts_insert_own on public.admin_user_accounts;
+create policy admin_user_accounts_insert_own on public.admin_user_accounts for insert to authenticated
+with check (user_id = auth.uid());
+
+drop policy if exists admin_user_accounts_update_own_or_admin on public.admin_user_accounts;
+create policy admin_user_accounts_update_own_or_admin on public.admin_user_accounts for update to authenticated
+using (user_id = auth.uid() or public.is_admin())
+with check (user_id = auth.uid() or public.is_admin());
 
 drop policy if exists worker_profiles_insert_own_or_admin on public.worker_profiles;
 create policy worker_profiles_insert_own_or_admin on public.worker_profiles for insert to authenticated
@@ -624,3 +693,4 @@ with check (bucket_id = 'site-assets' and public.is_admin());
 drop policy if exists site_assets_admin_delete on storage.objects;
 create policy site_assets_admin_delete on storage.objects for delete to authenticated
 using (bucket_id = 'site-assets' and public.is_admin());
+

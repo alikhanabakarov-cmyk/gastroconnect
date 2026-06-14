@@ -73,11 +73,43 @@
           <p id="authModeHint" class="message auth-mode-hint"></p>
 
           <label
+            >Способ входа
+            <select id="authMethod">
+              <option value="email">По email</option>
+              <option value="phone">По телефону</option>
+            </select>
+          </label>
+          <label id="nameField"
+            >Имя / название
+            <input
+              id="displayName"
+              type="text"
+              placeholder="Иван / Кафе на Арбате / Поставщик продуктов"
+              autocomplete="name"
+            />
+          </label>
+          <label id="cityField"
+            >Город
+            <input
+              id="city"
+              type="text"
+              placeholder="Москва"
+              autocomplete="address-level2"
+            />
+          </label>
+          <label id="emailField"
             >Email<input
               id="email"
               type="email"
               placeholder="example@mail.ru"
               autocomplete="email"
+          /></label>
+          <label id="phoneField"
+            >Телефон<input
+              id="phone"
+              type="tel"
+              placeholder="+7 910 000-00-00"
+              autocomplete="tel"
           /></label>
           <label
             >Пароль<input
@@ -138,10 +170,11 @@
           }
         });
         var script = document.createElement("script");
-        script.src = "/public.min.js?v=1005";
+        script.src = "/public.min.js?v=1006";
         script.async = true;
         document.body.appendChild(script);
       }, { once: true });
     </script>
   </body>
 </html>
+
