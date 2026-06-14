@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
   const SETTINGS_KEY = "gc_site_settings";
   const SETTINGS_ROW = "public_site";
   const SUBMISSIONS_KEY = "gc_public_submissions";
@@ -179,22 +179,33 @@
   }
 
   function makeSubmission(type, data) {
+    const consentDate = data.personalDataConsentDate || new Date().toISOString();
+    const personalDataConsent = data.personalDataConsent === true || data.personalDataConsent === "true" || data.personalDataConsent === "on";
+    const normalizedData = {
+      ...data,
+      personalDataConsent,
+      personalDataConsentDate: personalDataConsent ? consentDate : "",
+      email: data.email || "",
+      phone: data.phone || "",
+      ipAddress: data.ipAddress || "",
+      userAgent: data.userAgent || navigator.userAgent || "",
+    };
     const title =
       type === "callback"
-        ? `Заказ звонка: ${data.name || data.phone || "контакт"}`
+        ? `Заказ звонка: ${normalizedData.name || normalizedData.phone || "контакт"}`
         : type === "feedback"
-          ? `Обратная связь: ${data.name || data.phone || "контакт"}`
+          ? `Обратная связь: ${normalizedData.name || normalizedData.phone || "контакт"}`
           : type === "telegram_bot"
-            ? `Telegram-уведомления: ${data.telegram || data.name || "контакт"}`
-        : data.name || data.company || data.role || data.product || "Заявка";
+            ? `Telegram-уведомления: ${normalizedData.telegram || normalizedData.name || "контакт"}`
+        : normalizedData.name || normalizedData.company || normalizedData.role || normalizedData.product || "Заявка";
     return {
       id: createSubmissionId(),
       type,
       title,
-      phone: data.phone || "",
-      telegram: data.telegram || "",
-      city: data.city || "",
-      data,
+      phone: normalizedData.phone || "",
+      telegram: normalizedData.telegram || "",
+      city: normalizedData.city || "",
+      data: normalizedData,
       source: "site",
       created_at: new Date().toISOString(),
     };
@@ -229,10 +240,19 @@
         const button = form.querySelector('button[type="submit"], input[type="submit"]');
         const box = form.querySelector(".success");
         if (button) button.disabled = true;
-        const row = makeSubmission(
-          form.dataset.formType,
-          Object.fromEntries(new FormData(form).entries()),
-        );
+        const rawData = Object.fromEntries(new FormData(form).entries());
+        if (rawData.personalDataConsent !== "true" && rawData.personalDataConsent !== "on") {
+          if (box) {
+            box.textContent = "Нужно принять документы и дать согласие на обработку персональных данных.";
+            box.style.display = "block";
+          }
+          if (button) button.disabled = false;
+          return;
+        }
+        rawData.personalDataConsentDate = new Date().toISOString();
+        rawData.userAgent = navigator.userAgent || "";
+        rawData.ipAddress = "";
+        const row = makeSubmission(form.dataset.formType, rawData);
         saveLocalSubmission(row);
         try {
           await saveRemoteSubmission(row);
@@ -271,6 +291,7 @@
     const roleInput = document.getElementById("role");
     const roleField = document.getElementById("roleField");
     const message = document.getElementById("authMessage");
+    const authConsent = document.getElementById("authConsent");
     const registerBtn = document.getElementById("registerBtn");
     const loginBtn = document.getElementById("loginBtn");
     const showLoginBtn = document.getElementById("showLoginBtn");
@@ -459,10 +480,12 @@
       if (method === "email" && !email) return (message.textContent = "Введите email.");
       if (method === "phone" && !phone) return (message.textContent = "Введите телефон в формате +7...");
       if (!password) return (message.textContent = "Введите пароль.");
+      if (authConsent && !authConsent.checked) return (message.textContent = "Нужно принять документы и дать согласие на обработку персональных данных.");
       if (password.length < 6) return (message.textContent = "Пароль должен быть минимум 6 символов.");
 
       setBusy(true, "Создаем аккаунт...");
-      const options = { data: { role, name, city, email, phone, auth_provider: method } };
+      const consentDate = new Date().toISOString();
+      const options = { data: { role, name, city, email, phone, auth_provider: method, personalDataConsent: true, personalDataConsentDate: consentDate, userAgent: navigator.userAgent || "", ipAddress: "" } };
       const signUpPayload = method === "phone" ? { phone, password, options } : { email, password, options };
       const { data, error } = await client.auth.signUp(signUpPayload);
       if (error) {

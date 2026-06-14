@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   --cream: #fffaf2;
   --cream-2: #f6ecdf;
   --green: #064c3b;
@@ -1986,3 +1986,45 @@ th {
   }
 }
 
+
+
+.legal-warning {
+  margin: 22px 0 28px;
+  padding: 18px 20px;
+  border: 1px solid rgba(185, 130, 36, 0.28);
+  border-radius: 8px;
+  background: rgba(255, 247, 232, 0.9);
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.legal-meta-list {
+  margin: 0;
+  padding-left: 22px;
+}
+
+.consent-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 18px 0 16px;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 700;
+}
+
+.consent-checkbox input {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  flex: 0 0 auto;
+  accent-color: var(--green);
+}
+
+.consent-checkbox a {
+  color: var(--green);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

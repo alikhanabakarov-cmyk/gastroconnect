@@ -1,4 +1,4 @@
-﻿-- GastroConnect MVP v900 full schema.
+-- GastroConnect MVP v900 full schema.
 -- Use this only if the Supabase project is empty or missing the core tables.
 -- It does not change Supabase project keys.
 
@@ -46,6 +46,11 @@ create table if not exists public.public_submissions (
   phone text,
   telegram text,
   city text,
+  email text,
+  personal_data_consent boolean not null default false,
+  personal_data_consent_date timestamptz,
+  ip_address text,
+  user_agent text,
   data jsonb not null default '{}'::jsonb,
   source text not null default 'site',
   status text not null default 'new' check (status in ('new', 'in_progress', 'done', 'archived')),
@@ -694,3 +699,11 @@ drop policy if exists site_assets_admin_delete on storage.objects;
 create policy site_assets_admin_delete on storage.objects for delete to authenticated
 using (bucket_id = 'site-assets' and public.is_admin());
 
+
+
+alter table public.public_submissions
+  add column if not exists email text,
+  add column if not exists personal_data_consent boolean not null default false,
+  add column if not exists personal_data_consent_date timestamptz,
+  add column if not exists ip_address text,
+  add column if not exists user_agent text;

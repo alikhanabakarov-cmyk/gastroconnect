@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
@@ -37,7 +37,7 @@
     <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" sizes="120x120" />
     <link rel="alternate icon" href="/favicon.ico" sizes="any" />
     <link rel="manifest" href="/site.webmanifest" />
-    <link rel="stylesheet" href="/style.css?v=1024" />
+    <link rel="stylesheet" href="/style.css?v=1025" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -785,12 +785,12 @@
               </div>
               <input type="hidden" name="city" value="Москва и Московская область" />
               <input type="hidden" name="request" value="Заказать звонок" />
+              <label class="consent-checkbox">
+                <input type="checkbox" name="personalDataConsent" value="true" required />
+                <span>Я согласен с <a href="/privacy/">Политикой конфиденциальности</a>, <a href="/terms/">Пользовательским соглашением</a> и даю <a href="/personal-data-consent/">согласие на обработку персональных данных</a>.</span>
+              </label>
               <button class="primary" type="submit">Заказать звонок</button>
               <p class="success" role="status"></p>
-              <p class="form-note">
-                Нажимая кнопку, вы соглашаетесь с
-                <a href="/privacy/">политикой обработки персональных данных</a>.
-              </p>
             </form>
             <div class="form-actions-row">
               <a class="btn" href="/auth/?mode=signup" data-site-setting="nav.signup"
@@ -815,6 +815,7 @@
           <a href="https://t.me/gastroconnect" target="_blank" rel="noopener">Telegram</a>
           <a href="/privacy/">Политика конфиденциальности</a>
           <a href="/terms/">Пользовательское соглашение</a>
+          <a href="/personal-data-consent/">Согласие на обработку персональных данных</a>
         </div>
       </footer>
     </div>
@@ -836,7 +837,7 @@
           }
         });
         var script = document.createElement("script");
-        script.src = "/public.min.js?v=1009";
+        script.src = "/public.min.js?v=1010";
         script.async = true;
         document.body.appendChild(script);
 
