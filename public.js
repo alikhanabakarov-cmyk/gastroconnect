@@ -6,9 +6,9 @@
   const roles = ["worker", "restaurant", "supplier"];
   let allowBackgrounds = false;
   const roleName = {
-    worker: "СЂР°Р±РѕС‚РЅРёРєР°",
-    restaurant: "Р·Р°РІРµРґРµРЅРёСЏ",
-    supplier: "РїРѕСЃС‚Р°РІС‰РёРєР°",
+    worker: "работника",
+    restaurant: "заведения",
+    supplier: "поставщика",
   };
 
   const normalizeRole = (role) => (roles.includes(role) ? role : "worker");
@@ -182,6 +182,10 @@
     const title =
       type === "callback"
         ? `Заказ звонка: ${data.name || data.phone || "контакт"}`
+        : type === "feedback"
+          ? `Обратная связь: ${data.name || data.phone || "контакт"}`
+          : type === "telegram_bot"
+            ? `Telegram-уведомления: ${data.telegram || data.name || "контакт"}`
         : data.name || data.company || data.role || data.product || "Заявка";
     return {
       id: createSubmissionId(),
@@ -236,6 +240,10 @@
             box.textContent =
               form.dataset.formType === "callback"
                 ? "Заявка на звонок отправлена. Мы свяжемся с вами по указанному телефону."
+                : form.dataset.formType === "feedback"
+                  ? "Обращение отправлено. Мы ответим по указанным контактам."
+                  : form.dataset.formType === "telegram_bot"
+                    ? "Заявка на Telegram-уведомления отправлена. Мы свяжемся для подключения."
                 : "Заявка отправлена. Дальше работайте с ней в личном кабинете.";
           }
         } catch {
@@ -530,4 +538,5 @@
   initAuthPage();
   window.addEventListener("load", () => setTimeout(refreshSettings, 400), { once: true });
 })();
+
 

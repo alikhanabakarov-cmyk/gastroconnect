@@ -41,7 +41,7 @@ create table if not exists public.site_settings (
 
 create table if not exists public.public_submissions (
   id uuid primary key default gen_random_uuid(),
-  type text not null check (type in ('worker', 'restaurant', 'supplier', 'callback')),
+  type text not null check (type in ('worker', 'restaurant', 'supplier', 'callback', 'feedback', 'telegram_bot')),
   title text not null,
   phone text,
   telegram text,
@@ -356,7 +356,7 @@ using ((select public.is_admin()));
 
 drop policy if exists public_submissions_insert_anon on public.public_submissions;
 create policy public_submissions_insert_anon on public.public_submissions for insert to anon, authenticated
-with check (type in ('worker', 'restaurant', 'supplier', 'callback'));
+with check (type in ('worker', 'restaurant', 'supplier', 'callback', 'feedback', 'telegram_bot'));
 
 drop policy if exists public_submissions_admin_read on public.public_submissions;
 create policy public_submissions_admin_read on public.public_submissions for select to authenticated

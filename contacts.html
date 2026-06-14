@@ -7,7 +7,7 @@
     <title>Контакты GastroConnect — Москва и Московская область</title>
     <meta
       name="description"
-      content="Контакты GastroConnect: платформа для работников, заведений и поставщиков HoReCa в Москве и Московской области."
+      content="Контакты GastroConnect: обратная связь, заказ звонка и Telegram-уведомления для работников, заведений и поставщиков HoReCa."
     />
     <meta name="theme-color" content="#064c3b" />
     <link rel="canonical" href="https://gastroconnect.ru/contacts/" />
@@ -25,14 +25,14 @@
     <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" sizes="120x120" />
     <link rel="alternate icon" href="/favicon.ico" sizes="any" />
     <link rel="manifest" href="/site.webmanifest" />
-    <link rel="stylesheet" href="/style.css?v=1022" />
+    <link rel="stylesheet" href="/style.css?v=1024" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@type": "Organization",
         "name": "GastroConnect",
         "url": "https://gastroconnect.ru/",
-        "email": "alikhanabakarov@gmail.com",
+        "email": "info@gastroconnect.ru",
         "telephone": "+79104334729",
         "areaServed": ["Москва", "Московская область"],
         "sameAs": ["https://t.me/gastroconnect"]
@@ -55,37 +55,132 @@
         <a class="header-cta" href="/auth/?mode=signup">Войти / регистрация</a>
       </header>
 
-      <main class="legal-page">
-        <p class="eyebrow">Контакты</p>
-        <h1>GastroConnect работает по Москве и Московской области</h1>
-        <p>
-          GastroConnect соединяет работников HoReCa, заведения и поставщиков.
-          Основной регион работы сервиса: Москва и Московская область.
-        </p>
-
-        <section>
-          <h2>Связаться с нами</h2>
-          <ul>
-            <li>Телефон: <a href="tel:+79104334729">+7 910 433-47-29</a></li>
-            <li>Email: <a href="mailto:alikhanabakarov@gmail.com">alikhanabakarov@gmail.com</a></li>
-            <li>Telegram: <a href="https://t.me/gastroconnect" target="_blank" rel="noopener">t.me/gastroconnect</a></li>
-          </ul>
+      <main>
+        <section class="contact-hero">
+          <div>
+            <p class="eyebrow">Связь с GastroConnect</p>
+            <h1>Поможем настроить смены, заявки и поставки без лишней суеты</h1>
+            <p>
+              Работаем по Москве и Московской области. Напишите, позвоните или
+              оставьте форму — мы разберём задачу и подскажем самый короткий путь.
+            </p>
+          </div>
+          <div class="contact-card contact-card-accent">
+            <span>Приоритет</span>
+            <strong>Ответ в Telegram или по телефону</strong>
+            <p>Для заведений, сотрудников и поставщиков HoReCa.</p>
+          </div>
         </section>
 
-        <section>
-          <h2>Для кого сервис</h2>
-          <p>
-            Мы работаем с ресторанами, кафе, барами, кофейнями, работниками
-            HoReCa и поставщиками продуктов, оборудования и услуг.
-          </p>
+        <section class="contact-grid" aria-label="Контактные каналы">
+          <article class="contact-card">
+            <span>Телефон</span>
+            <h2><a href="tel:+79104334729">+7 910 433-47-29</a></h2>
+            <p>Звонок или WhatsApp/Telegram по номеру, если нужно быстро обсудить задачу.</p>
+          </article>
+          <article class="contact-card">
+            <span>Email</span>
+            <h2><a href="mailto:info@gastroconnect.ru">info@gastroconnect.ru</a></h2>
+            <p>Юридические вопросы, партнёрство, документы и обращения по данным.</p>
+          </article>
+          <article class="contact-card">
+            <span>Telegram</span>
+            <h2>
+              <a href="https://t.me/gastroconnect" target="_blank" rel="noopener"
+                >@gastroconnect</a
+              >
+            </h2>
+            <p>Самый удобный канал для быстрых уведомлений и поддержки.</p>
+          </article>
         </section>
 
-        <section>
-          <h2>Региональность</h2>
-          <p>
-            Страница подтверждает регион сайта для поисковых систем:
-            Москва и Московская область.
-          </p>
+        <section class="telegram-panel">
+          <div>
+            <p class="eyebrow">Telegram-уведомления</p>
+            <h2>Бот будет сообщать о новых заявках и откликах</h2>
+            <p>
+              Для MVP мы фиксируем подключение через форму. После подключения
+              BotFather-токена бот сможет отправлять уведомления о новых
+              заявках, откликах работников, приглашениях и запросах поставщикам.
+            </p>
+          </div>
+          <form class="telegram-connect-form" data-form-type="telegram_bot">
+            <div class="form-grid">
+              <label
+                >Имя
+                <input name="name" type="text" placeholder="Имя или название компании" required />
+              </label>
+              <label
+                >Telegram
+                <input name="telegram" type="text" placeholder="@username" required />
+              </label>
+              <label class="full"
+                >Что уведомлять
+                <select name="request">
+                  <option>Новые заявки с сайта</option>
+                  <option>Отклики работников</option>
+                  <option>Запросы поставщикам</option>
+                  <option>Все события GastroConnect</option>
+                </select>
+              </label>
+            </div>
+            <button class="primary" type="submit">Подключить уведомления</button>
+            <p class="success" role="status"></p>
+          </form>
+        </section>
+
+        <section class="form-section contact-feedback" id="feedback">
+          <div class="form-info">
+            <p class="eyebrow">Форма обратной связи</p>
+            <h2>Опишите задачу</h2>
+            <p>
+              Напишите, кто вы: заведение, работник или поставщик. Мы получим
+              обращение в админке и свяжемся с вами.
+            </p>
+          </div>
+
+          <div class="form-card">
+            <form data-form-type="feedback">
+              <div class="form-grid">
+                <label
+                  >Имя
+                  <input name="name" type="text" placeholder="Как к вам обращаться" required />
+                </label>
+                <label
+                  >Телефон
+                  <input name="phone" type="tel" placeholder="+7 910 433-47-29" required />
+                </label>
+                <label
+                  >Email
+                  <input name="email" type="email" placeholder="info@gastroconnect.ru" />
+                </label>
+                <label
+                  >Роль
+                  <select name="role">
+                    <option>Заведение</option>
+                    <option>Работник</option>
+                    <option>Поставщик</option>
+                    <option>Партнёр</option>
+                  </select>
+                </label>
+                <label class="full"
+                  >Сообщение
+                  <textarea
+                    name="message"
+                    placeholder="Например: нужен повар на смены, хочу подключить поставки или протестировать кабинет"
+                    required
+                  ></textarea>
+                </label>
+              </div>
+              <input type="hidden" name="city" value="Москва и Московская область" />
+              <button class="primary" type="submit">Отправить обращение</button>
+              <p class="success" role="status"></p>
+              <p class="form-note">
+                Нажимая кнопку, вы соглашаетесь с
+                <a href="/privacy/">политикой обработки персональных данных</a>.
+              </p>
+            </form>
+          </div>
         </section>
       </main>
 
@@ -96,13 +191,21 @@
         </div>
         <div class="footer-links">
           <a href="tel:+79104334729">+7 910 433-47-29</a>
-          <a href="mailto:alikhanabakarov@gmail.com">alikhanabakarov@gmail.com</a>
+          <a href="mailto:info@gastroconnect.ru">info@gastroconnect.ru</a>
           <a href="https://t.me/gastroconnect" target="_blank" rel="noopener">Telegram</a>
           <a href="/privacy/">Политика конфиденциальности</a>
           <a href="/terms/">Пользовательское соглашение</a>
         </div>
       </footer>
     </div>
+    <script>
+      window.addEventListener("load", function () {
+        var script = document.createElement("script");
+        script.src = "/public.min.js?v=1009";
+        script.async = true;
+        document.body.appendChild(script);
+      }, { once: true });
+    </script>
   </body>
 </html>
 
