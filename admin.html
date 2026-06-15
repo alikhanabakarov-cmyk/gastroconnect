@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
@@ -15,7 +15,7 @@
     <link rel="alternate icon" href="/favicon.ico" sizes="any" />
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-    <link rel="stylesheet" href="/style.css?v=1027" />
+    <link rel="stylesheet" href="/style.css?v=1028" />
   </head>
   <body>
     <div class="page-shell">
@@ -67,6 +67,22 @@
                 type="search"
                 placeholder="Поиск: имя, телефон, Telegram, город..."
               />
+              <select id="adminTypeFilter" aria-label="Фильтр по типу заявки">
+                <option value="">Все типы</option>
+                <option value="callback">Звонки</option>
+                <option value="worker">Работники</option>
+                <option value="restaurant">Заведения</option>
+                <option value="supplier">Поставщики</option>
+                <option value="feedback">Обратная связь</option>
+                <option value="telegram_bot">Telegram</option>
+              </select>
+              <select id="adminStatusFilter" aria-label="Фильтр по статусу">
+                <option value="">Все статусы</option>
+                <option value="new">Новые</option>
+                <option value="in_progress">В работе</option>
+                <option value="done">Закрытые</option>
+                <option value="archived">Архив</option>
+              </select>
             </div>
           </div>
           <div class="service-hero-media service-hero-media-home" data-site-bg="admin.hero" data-bg-default="/assets/hero-home.webp" aria-hidden="true">
@@ -831,10 +847,12 @@
                 <tr>
                   <th>Дата</th>
                   <th>Тип</th>
+                  <th>Статус</th>
                   <th>Имя/Компания</th>
                   <th>Телефон</th>
                   <th>Telegram</th>
                   <th>Данные</th>
+                  <th>Действия</th>
                 </tr>
               </thead>
               <tbody></tbody>
@@ -874,12 +892,6 @@
         document.body.appendChild(script);
       }, { once: true });
     </script>
-    <script src="/script.min.js?v=1025"></script>
+    <script src="/script.min.js?v=1028"></script>
   </body>
 </html>
-
-
-
-
-
-

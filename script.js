@@ -620,6 +620,7 @@
       city: data.city || "",
       data,
       source: "site",
+      status: "new",
       created_at: new Date().toISOString(),
     };
   }
@@ -651,6 +652,7 @@
           city: row.city,
           data: row.data,
           source: row.source || "site",
+          status: row.status || "new",
         }),
       });
       if (!response.ok)
@@ -684,6 +686,29 @@
   }
   function roleText(type) {
     return roleLabels[type] || type || "-";
+  }
+  function statusText(status) {
+    return {
+      new: "Новая",
+      in_progress: "В работе",
+      done: "Закрыта",
+      archived: "Архив",
+    }[status] || "Новая";
+  }
+  function normalizeSubmissionStatus(status) {
+    return ["new", "in_progress", "done", "archived"].includes(status)
+      ? status
+      : "new";
+  }
+  function getSubmissionKey(row) {
+    return row.id || `${row.type}-${row.created_at}-${row.phone || ""}`;
+  }
+  function telegramHref(value) {
+    const raw = String(value || "").trim();
+    if (!raw) return "";
+    if (raw.startsWith("@")) return `https://t.me/${raw.slice(1)}`;
+    if (/^https:\/\/t\.me\/[a-z0-9_/?=&.-]+$/i.test(raw)) return raw;
+    return "";
   }
   function download(name, text, type) {
     const link = document.createElement("a");
@@ -958,12 +983,43 @@
   function mergeSubmissionRows(localRows, remoteRows) {
     const map = new Map();
     [...remoteRows, ...localRows].forEach((row) => {
-      const key = row.id || `${row.type}-${row.created_at}-${row.phone || ""}`;
-      if (!map.has(key)) map.set(key, row);
+      const key = getSubmissionKey(row);
+      if (!map.has(key)) {
+        map.set(key, {
+          ...row,
+          status: normalizeSubmissionStatus(row.status),
+        });
+      }
     });
     return [...map.values()].sort(
       (a, b) => new Date(b.created_at) - new Date(a.created_at),
     );
+  }
+  function updateLocalSubmissionStatus(rowId, nextStatus) {
+    const rows = readRows();
+    const normalized = normalizeSubmissionStatus(nextStatus);
+    writeRows(
+      rows.map((row) =>
+        getSubmissionKey(row) === rowId
+          ? { ...row, status: normalized, updated_at: new Date().toISOString() }
+          : row,
+      ),
+    );
+  }
+  async function updateRemoteSubmissionStatus(rowId, nextStatus) {
+    const client = window.supabaseClient;
+    if (!client) return false;
+    const { data: sessionData } = await client.auth.getSession();
+    if (!sessionData.session) return false;
+    const { error } = await client
+      .from(PUBLIC_SUBMISSIONS_TABLE)
+      .update({
+        status: normalizeSubmissionStatus(nextStatus),
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", rowId);
+    if (error) throw error;
+    return true;
   }
   function getExportRows() {
     return adminRowsCache.length ? adminRowsCache : readRows();
@@ -975,12 +1031,25 @@
       (acc, row) => {
         acc.all += 1;
         acc[row.type] = (acc[row.type] || 0) + 1;
+        acc[normalizeSubmissionStatus(row.status)] += 1;
         return acc;
       },
-      { all: 0, worker: 0, restaurant: 0, supplier: 0 },
+      {
+        all: 0,
+        worker: 0,
+        restaurant: 0,
+        supplier: 0,
+        new: 0,
+        in_progress: 0,
+        done: 0,
+        archived: 0,
+      },
     );
     stats.innerHTML = `
       <div class="stat">Всего: ${counts.all}</div>
+      <div class="stat">Новые: ${counts.new}</div>
+      <div class="stat">В работе: ${counts.in_progress}</div>
+      <div class="stat">Закрытые: ${counts.done}</div>
       <div class="stat">Работники: ${counts.worker}</div>
       <div class="stat">Заведения: ${counts.restaurant}</div>
       <div class="stat">Поставщики: ${counts.supplier}</div>
@@ -990,32 +1059,55 @@
     const tbody = document.querySelector("#adminTable tbody");
     if (!tbody) return;
     const searchInput = document.getElementById("adminSearch");
+    const typeFilter = document.getElementById("adminTypeFilter");
+    const statusFilter = document.getElementById("adminStatusFilter");
     const query = searchInput ? searchInput.value.toLowerCase().trim() : "";
+    const typeValue = typeFilter?.value || "";
+    const statusValue = statusFilter?.value || "";
     let rows = readRows();
     try {
       rows = mergeSubmissionRows(rows, await readRemoteRows());
     } catch {}
     adminRowsCache = rows;
-    const visibleRows = query
-      ? rows.filter((row) => JSON.stringify(row).toLowerCase().includes(query))
-      : rows;
+    const visibleRows = rows.filter((row) => {
+      const status = normalizeSubmissionStatus(row.status);
+      const searchOk = query
+        ? JSON.stringify(row).toLowerCase().includes(query)
+        : true;
+      const typeOk = typeValue ? row.type === typeValue : true;
+      const statusOk = statusValue ? status === statusValue : true;
+      return searchOk && typeOk && statusOk;
+    });
     renderStats(visibleRows);
     tbody.innerHTML = visibleRows
       .map(
-        (row) => `
+        (row) => {
+          const rowKey = getSubmissionKey(row);
+          const status = normalizeSubmissionStatus(row.status);
+          const telegramUrl = telegramHref(row.telegram);
+          return `
       <tr>
         <td>${escapeHtml(formatDate(row.created_at))}</td>
         <td>${escapeHtml(roleText(row.type))}</td>
+        <td><span class="status-pill status-${escapeHtml(status)}">${escapeHtml(statusText(status))}</span></td>
         <td>${escapeHtml(row.title)}${row.remote ? " (Supabase)" : ""}</td>
         <td>${row.phone ? `<a href="tel:${escapeHtml(row.phone)}">${escapeHtml(row.phone)}</a>` : "-"}</td>
-        <td>${row.telegram ? escapeHtml(row.telegram) : "-"}</td>
-        <td>${escapeHtml(JSON.stringify(row.data))}</td>
+        <td>${row.telegram ? (telegramUrl ? `<a href="${escapeHtml(telegramUrl)}" target="_blank" rel="noopener">${escapeHtml(row.telegram)}</a>` : escapeHtml(row.telegram)) : "-"}</td>
+        <td><pre class="admin-json">${escapeHtml(JSON.stringify(row.data, null, 2))}</pre></td>
+        <td>
+          <div class="admin-row-actions">
+            <button class="btn compact" type="button" data-admin-status="in_progress" data-row-id="${escapeHtml(rowKey)}">В работу</button>
+            <button class="btn compact" type="button" data-admin-status="done" data-row-id="${escapeHtml(rowKey)}">Закрыть</button>
+            <button class="btn compact danger" type="button" data-admin-status="archived" data-row-id="${escapeHtml(rowKey)}">Архив</button>
+          </div>
+        </td>
       </tr>
-    `,
+    `;
+        },
       )
       .join("");
     if (!visibleRows.length) {
-      tbody.innerHTML = '<tr><td colspan="6">Заявок пока нет.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="8">Заявок пока нет.</td></tr>';
     }
   }
   function initAdminActions() {
@@ -1030,11 +1122,12 @@
     });
     document.getElementById("exportCsv")?.addEventListener("click", () => {
       const csv = [
-        "Дата,Тип,Название,Телефон,Telegram,Город",
+        "Дата,Тип,Статус,Название,Телефон,Telegram,Город",
         ...getExportRows().map((row) =>
           [
             formatDate(row.created_at),
             roleText(row.type),
+            statusText(normalizeSubmissionStatus(row.status)),
             row.title || "",
             row.phone || "",
             row.telegram || "",
@@ -1059,6 +1152,25 @@
     document
       .getElementById("adminSearch")
       ?.addEventListener("input", renderAdmin);
+    document
+      .getElementById("adminTypeFilter")
+      ?.addEventListener("change", renderAdmin);
+    document
+      .getElementById("adminStatusFilter")
+      ?.addEventListener("change", renderAdmin);
+    tbody.addEventListener("click", async (event) => {
+      const button = event.target.closest("[data-admin-status]");
+      if (!button) return;
+      const rowId = button.dataset.rowId;
+      const nextStatus = normalizeSubmissionStatus(button.dataset.adminStatus);
+      if (!rowId) return;
+      button.disabled = true;
+      updateLocalSubmissionStatus(rowId, nextStatus);
+      try {
+        await updateRemoteSubmissionStatus(rowId, nextStatus);
+      } catch {}
+      await renderAdmin();
+    });
   }
   applySiteSettings();
   scheduleRemoteSiteSettings();
