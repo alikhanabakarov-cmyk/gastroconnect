@@ -1193,23 +1193,22 @@ textarea:focus {
 .footer {
   max-width: 1380px;
   margin: 0 auto;
-  padding: 36px 48px 46px;
+  padding: 36px 48px 52px;
   display: grid;
-  grid-template-columns: minmax(220px, 0.8fr) minmax(0, 1.2fr);
-  align-items: center;
+  grid-template-columns: minmax(260px, 0.72fr) minmax(0, 1.28fr);
+  align-items: stretch;
   gap: 28px;
   color: var(--green);
 }
 
 .footer-brand {
-  align-self: stretch;
-  min-height: 112px;
-  padding: 22px;
+  min-height: 150px;
+  padding: 26px;
   border: 1px solid rgba(201, 154, 63, 0.22);
   border-radius: 8px;
   display: flex;
-  align-items: center;
-  gap: 12px;
+  align-items: flex-start;
+  gap: 16px;
   background:
     linear-gradient(135deg, rgba(255, 253, 248, 0.92), rgba(255, 249, 238, 0.78)),
     var(--card);
@@ -1229,46 +1228,70 @@ textarea:focus {
 }
 
 .footer-brand .brand-mark {
-  width: 42px;
-  height: 42px;
+  width: 48px;
+  height: 48px;
   font-size: 15px;
 }
 
 .footer-brand .brand-text {
-  font-size: 24px;
+  display: block;
+  margin-top: 4px;
+  font-size: 25px;
+  line-height: 1;
+}
+
+.footer-brand p {
+  max-width: 360px;
+  margin: 16px 0 0;
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.45;
+  font-weight: 750;
 }
 
 .footer-links {
-  min-height: 112px;
-  padding: 22px;
+  min-height: 150px;
+  padding: 26px;
   border: 1px solid rgba(201, 154, 63, 0.22);
   border-radius: 8px;
   display: grid;
-  grid-template-columns: repeat(3, minmax(170px, 1fr));
-  gap: 12px;
-  align-items: center;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  align-items: start;
   background: rgba(255, 253, 248, 0.9);
   box-shadow: 0 18px 42px rgba(42, 33, 18, 0.08);
-  font-size: 15px;
-  font-weight: 900;
 }
 
-.footer-links a {
-  min-height: 42px;
-  padding: 10px 12px;
-  border: 1px solid rgba(6, 76, 59, 0.1);
-  border-radius: 8px;
-  display: inline-flex;
-  align-items: center;
+.footer-group {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+.footer-group span {
+  margin-bottom: 4px;
+  color: var(--gold);
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.footer-group a,
+.footer-group p {
+  margin: 0;
   color: var(--green);
-  background: rgba(255, 255, 255, 0.68);
+  font-size: 15px;
+  font-weight: 850;
+  line-height: 1.32;
   text-decoration: none;
-  line-height: 1.2;
 }
 
-.footer-links a:hover {
-  border-color: rgba(201, 154, 63, 0.36);
-  background: rgba(201, 154, 63, 0.08);
+.footer-group p {
+  color: var(--text);
+}
+
+.footer-group a:hover {
   color: var(--gold);
 }
 
