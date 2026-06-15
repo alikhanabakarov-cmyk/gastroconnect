@@ -606,9 +606,38 @@
     return `gc-${Date.now()}-${Math.random().toString(16).slice(2)}`;
   }
   function getFormTitle(type, data) {
+    if (type === "callback") return data.name || "Заказать звонок";
+    if (type === "feedback") return data.name || "Обратная связь";
+    if (type === "telegram_bot") return data.telegram || "Telegram-уведомления";
     if (type === "worker") return data.name || "Работник";
     if (type === "restaurant") return data.business_name || "Заведение";
     return data.company_name || "Поставщик";
+  }
+  function normalizePhone(value) {
+    return String(value || "")
+      .replace(/[^\d+]/g, "")
+      .replace(/^8(\d{10})$/, "+7$1");
+  }
+  function normalizeTelegram(value) {
+    const raw = String(value || "").trim();
+    if (!raw) return "";
+    if (raw.startsWith("https://t.me/")) return raw;
+    return raw.startsWith("@") ? raw : `@${raw.replace(/^t\.me\//i, "")}`;
+  }
+  function enrichSubmissionData(form, type) {
+    const data = Object.fromEntries(new FormData(form).entries());
+    if (data.phone) data.phone = normalizePhone(data.phone);
+    if (data.telegram) data.telegram = normalizeTelegram(data.telegram);
+    data.formType = type;
+    data.pageUrl = window.location.href;
+    data.pagePath = window.location.pathname;
+    data.personalDataConsent = data.personalDataConsent === "true";
+    data.personalDataConsentDate = data.personalDataConsent
+      ? new Date().toISOString()
+      : "";
+    data.userAgent = navigator.userAgent || "";
+    data.ipAddress = "";
+    return data;
   }
   function makeSubmissionRow(type, data) {
     return {
@@ -618,6 +647,11 @@
       phone: data.phone || "",
       telegram: data.telegram || "",
       city: data.city || "",
+      email: data.email || "",
+      personalDataConsent: Boolean(data.personalDataConsent),
+      personalDataConsentDate: data.personalDataConsentDate || "",
+      ipAddress: data.ipAddress || "",
+      userAgent: data.userAgent || "",
       data,
       source: "site",
       status: "new",
@@ -650,6 +684,11 @@
           phone: row.phone,
           telegram: row.telegram,
           city: row.city,
+          email: row.email || row.data?.email || null,
+          personal_data_consent: Boolean(row.personalDataConsent),
+          personal_data_consent_date: row.personalDataConsentDate || null,
+          ip_address: row.ipAddress || null,
+          user_agent: row.userAgent || null,
           data: row.data,
           source: row.source || "site",
           status: row.status || "new",
@@ -726,17 +765,21 @@
         );
         if (button) button.disabled = true;
         const type = form.dataset.formType;
-        const data = Object.fromEntries(new FormData(form).entries());
+        const data = enrichSubmissionData(form, type);
         const box = form.querySelector(".success");
         try {
           const result = await saveSubmission(type, data);
           if (box) {
+            box.setAttribute("role", "status");
             box.textContent = result.remote
-              ? "Заявка отправлена. Для работы с профилем, приглашениями и откликами войдите в личный кабинет."
-              : "Заявка сохранена локально. Если глобальное сохранение недоступно, войдите в кабинет или повторите позже.";
+              ? "Готово. Заявка отправлена, мы получили ваши контакты и свяжемся с вами."
+              : "Заявка сохранена в этом браузере. Если интернет или база временно недоступны, повторите отправку позже.";
             box.style.display = "block";
           }
           form.reset();
+          form
+            .querySelectorAll("input, select, textarea, button")
+            .forEach((field) => field.blur());
         } finally {
           if (button) button.disabled = false;
         }
@@ -978,6 +1021,10 @@
       ...row,
       remote: true,
       data: row.data || {},
+      personalDataConsent: Boolean(row.personal_data_consent),
+      personalDataConsentDate: row.personal_data_consent_date || "",
+      ipAddress: row.ip_address || "",
+      userAgent: row.user_agent || "",
     }));
   }
   function mergeSubmissionRows(localRows, remoteRows) {
@@ -1122,7 +1169,7 @@
     });
     document.getElementById("exportCsv")?.addEventListener("click", () => {
       const csv = [
-        "Дата,Тип,Статус,Название,Телефон,Telegram,Город",
+        "Дата,Тип,Статус,Название,Телефон,Email,Telegram,Город,Согласие,Дата согласия",
         ...getExportRows().map((row) =>
           [
             formatDate(row.created_at),
@@ -1130,8 +1177,11 @@
             statusText(normalizeSubmissionStatus(row.status)),
             row.title || "",
             row.phone || "",
+            row.email || row.data?.email || "",
             row.telegram || "",
             row.city || "",
+            row.personalDataConsent ? "Да" : "Нет",
+            row.personalDataConsentDate || "",
           ]
             .map((value) => `"${String(value).replaceAll('"', '""')}"`)
             .join(","),

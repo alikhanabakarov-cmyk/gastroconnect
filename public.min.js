@@ -181,23 +181,33 @@
   function makeSubmission(type, data) {
     const consentDate = data.personalDataConsentDate || new Date().toISOString();
     const personalDataConsent = data.personalDataConsent === true || data.personalDataConsent === "true" || data.personalDataConsent === "on";
+    const phone = String(data.phone || "")
+      .replace(/[^\d+]/g, "")
+      .replace(/^8(\d{10})$/, "+7$1");
+    const telegramRaw = String(data.telegram || "").trim();
+    const telegram = telegramRaw && !telegramRaw.startsWith("@") && !telegramRaw.startsWith("https://t.me/")
+      ? `@${telegramRaw.replace(/^t\.me\//i, "")}`
+      : telegramRaw;
     const normalizedData = {
       ...data,
       personalDataConsent,
       personalDataConsentDate: personalDataConsent ? consentDate : "",
       email: data.email || "",
-      phone: data.phone || "",
+      phone,
+      telegram,
+      pageUrl: window.location.href,
+      pagePath: window.location.pathname,
       ipAddress: data.ipAddress || "",
       userAgent: data.userAgent || navigator.userAgent || "",
     };
     const title =
       type === "callback"
-        ? `Заказ звонка: ${normalizedData.name || normalizedData.phone || "контакт"}`
+        ? `\u0417\u0430\u043a\u0430\u0437 \u0437\u0432\u043e\u043d\u043a\u0430: ${normalizedData.name || normalizedData.phone || "\u043a\u043e\u043d\u0442\u0430\u043a\u0442"}`
         : type === "feedback"
-          ? `Обратная связь: ${normalizedData.name || normalizedData.phone || "контакт"}`
+          ? `\u041e\u0431\u0440\u0430\u0442\u043d\u0430\u044f \u0441\u0432\u044f\u0437\u044c: ${normalizedData.name || normalizedData.phone || "\u043a\u043e\u043d\u0442\u0430\u043a\u0442"}`
           : type === "telegram_bot"
-            ? `Telegram-уведомления: ${normalizedData.telegram || normalizedData.name || "контакт"}`
-        : normalizedData.name || normalizedData.company || normalizedData.role || normalizedData.product || "Заявка";
+            ? `Telegram-\u0443\u0432\u0435\u0434\u043e\u043c\u043b\u0435\u043d\u0438\u044f: ${normalizedData.telegram || normalizedData.name || "\u043a\u043e\u043d\u0442\u0430\u043a\u0442"}`
+            : normalizedData.name || normalizedData.company || normalizedData.role || normalizedData.product || "\u0417\u0430\u044f\u0432\u043a\u0430";
     return {
       id: createSubmissionId(),
       type,
@@ -205,16 +215,36 @@
       phone: normalizedData.phone || "",
       telegram: normalizedData.telegram || "",
       city: normalizedData.city || "",
+      email: normalizedData.email || "",
+      personalDataConsent: normalizedData.personalDataConsent,
+      personalDataConsentDate: normalizedData.personalDataConsentDate,
+      ipAddress: normalizedData.ipAddress,
+      userAgent: normalizedData.userAgent,
       data: normalizedData,
       source: "site",
+      status: "new",
       created_at: new Date().toISOString(),
     };
   }
-
   async function saveRemoteSubmission(row) {
+    const payload = {
+      type: row.type,
+      title: row.title,
+      phone: row.phone,
+      telegram: row.telegram,
+      city: row.city,
+      email: row.email || row.data?.email || null,
+      personal_data_consent: Boolean(row.personalDataConsent),
+      personal_data_consent_date: row.personalDataConsentDate || null,
+      ip_address: row.ipAddress || null,
+      user_agent: row.userAgent || null,
+      data: row.data,
+      source: row.source || "site",
+      status: row.status || "new",
+    };
     const client = window.supabaseClient;
     if (client) {
-      const { error } = await client.from(SUBMISSIONS_TABLE).insert(row);
+      const { error } = await client.from(SUBMISSIONS_TABLE).insert(payload);
       if (error) throw error;
       return true;
     }
@@ -227,12 +257,11 @@
         "Content-Type": "application/json",
         Prefer: "return=minimal",
       },
-      body: JSON.stringify(row),
+      body: JSON.stringify(payload),
     });
     if (!response.ok) throw new Error(`public_submissions ${response.status}`);
     return true;
   }
-
   function initPublicForms() {
     document.querySelectorAll("form[data-form-type]").forEach((form) => {
       form.addEventListener("submit", async (event) => {
@@ -243,7 +272,7 @@
         const rawData = Object.fromEntries(new FormData(form).entries());
         if (rawData.personalDataConsent !== "true" && rawData.personalDataConsent !== "on") {
           if (box) {
-            box.textContent = "Нужно принять документы и дать согласие на обработку персональных данных.";
+            box.textContent = "\u041d\u0443\u0436\u043d\u043e \u043f\u0440\u0438\u043d\u044f\u0442\u044c \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b \u0438 \u0434\u0430\u0442\u044c \u0441\u043e\u0433\u043b\u0430\u0441\u0438\u0435 \u043d\u0430 \u043e\u0431\u0440\u0430\u0431\u043e\u0442\u043a\u0443 \u043f\u0435\u0440\u0441\u043e\u043d\u0430\u043b\u044c\u043d\u044b\u0445 \u0434\u0430\u043d\u043d\u044b\u0445.";
             box.style.display = "block";
           }
           if (button) button.disabled = false;
@@ -257,17 +286,18 @@
         try {
           await saveRemoteSubmission(row);
           if (box) {
+            box.setAttribute("role", "status");
             box.textContent =
               form.dataset.formType === "callback"
-                ? "Заявка на звонок отправлена. Мы свяжемся с вами по указанному телефону."
+                ? "\u0417\u0430\u044f\u0432\u043a\u0430 \u043d\u0430 \u0437\u0432\u043e\u043d\u043e\u043a \u043e\u0442\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u0430. \u041c\u044b \u0441\u0432\u044f\u0436\u0435\u043c\u0441\u044f \u0441 \u0432\u0430\u043c\u0438 \u043f\u043e \u0443\u043a\u0430\u0437\u0430\u043d\u043d\u043e\u043c\u0443 \u0442\u0435\u043b\u0435\u0444\u043e\u043d\u0443."
                 : form.dataset.formType === "feedback"
-                  ? "Обращение отправлено. Мы ответим по указанным контактам."
+                  ? "\u041e\u0431\u0440\u0430\u0449\u0435\u043d\u0438\u0435 \u043e\u0442\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u043e. \u041c\u044b \u043e\u0442\u0432\u0435\u0442\u0438\u043c \u043f\u043e \u0443\u043a\u0430\u0437\u0430\u043d\u043d\u044b\u043c \u043a\u043e\u043d\u0442\u0430\u043a\u0442\u0430\u043c."
                   : form.dataset.formType === "telegram_bot"
-                    ? "Заявка на Telegram-уведомления отправлена. Мы свяжемся для подключения."
-                : "Заявка отправлена. Дальше работайте с ней в личном кабинете.";
+                    ? "\u0417\u0430\u044f\u0432\u043a\u0430 \u043d\u0430 Telegram-\u0443\u0432\u0435\u0434\u043e\u043c\u043b\u0435\u043d\u0438\u044f \u043e\u0442\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u0430. \u041c\u044b \u0441\u0432\u044f\u0436\u0435\u043c\u0441\u044f \u0434\u043b\u044f \u043f\u043e\u0434\u043a\u043b\u044e\u0447\u0435\u043d\u0438\u044f."
+                    : "\u0417\u0430\u044f\u0432\u043a\u0430 \u043e\u0442\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u0430. \u041c\u044b \u043f\u043e\u043b\u0443\u0447\u0438\u043b\u0438 \u0432\u0430\u0448\u0438 \u043a\u043e\u043d\u0442\u0430\u043a\u0442\u044b \u0438 \u0441\u0432\u044f\u0436\u0435\u043c\u0441\u044f \u0441 \u0432\u0430\u043c\u0438.";
           }
         } catch {
-          if (box) box.textContent = "Заявка сохранена локально. Если интернет или база недоступны, попробуйте отправить еще раз позже.";
+          if (box) box.textContent = "\u0417\u0430\u044f\u0432\u043a\u0430 \u0441\u043e\u0445\u0440\u0430\u043d\u0435\u043d\u0430 \u0432 \u044d\u0442\u043e\u043c \u0431\u0440\u0430\u0443\u0437\u0435\u0440\u0435. \u0415\u0441\u043b\u0438 \u0438\u043d\u0442\u0435\u0440\u043d\u0435\u0442 \u0438\u043b\u0438 \u0431\u0430\u0437\u0430 \u0432\u0440\u0435\u043c\u0435\u043d\u043d\u043e \u043d\u0435\u0434\u043e\u0441\u0442\u0443\u043f\u043d\u044b, \u043f\u043e\u0432\u0442\u043e\u0440\u0438\u0442\u0435 \u043e\u0442\u043f\u0440\u0430\u0432\u043a\u0443 \u043f\u043e\u0437\u0436\u0435.";
         } finally {
           if (box) box.style.display = "block";
           form.reset();
@@ -276,7 +306,6 @@
       });
     });
   }
-
   function initAuthPage() {
     const methodInput = document.getElementById("authMethod");
     const nameInput = document.getElementById("displayName");
