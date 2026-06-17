@@ -411,22 +411,37 @@
 
     async function upsertAdminAccount(user, role, payload = {}) {
       if (!user || !window.supabaseClient) return;
-      await window.supabaseClient.from("admin_user_accounts").upsert(
-        {
-          user_id: user.id,
-          role: normalizeRole(role),
-          email: user.email || payload.email || emailValue() || null,
-          phone: user.phone || payload.phone || phoneValue() || null,
-          name: payload.name || nameInput?.value.trim() || user.email || user.phone || "Пользователь",
-          city: payload.city || cityInput?.value.trim() || null,
-          auth_provider: payload.auth_provider || methodInput.value,
-          status: "active",
-          source: "auth_page",
-          raw_meta: user.user_metadata || {},
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: "user_id" }
-      );
+      const metadata = user.user_metadata || {};
+      const consentGranted =
+        payload.personalDataConsent === true ||
+        metadata.personalDataConsent === true ||
+        metadata.personalDataConsent === "true";
+      const basePayload = {
+        user_id: user.id,
+        role: normalizeRole(role),
+        email: user.email || payload.email || emailValue() || null,
+        phone: user.phone || payload.phone || phoneValue() || null,
+        name: payload.name || nameInput?.value.trim() || user.email || user.phone || "Пользователь",
+        city: payload.city || cityInput?.value.trim() || null,
+        auth_provider: payload.auth_provider || metadata.auth_provider || methodInput.value,
+        status: "active",
+        source: "auth_page",
+        raw_meta: metadata,
+        updated_at: new Date().toISOString(),
+      };
+      const consentPayload = {
+        ...basePayload,
+        personal_data_consent: consentGranted,
+        personal_data_consent_date: payload.personalDataConsentDate || metadata.personalDataConsentDate || null,
+        user_agent: payload.userAgent || metadata.userAgent || navigator.userAgent || "",
+        ip_address: payload.ipAddress || metadata.ipAddress || "",
+      };
+      const { error } = await window.supabaseClient
+        .from("admin_user_accounts")
+        .upsert(consentPayload, { onConflict: "user_id" });
+      if (error && /personal_data_consent|personal_data_consent_date|user_agent|ip_address/i.test(error.message || "")) {
+        await window.supabaseClient.from("admin_user_accounts").upsert(basePayload, { onConflict: "user_id" });
+      }
     }
 
     async function ensureProfile(user, role) {
@@ -456,7 +471,7 @@
           .eq("id", user.id)
           .select("*")
           .maybeSingle();
-        await upsertAdminAccount(user, existing.role, { ...existing, ...patch });
+        await upsertAdminAccount(user, existing.role, { ...existing, ...patch, ...user.user_metadata });
         return updated || existing;
       }
       if (!profileRole) {

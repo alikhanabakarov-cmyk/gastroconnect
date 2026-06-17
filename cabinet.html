@@ -674,15 +674,29 @@
       <footer class="footer" id="contacts">
         <div class="footer-brand">
           <span class="brand-mark" aria-hidden="true">GC</span>
-          <span class="brand-text">GastroConnect</span>
+          <div>
+            <span class="brand-text">GastroConnect</span>
+            <p>Бесплатная платформа для работников, заведений и поставщиков HoReCa.</p>
+          </div>
         </div>
         <div class="footer-links">
-          <a href="tel:+79104334729">+7 910 433-47-29</a>
-          <a href="mailto:info@gastroconnect.ru">info@gastroconnect.ru</a>
-          <a href="https://t.me/gastroconnect" target="_blank" rel="noopener">Telegram</a>
-          <a href="/privacy/">Политика конфиденциальности</a>
-          <a href="/terms/">Пользовательское соглашение</a>
-          <a href="/personal-data-consent/">Согласие на обработку персональных данных</a>
+          <div class="footer-group">
+            <span>Связь</span>
+            <a href="tel:+79104334729">+7 910 433-47-29</a>
+            <a href="mailto:info@gastroconnect.ru">info@gastroconnect.ru</a>
+            <a href="https://t.me/gastroconnect" target="_blank" rel="noopener">Telegram</a>
+          </div>
+          <div class="footer-group">
+            <span>Документы</span>
+            <a href="/privacy/">Политика конфиденциальности</a>
+            <a href="/terms/">Пользовательское соглашение</a>
+            <a href="/personal-data-consent/">Согласие на обработку данных</a>
+          </div>
+          <div class="footer-group">
+            <span>Регион</span>
+            <p>Москва и Московская область</p>
+            <a href="/contacts/">Контакты</a>
+          </div>
         </div>
       </footer>
     </div>
@@ -698,12 +712,12 @@
           }
         });
         var script = document.createElement("script");
-        script.src = "/public.min.js?v=1011";
+        script.src = "/public.min.js?v=1013";
         script.async = true;
         document.body.appendChild(script);
       }, { once: true });
     </script>
-    <script src="/cabinet-1014.min.js?v=1020"></script>
+    <script src="/cabinet.min.js?v=1021"></script>
   </body>
 </html>
 

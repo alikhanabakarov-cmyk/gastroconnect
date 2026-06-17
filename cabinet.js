@@ -278,22 +278,36 @@
 
   async function saveAdminAccount(payload = {}) {
     if (!state.user || !state.profile) return { error: null };
-    return db.from("admin_user_accounts").upsert(
-      {
-        user_id: state.user.id,
-        role: state.profile.role,
-        email: payload.email || state.profile.email || state.user.email || null,
-        phone: payload.phone || state.profile.phone || state.user.phone || null,
-        name: payload.name || state.profile.name || state.user.email || state.user.phone || "Пользователь",
-        city: payload.city || state.profile.city || null,
-        auth_provider: state.profile.auth_provider || (state.user.phone && !state.user.email ? "phone" : "email"),
-        status: state.profile.status || "active",
-        source: "cabinet",
-        raw_meta: state.user.user_metadata || {},
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "user_id" }
-    );
+    const metadata = state.user.user_metadata || {};
+    const consentGranted =
+      payload.personalDataConsent === true ||
+      metadata.personalDataConsent === true ||
+      metadata.personalDataConsent === "true";
+    const basePayload = {
+      user_id: state.user.id,
+      role: state.profile.role,
+      email: payload.email || state.profile.email || state.user.email || null,
+      phone: payload.phone || state.profile.phone || state.user.phone || null,
+      name: payload.name || state.profile.name || state.user.email || state.user.phone || "Пользователь",
+      city: payload.city || state.profile.city || null,
+      auth_provider: state.profile.auth_provider || metadata.auth_provider || (state.user.phone && !state.user.email ? "phone" : "email"),
+      status: state.profile.status || "active",
+      source: "cabinet",
+      raw_meta: metadata,
+      updated_at: new Date().toISOString(),
+    };
+    const consentPayload = {
+      ...basePayload,
+      personal_data_consent: consentGranted,
+      personal_data_consent_date: payload.personalDataConsentDate || metadata.personalDataConsentDate || null,
+      user_agent: payload.userAgent || metadata.userAgent || navigator.userAgent || "",
+      ip_address: payload.ipAddress || metadata.ipAddress || "",
+    };
+    const result = await db.from("admin_user_accounts").upsert(consentPayload, { onConflict: "user_id" });
+    if (result.error && /personal_data_consent|personal_data_consent_date|user_agent|ip_address/i.test(result.error.message || "")) {
+      return db.from("admin_user_accounts").upsert(basePayload, { onConflict: "user_id" });
+    }
+    return result;
   }
 
   function collectProfile(fields) {

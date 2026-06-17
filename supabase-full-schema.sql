@@ -212,10 +212,20 @@ create table if not exists public.admin_user_accounts (
   auth_provider text,
   status text not null default 'active',
   source text not null default 'auth_signup',
+  personal_data_consent boolean not null default false,
+  personal_data_consent_date timestamptz,
+  user_agent text,
+  ip_address text,
   raw_meta jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.admin_user_accounts
+  add column if not exists personal_data_consent boolean not null default false,
+  add column if not exists personal_data_consent_date timestamptz,
+  add column if not exists user_agent text,
+  add column if not exists ip_address text;
 
 create or replace function public.handle_new_user()
 returns trigger
@@ -247,7 +257,21 @@ begin
     auth_provider = coalesce(public.profiles.auth_provider, excluded.auth_provider),
     updated_at = now();
 
-  insert into public.admin_user_accounts (user_id, role, email, phone, name, city, auth_provider, raw_meta, updated_at)
+  insert into public.admin_user_accounts (
+    user_id,
+    role,
+    email,
+    phone,
+    name,
+    city,
+    auth_provider,
+    personal_data_consent,
+    personal_data_consent_date,
+    user_agent,
+    ip_address,
+    raw_meta,
+    updated_at
+  )
   values (
     new.id,
     case
@@ -260,6 +284,10 @@ begin
     coalesce(new.raw_user_meta_data->>'name', new.email, new.phone, 'Пользователь'),
     new.raw_user_meta_data->>'city',
     coalesce(new.raw_user_meta_data->>'auth_provider', case when new.phone is not null and new.email is null then 'phone' else 'email' end),
+    coalesce((new.raw_user_meta_data->>'personalDataConsent')::boolean, false),
+    nullif(new.raw_user_meta_data->>'personalDataConsentDate', '')::timestamptz,
+    new.raw_user_meta_data->>'userAgent',
+    new.raw_user_meta_data->>'ipAddress',
     coalesce(new.raw_user_meta_data, '{}'::jsonb),
     now()
   )
@@ -270,6 +298,10 @@ begin
     name = excluded.name,
     city = excluded.city,
     auth_provider = excluded.auth_provider,
+    personal_data_consent = excluded.personal_data_consent,
+    personal_data_consent_date = coalesce(public.admin_user_accounts.personal_data_consent_date, excluded.personal_data_consent_date),
+    user_agent = coalesce(excluded.user_agent, public.admin_user_accounts.user_agent),
+    ip_address = coalesce(excluded.ip_address, public.admin_user_accounts.ip_address),
     raw_meta = excluded.raw_meta,
     updated_at = now();
   return new;
