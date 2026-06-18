@@ -316,7 +316,25 @@ button:disabled {
 }
 
 .poster-visual-home {
+  --hero-image: url("/assets/hero-home.webp");
   --hero-position: right center;
+}
+
+.service-hero-media-home {
+  --hero-image: url("/assets/hero-home.webp");
+  --hero-position: right center;
+}
+
+.service-hero-media-workers {
+  --hero-image: url("/assets/hero-workers.webp");
+}
+
+.service-hero-media-restaurants {
+  --hero-image: url("/assets/hero-restaurants.webp");
+}
+
+.service-hero-media-suppliers {
+  --hero-image: url("/assets/hero-suppliers.webp");
 }
 
 .poster-visual::after {
