@@ -2020,14 +2020,20 @@
 
     if (existing) {
       state.profile = existing;
+      await saveAdminAccount(existing);
       return existing;
     }
 
     const fallbackRole = normalizePublicRole(state.user.user_metadata?.role);
+    const metadata = state.user.user_metadata || {};
     const payload = {
       id: state.user.id,
       role: fallbackRole,
-      name: state.user.email || "Пользователь",
+      name: metadata.name || state.user.email || state.user.phone || "Пользователь",
+      email: state.user.email || metadata.email || null,
+      phone: state.user.phone || metadata.phone || null,
+      city: metadata.city || null,
+      auth_provider: metadata.auth_provider || (state.user.phone && !state.user.email ? "phone" : "email"),
       status: "active",
       updated_at: new Date().toISOString(),
     };
@@ -2040,6 +2046,7 @@
     }
 
     state.profile = payload;
+    await saveAdminAccount(payload);
     return payload;
   }
 
