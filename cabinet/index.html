@@ -1,709 +1,347 @@
-﻿<!doctype html>
-<html lang="ru">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="yandex-verification" content="7809b97f5ab8ab49" />
-    <title>Кабинет — GastroConnect</title>
-    <meta name="robots" content="noindex,nofollow" />
-    <meta
+﻿<!doctype html><html lang="ru"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="yandex-verification" content="7809b97f5ab8ab49" /><title>Кабинет — GastroConnect</title><meta name="robots" content="noindex,nofollow" /><meta
       name="description"
       content="Личный кабинет GastroConnect для профилей, смен, приглашений и заявок по ролям."
-    />
-    <meta name="theme-color" content="#064c3b" />
-    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" sizes="120x120" />
-    <link rel="alternate icon" href="/favicon.ico" sizes="any" />
-    <link rel="manifest" href="/site.webmanifest" />
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-    <link rel="stylesheet" href="/style.css?v=1027" />
-  </head>
-  <body>
-    <div class="page-shell">
-      <header class="site-header">
-        <a class="brand" href="/" aria-label="GastroConnect">
-          <span class="brand-mark" aria-hidden="true">GC</span>
-          <span class="brand-text">GastroConnect</span>
-        </a>
-        <nav class="main-nav" aria-label="Главное меню">
-          <a href="/workers/">Сотрудникам</a>
-          <a href="/restaurants/">Заведениям</a>
-          <a href="/suppliers/">Поставщикам</a>
-          <a href="/contacts/">Контакты</a>
-        </nav>
-        <button id="logoutBtn" type="button">Выйти</button>
-      </header>
-
-      <main class="cabinet-page service-page">
-        <section class="service-hero service-hero-cabinet">
-          <div class="service-hero-copy">
-            <p class="eyebrow" data-site-setting="cabinet.eyebrow">
+    /><meta name="theme-color" content="#064c3b" /><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" sizes="120x120" /><link rel="alternate icon" href="/favicon.ico" sizes="any" /><link rel="manifest" href="/site.webmanifest" /><link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin /><link rel="stylesheet" href="/style.css?v=1027" /></head><body><div class="page-shell"><header class="site-header"><a class="brand" href="/" aria-label="GastroConnect"><span class="brand-mark" aria-hidden="true">GC</span><span class="brand-text">GastroConnect</span></a><nav class="main-nav" aria-label="Главное меню"><a href="/workers/">Сотрудникам</a><a href="/restaurants/">Заведениям</a><a href="/suppliers/">Поставщикам</a><a href="/contacts/">Контакты</a></nav><button id="logoutBtn" type="button">Выйти</button></header><main class="cabinet-page service-page"><section class="service-hero service-hero-cabinet"><div class="service-hero-copy"><p class="eyebrow" data-site-setting="cabinet.eyebrow">
               Рабочее пространство
-            </p>
-            <h1 data-site-setting="cabinet.title">Кабинет GastroConnect</h1>
-            <p data-site-setting="cabinet.lead">
+            </p><h1 data-site-setting="cabinet.title">Кабинет GastroConnect</h1><p data-site-setting="cabinet.lead">
               Профили, смены, приглашения и заявки собраны в одном месте для
               каждой роли.
-            </p>
-            <p id="userInfo" class="message">Проверяем вход...</p>
-          </div>
-          <div class="service-hero-media service-hero-media-home" data-site-bg="cabinet.hero" data-bg-default="/assets/hero-home.webp" aria-hidden="true">
-          </div>
-        </section>
-
-        <section id="workerCabinet" class="role-panel">
-          <h2>Кабинет работника</h2>
-          <p>
+            </p><p id="userInfo" class="message">Проверяем вход...</p></div><div class="service-hero-media service-hero-media-home" data-site-bg="cabinet.hero" data-bg-default="/assets/hero-home.webp" aria-hidden="true"></div></section><section id="workerCabinet" class="role-panel"><h2>Кабинет работника</h2><p>
             Заполните профиль, чтобы заведения понимали, кого они приглашают на
             смену.
-          </p>
-
-          <div class="cabinet-grid">
-            <label
+          </p><div class="cabinet-grid"><label
               >Имя
               <input
                 id="workerName"
                 type="text"
                 placeholder="Как заведение увидит вас в анкете"
-              />
-            </label>
-            <label
+              /></label><label
               >Город
-              <input id="workerCity" type="text" placeholder="Москва" />
-            </label>
-            <label
+              <input id="workerCity" type="text" placeholder="Москва" /></label><label
               >Район
-              <input id="workerDistrict" type="text" placeholder="ЦАО, Арбат" />
-            </label>
-            <label
+              <input id="workerDistrict" type="text" placeholder="ЦАО, Арбат" /></label><label
               >Профессии
               <input
                 id="workerProfessions"
                 type="text"
                 placeholder="повар, официант, бариста"
-              />
-            </label>
-            <label
+              /></label><label
               >Телефон
               <input
                 id="workerPhone"
                 type="tel"
                 placeholder="+7 910 000-00-00"
                 autocomplete="tel"
-              />
-            </label>
-            <label
+              /></label><label
               >Email
               <input
                 id="workerEmail"
                 type="email"
                 placeholder="example@mail.ru"
                 autocomplete="email"
-              />
-            </label>
-            <label
+              /></label><label
               >Доступные дни
               <input
                 id="workerAvailableDays"
                 type="text"
                 placeholder="пн, вт, сб"
-              />
-            </label>
-            <label class="full"
+              /></label><label class="full"
               >Опыт
               <textarea
                 id="workerExperience"
                 placeholder="например: 3 года поваром в ресторане"
-              ></textarea>
-            </label>
-            <label
+              ></textarea></label><label
               >Доступное время
               <input
                 id="workerAvailableTime"
                 type="text"
                 placeholder="10:00-22:00"
-              />
-            </label>
-            <label
+              /></label><label
               >Минимальная ставка
-              <input id="workerMinRate" type="number" placeholder="3500" />
-            </label>
-            <label
+              <input id="workerMinRate" type="number" placeholder="3500" /></label><label
               >Тип оплаты
-              <select id="workerPaymentType">
-                <option value="per_shift">За смену</option>
-                <option value="per_hour">За час</option>
-                <option value="per_day">За день</option>
-              </select>
-            </label>
-            <label class="check-label">
-              <input id="workerCanTravel" type="checkbox" />
+              <select id="workerPaymentType"><option value="per_shift">За смену</option><option value="per_hour">За час</option><option value="per_day">За день</option></select></label><label class="check-label"><input id="workerCanTravel" type="checkbox" />
               Готов ехать в другой город
-            </label>
-            <label
+            </label><label
               >Города, куда готов ехать
               <input
                 id="workerTravelCities"
                 type="text"
                 placeholder="Москва, Химки, Одинцово"
-              />
-            </label>
-            <label
+              /></label><label
               >Радиус поездки, км
-              <input id="workerTravelRadiusKm" type="number" placeholder="30" />
-            </label>
-            <label class="full"
+              <input id="workerTravelRadiusKm" type="number" placeholder="30" /></label><label class="full"
               >О себе
               <textarea
                 id="workerAbout"
                 placeholder="коротко о себе, навыки и пожелания"
-              ></textarea>
-            </label>
-          </div>
-
-          <div class="cabinet-actions form-actions">
-            <button id="saveWorkerProfileBtn" type="button">
+              ></textarea></label></div><div class="cabinet-actions form-actions"><button id="saveWorkerProfileBtn" type="button">
               Сохранить профиль работника
-            </button>
-          </div>
-          <p id="workerProfileMessage" class="message"></p>
-
-          <hr class="section-divider" />
-
-          <h3>Приглашения на смены</h3>
-          <div class="cabinet-actions">
-            <button id="loadInvitesBtn" type="button">
+            </button></div><p id="workerProfileMessage" class="message"></p><hr class="section-divider" /><h3>Приглашения на смены</h3><div class="cabinet-actions"><button id="loadInvitesBtn" type="button">
               Показать приглашения
-            </button>
-          </div>
-          <div id="invitesList" class="list-grid"></div>
-          <p id="invitesMessage" class="message"></p>
-
-          <hr class="section-divider" />
-
-          <h3>Мои отклики</h3>
-          <div class="cabinet-actions">
-            <button id="loadWorkerApplicationsBtn" type="button">
+            </button></div><div id="invitesList" class="list-grid"></div><p id="invitesMessage" class="message"></p><hr class="section-divider" /><h3>Мои отклики</h3><div class="cabinet-actions"><button id="loadWorkerApplicationsBtn" type="button">
               Показать мои отклики
-            </button>
-          </div>
-          <div id="workerApplicationsList" class="list-grid"></div>
-          <p id="workerApplicationsMessage" class="message"></p>
-
-          <hr class="section-divider" />
-
-          <h3>Доступные смены</h3>
-          <label class="filter-label"
+            </button></div><div id="workerApplicationsList" class="list-grid"></div><p id="workerApplicationsMessage" class="message"></p><hr class="section-divider" /><h3>Доступные смены</h3><label class="filter-label"
             >Фильтр смен
             <input
               id="shiftSearchInput"
               type="search"
               placeholder="Повар, бариста, Москва, ставка..."
-            />
-          </label>
-          <div class="cabinet-actions">
-            <button id="loadShiftPostsBtn" type="button">Показать смены</button>
-          </div>
-          <div id="shiftPostsList" class="list-grid"></div>
-          <p id="shiftPostsMessage" class="message"></p>
-        </section>
-
-        <section id="restaurantCabinet" class="role-panel">
-          <h2>Кабинет заведения</h2>
-          <p>
+            /></label><div class="cabinet-actions"><button id="loadShiftPostsBtn" type="button">Показать смены</button></div><div id="shiftPostsList" class="list-grid"></div><p id="shiftPostsMessage" class="message"></p></section><section id="restaurantCabinet" class="role-panel"><h2>Кабинет заведения</h2><p>
             Здесь заведение ведет профиль, публикует смены, смотрит анкеты
             работников и отправляет заявки поставщикам.
-          </p>
-
-          <h3>Профиль заведения</h3>
-          <div class="cabinet-grid">
-            <label
+          </p><h3>Профиль заведения</h3><div class="cabinet-grid"><label
               >Название заведения
               <input
                 id="restaurantBusinessName"
                 type="text"
                 placeholder="Ресторан / кафе / бар"
-              />
-            </label>
-            <label
+              /></label><label
               >Тип заведения
               <input
                 id="restaurantBusinessType"
                 type="text"
                 placeholder="Ресторан, кофейня, dark kitchen"
-              />
-            </label>
-            <label
+              /></label><label
               >Контактное лицо
               <input
                 id="restaurantContactPerson"
                 type="text"
                 placeholder="Имя управляющего"
-              />
-            </label>
-            <label
+              /></label><label
               >Телефон
               <input
                 id="restaurantPhone"
                 type="tel"
                 placeholder="+7 910 000-00-00"
                 autocomplete="tel"
-              />
-            </label>
-            <label
+              /></label><label
               >Email
               <input
                 id="restaurantEmail"
                 type="email"
                 placeholder="manager@example.ru"
                 autocomplete="email"
-              />
-            </label>
-            <label
+              /></label><label
               >Город
-              <input id="restaurantCity" type="text" placeholder="Москва" />
-            </label>
-            <label class="full"
+              <input id="restaurantCity" type="text" placeholder="Москва" /></label><label class="full"
               >Адрес
               <input
                 id="restaurantAddress"
                 type="text"
                 placeholder="Улица, дом, район"
-              />
-            </label>
-            <label class="full"
+              /></label><label class="full"
               >О заведении
               <textarea
                 id="restaurantAbout"
                 placeholder="Формат кухни, условия смен, питание, форма, особенности объекта"
-              ></textarea>
-            </label>
-          </div>
-          <div class="cabinet-actions form-actions">
-            <button id="saveRestaurantProfileBtn" type="button">
+              ></textarea></label></div><div class="cabinet-actions form-actions"><button id="saveRestaurantProfileBtn" type="button">
               Сохранить профиль заведения
-            </button>
-          </div>
-          <p id="restaurantProfileMessage" class="message"></p>
-
-          <hr class="section-divider" />
-
-          <h3>Создать смену</h3>
-          <div class="cabinet-grid">
-            <label
+            </button></div><p id="restaurantProfileMessage" class="message"></p><hr class="section-divider" /><h3>Создать смену</h3><div class="cabinet-grid"><label
               >Название смены
               <input
                 id="shiftTitle"
                 type="text"
                 placeholder="Повар на вечернюю смену"
-              />
-            </label>
-            <label
+              /></label><label
               >Профессия
               <input
                 id="shiftProfession"
                 type="text"
                 placeholder="Повар, официант, бариста"
-              />
-            </label>
-            <label
+              /></label><label
               >Город
-              <input id="shiftCity" type="text" placeholder="Москва" />
-            </label>
-            <label
+              <input id="shiftCity" type="text" placeholder="Москва" /></label><label
               >Район
               <input
                 id="shiftDistrict"
                 type="text"
                 placeholder="ЦАО, Арбат, Хамовники"
-              />
-            </label>
-            <label
+              /></label><label
               >Адрес
-              <input id="shiftAddress" type="text" placeholder="улица, дом" />
-            </label>
-            <label
+              <input id="shiftAddress" type="text" placeholder="улица, дом" /></label><label
               >Дата
-              <input id="shiftDateFrom" type="date" />
-            </label>
-            <label
+              <input id="shiftDateFrom" type="date" /></label><label
               >Начало
-              <input id="shiftTimeFrom" type="time" />
-            </label>
-            <label
+              <input id="shiftTimeFrom" type="time" /></label><label
               >Конец
-              <input id="shiftTimeTo" type="time" />
-            </label>
-            <label
+              <input id="shiftTimeTo" type="time" /></label><label
               >Ставка
-              <input id="shiftRate" type="number" placeholder="4500" />
-            </label>
-            <label class="full"
+              <input id="shiftRate" type="number" placeholder="4500" /></label><label class="full"
               >Требования
               <textarea
                 id="shiftRequirements"
                 placeholder="Форма, опыт, обязанности, питание, оплата..."
-              ></textarea>
-            </label>
-          </div>
-          <div class="cabinet-actions form-actions">
-            <button id="createShiftPostBtn" type="button">
+              ></textarea></label></div><div class="cabinet-actions form-actions"><button id="createShiftPostBtn" type="button">
               Опубликовать смену
-            </button>
-            <button id="loadRestaurantShiftPostsBtn" class="btn" type="button">
+            </button><button id="loadRestaurantShiftPostsBtn" class="btn" type="button">
               Мои смены
-            </button>
-            <button id="loadShiftApplicationsBtn" class="btn" type="button">
+            </button><button id="loadShiftApplicationsBtn" class="btn" type="button">
               Отклики работников
-            </button>
-          </div>
-          <p id="shiftPostMessage" class="message"></p>
-          <div id="restaurantShiftPostsList" class="list-grid"></div>
-          <div id="shiftApplicationsList" class="list-grid"></div>
-
-          <h3>Работники</h3>
-          <label class="filter-label"
+            </button></div><p id="shiftPostMessage" class="message"></p><div id="restaurantShiftPostsList" class="list-grid"></div><div id="shiftApplicationsList" class="list-grid"></div><h3>Работники</h3><label class="filter-label"
             >Фильтр работников
             <input
               id="workerSearchInput"
               type="search"
               placeholder="Профессия, опыт, город, ставка..."
-            />
-          </label>
-          <div class="cabinet-actions">
-            <button id="loadWorkersBtn" type="button">
+            /></label><div class="cabinet-actions"><button id="loadWorkersBtn" type="button">
               Показать работников
-            </button>
-          </div>
-          <div id="workersList" class="list-grid"></div>
-          <p id="workersMessage" class="message"></p>
-
-          <h3>Приглашения работникам</h3>
-          <div class="cabinet-actions">
-            <button id="loadRestaurantInvitesBtn" class="btn" type="button">
+            </button></div><div id="workersList" class="list-grid"></div><p id="workersMessage" class="message"></p><h3>Приглашения работникам</h3><div class="cabinet-actions"><button id="loadRestaurantInvitesBtn" class="btn" type="button">
               Показать приглашения
-            </button>
-          </div>
-          <p id="restaurantInvitesMessage" class="message"></p>
-          <div id="restaurantInvitesList" class="list-grid"></div>
-
-          <hr class="section-divider" />
-
-          <h3>Запрос поставщику</h3>
-          <div class="cabinet-grid">
-            <label
+            </button></div><p id="restaurantInvitesMessage" class="message"></p><div id="restaurantInvitesList" class="list-grid"></div><hr class="section-divider" /><h3>Запрос поставщику</h3><div class="cabinet-grid"><label
               >Что нужно
               <input
                 id="supplyRequestTitle"
                 type="text"
                 placeholder="Сахар, 5 кг"
-              />
-            </label>
-            <label
+              /></label><label
               >Категория
               <input
                 id="supplyRequestCategory"
                 type="text"
                 placeholder="Продукты"
-              />
-            </label>
-            <label
+              /></label><label
               >Количество
               <input
                 id="supplyRequestQuantity"
                 type="text"
                 placeholder="5 кг"
-              />
-            </label>
-            <label
+              /></label><label
               >Бюджет
               <input
                 id="supplyRequestBudget"
                 type="text"
                 placeholder="до 1000 ₽"
-              />
-            </label>
-            <label
+              /></label><label
               >Город
-              <input id="supplyRequestCity" type="text" placeholder="Москва" />
-            </label>
-            <label class="full"
+              <input id="supplyRequestCity" type="text" placeholder="Москва" /></label><label class="full"
               >Комментарий
               <textarea
                 id="supplyRequestMessage"
                 placeholder="Срок, доставка, требования..."
-              ></textarea>
-            </label>
-          </div>
-          <div class="cabinet-actions form-actions">
-            <button id="createSupplyRequestBtn" type="button">
+              ></textarea></label></div><div class="cabinet-actions form-actions"><button id="createSupplyRequestBtn" type="button">
               Опубликовать запрос
-            </button>
-            <button id="loadRestaurantSupplyRequestsBtn" class="btn" type="button">
+            </button><button id="loadRestaurantSupplyRequestsBtn" class="btn" type="button">
               Мои запросы
-            </button>
-            <button id="loadSupplierOffersBtn" class="btn" type="button">
+            </button><button id="loadSupplierOffersBtn" class="btn" type="button">
               Показать предложения поставщиков
-            </button>
-          </div>
-          <p id="restaurantSupplyRequestsMessage" class="message"></p>
-          <div id="restaurantSupplyRequestsList" class="list-grid"></div>
-          <label class="filter-label filter-label-top"
+            </button></div><p id="restaurantSupplyRequestsMessage" class="message"></p><div id="restaurantSupplyRequestsList" class="list-grid"></div><label class="filter-label filter-label-top"
             >Фильтр предложений
             <input
               id="supplierOffersSearchInput"
               type="search"
               placeholder="Сыр, сахар, город, цена..."
-            />
-          </label>
-          <p id="supplyRequestMessageBox" class="message"></p>
-          <div id="supplierOffersList" class="list-grid"></div>
-
-          <hr class="section-divider" />
-
-          <h3>Отклики поставщиков на запросы</h3>
-          <div class="cabinet-actions">
-            <button id="loadSupplyResponsesBtn" type="button">
+            /></label><p id="supplyRequestMessageBox" class="message"></p><div id="supplierOffersList" class="list-grid"></div><hr class="section-divider" /><h3>Отклики поставщиков на запросы</h3><div class="cabinet-actions"><button id="loadSupplyResponsesBtn" type="button">
               Показать отклики поставщиков
-            </button>
-          </div>
-          <p id="supplyResponsesMessage" class="message"></p>
-          <div id="supplyResponsesList" class="list-grid"></div>
-        </section>
-
-        <section id="supplierCabinet" class="role-panel">
-          <h2>Кабинет поставщика</h2>
-          <p>
+            </button></div><p id="supplyResponsesMessage" class="message"></p><div id="supplyResponsesList" class="list-grid"></div></section><section id="supplierCabinet" class="role-panel"><h2>Кабинет поставщика</h2><p>
             Здесь поставщик ведет профиль, публикует предложения и видит запросы
             заведений.
-          </p>
-
-          <h3>Профиль поставщика</h3>
-          <div class="cabinet-grid">
-            <label
+          </p><h3>Профиль поставщика</h3><div class="cabinet-grid"><label
               >Компания
               <input
                 id="supplierCompanyName"
                 type="text"
                 placeholder="ООО / ИП / бренд"
-              />
-            </label>
-            <label
+              /></label><label
               >Категория
               <input
                 id="supplierProfileCategory"
                 type="text"
                 placeholder="Продукты, оборудование, услуги"
-              />
-            </label>
-            <label
+              /></label><label
               >Контактное лицо
               <input
                 id="supplierContactPerson"
                 type="text"
                 placeholder="Имя менеджера"
-              />
-            </label>
-            <label
+              /></label><label
               >Телефон
               <input
                 id="supplierPhone"
                 type="tel"
                 placeholder="+7 910 000-00-00"
                 autocomplete="tel"
-              />
-            </label>
-            <label
+              /></label><label
               >Email
               <input
                 id="supplierEmail"
                 type="email"
                 placeholder="sales@example.ru"
                 autocomplete="email"
-              />
-            </label>
-            <label
+              /></label><label
               >Город
               <input
                 id="supplierProfileCity"
                 type="text"
                 placeholder="Москва"
-              />
-            </label>
-            <label class="full"
+              /></label><label class="full"
               >Города доставки
               <input
                 id="supplierDeliveryCities"
                 type="text"
                 placeholder="Москва, Химки, Одинцово"
-              />
-            </label>
-            <label class="full"
+              /></label><label class="full"
               >О компании
               <textarea
                 id="supplierProfileAbout"
                 placeholder="Ассортимент, минимальный заказ, доставка, документы, условия"
-              ></textarea>
-            </label>
-          </div>
-          <div class="cabinet-actions form-actions">
-            <button id="saveSupplierProfileBtn" type="button">
+              ></textarea></label></div><div class="cabinet-actions form-actions"><button id="saveSupplierProfileBtn" type="button">
               Сохранить профиль поставщика
-            </button>
-          </div>
-          <p id="supplierProfileMessage" class="message"></p>
-
-          <hr class="section-divider" />
-
-          <h3>Мое предложение</h3>
-          <div class="cabinet-grid">
-            <label
+            </button></div><p id="supplierProfileMessage" class="message"></p><hr class="section-divider" /><h3>Мое предложение</h3><div class="cabinet-grid"><label
               >Товар или услуга
               <input
                 id="supplierOfferTitle"
                 type="text"
                 placeholder="Сыр, сахар, кофе, клининг"
-              />
-            </label>
-            <label
+              /></label><label
               >Категория
               <input
                 id="supplierOfferCategory"
                 type="text"
                 placeholder="Продукты"
-              />
-            </label>
-            <label
+              /></label><label
               >Цена
               <input
                 id="supplierOfferPrice"
                 type="text"
                 placeholder="150 ₽ / кг"
-              />
-            </label>
-            <label
+              /></label><label
               >Количество / условия
               <input
                 id="supplierOfferQuantity"
                 type="text"
                 placeholder="от 5 кг"
-              />
-            </label>
-            <label
+              /></label><label
               >Город
-              <input id="supplierOfferCity" type="text" placeholder="Москва" />
-            </label>
-            <label class="full"
+              <input id="supplierOfferCity" type="text" placeholder="Москва" /></label><label class="full"
               >Описание
               <textarea
                 id="supplierOfferMessage"
                 placeholder="Доставка, сроки, остатки, условия..."
-              ></textarea>
-            </label>
-          </div>
-          <div class="cabinet-actions form-actions">
-            <button id="createSupplierOfferBtn" type="button">
+              ></textarea></label></div><div class="cabinet-actions form-actions"><button id="createSupplierOfferBtn" type="button">
               Опубликовать предложение
-            </button>
-            <button id="loadSupplierOwnOffersBtn" class="btn" type="button">
+            </button><button id="loadSupplierOwnOffersBtn" class="btn" type="button">
               Мои предложения
-            </button>
-            <button id="loadSupplyRequestsBtn" class="btn" type="button">
+            </button><button id="loadSupplyRequestsBtn" class="btn" type="button">
               Показать запросы заведений
-            </button>
-            <button id="loadSupplierResponsesBtn" class="btn" type="button">
+            </button><button id="loadSupplierResponsesBtn" class="btn" type="button">
               Мои отклики
-            </button>
-          </div>
-          <label class="filter-label filter-label-top"
+            </button></div><label class="filter-label filter-label-top"
             >Фильтр запросов
             <input
               id="supplyRequestsSearchInput"
               type="search"
               placeholder="Сахар, продукты, город, бюджет..."
-            />
-          </label>
-          <p id="supplierOfferMessageBox" class="message"></p>
-          <div id="supplierOwnOffersList" class="list-grid"></div>
-          <div id="supplyRequestsList" class="list-grid"></div>
-
-          <h3>Мои отклики на запросы</h3>
-          <div id="supplierResponsesList" class="list-grid"></div>
-          <p id="supplierResponsesMessage" class="message"></p>
-
-          <hr class="section-divider" />
-
-          <h3>Входящие заявки от заведений</h3>
-          <div class="cabinet-actions">
-            <button id="loadSupplierInquiriesBtn" type="button">
+            /></label><p id="supplierOfferMessageBox" class="message"></p><div id="supplierOwnOffersList" class="list-grid"></div><div id="supplyRequestsList" class="list-grid"></div><h3>Мои отклики на запросы</h3><div id="supplierResponsesList" class="list-grid"></div><p id="supplierResponsesMessage" class="message"></p><hr class="section-divider" /><h3>Входящие заявки от заведений</h3><div class="cabinet-actions"><button id="loadSupplierInquiriesBtn" type="button">
               Показать заявки
-            </button>
-          </div>
-          <p id="supplierInquiriesMessage" class="message"></p>
-          <div id="supplierInquiriesList" class="list-grid"></div>
-        </section>
-
-        <section id="adminCabinet" class="role-panel">
-          <h2>Кабинет админа</h2>
-
-          <h3>Настройки сайта</h3>
-          <p>
+            </button></div><p id="supplierInquiriesMessage" class="message"></p><div id="supplierInquiriesList" class="list-grid"></div></section><section id="adminCabinet" class="role-panel"><h2>Кабинет админа</h2><h3>Настройки сайта</h3><p>
             Логотип, hero-картинки и главные тексты вынесены в отдельную лёгкую
             админку, чтобы кабинет быстро открывался у всех ролей.
-          </p>
-          <div class="cabinet-actions">
-            <a class="btn primary" href="/manage/"
+          </p><div class="cabinet-actions"><a class="btn primary" href="/manage/"
               >Открыть отдельную админку</a
-            >
-          </div>
-          <h3>Данные платформы</h3>
-          <div class="cabinet-actions">
-            <button id="loadAdminDataBtn" type="button">Обновить данные</button>
-          </div>
-          <p id="adminMessage" class="message"></p>
-          <div id="adminDataList" class="list-grid"></div>
-        </section>
-
-        <section id="unknownRole" class="role-panel">
-          <h2>Роль не найдена</h2>
-          <p>
+            ></div><h3>Данные платформы</h3><div class="cabinet-actions"><button id="loadAdminDataBtn" type="button">Обновить данные</button></div><p id="adminMessage" class="message"></p><div id="adminDataList" class="list-grid"></div></section><section id="unknownRole" class="role-panel"><h2>Роль не найдена</h2><p>
             Профиль пользователя пока не настроен. Проверьте таблицу profiles.
-          </p>
-        </section>
-      </main>
-
-      <footer class="footer" id="contacts">
-        <div class="footer-brand">
-          <span class="brand-mark" aria-hidden="true">GC</span>
-          <div>
-            <span class="brand-text">GastroConnect</span>
-            <p>Бесплатная платформа для работников, заведений и поставщиков HoReCa.</p>
-          </div>
-        </div>
-        <div class="footer-links">
-          <div class="footer-group">
-            <span>Связь</span>
-            <a href="tel:+79104334729">+7 910 433-47-29</a>
-            <a href="mailto:info@gastroconnect.ru">info@gastroconnect.ru</a>
-            <a href="https://t.me/gastroconnect" target="_blank" rel="noopener">Telegram</a>
-          </div>
-          <div class="footer-group">
-            <span>Документы</span>
-            <a href="/privacy/">Политика конфиденциальности</a>
-            <a href="/terms/">Пользовательское соглашение</a>
-            <a href="/personal-data-consent/">Согласие на обработку данных</a>
-          </div>
-          <div class="footer-group">
-            <span>Регион</span>
-            <p>Москва и Московская область</p>
-            <a href="/contacts/">Контакты</a>
-          </div>
-        </div>
-      </footer>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="/supabase.js?v=1002"></script>
-    <script>
+          </p></section></main><footer class="footer" id="contacts"><div class="footer-brand"><span class="brand-mark" aria-hidden="true">GC</span><div><span class="brand-text">GastroConnect</span><p>Бесплатная платформа для работников, заведений и поставщиков HoReCa.</p></div></div><div class="footer-links"><div class="footer-group"><span>Связь</span><a href="tel:+79104334729">+7 910 433-47-29</a><a href="mailto:info@gastroconnect.ru">info@gastroconnect.ru</a><a href="https://t.me/gastroconnect" target="_blank" rel="noopener">Telegram</a></div><div class="footer-group"><span>Документы</span><a href="/privacy/">Политика конфиденциальности</a><a href="/terms/">Пользовательское соглашение</a><a href="/personal-data-consent/">Согласие на обработку данных</a></div><div class="footer-group"><span>Регион</span><p>Москва и Московская область</p><a href="/contacts/">Контакты</a></div></div></footer></div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/supabase.js?v=1002"></script><script>
       window.addEventListener("load", function () {
         document.querySelectorAll("[data-bg-default]").forEach(function (node) {
           var src = node.getAttribute("data-bg-default") || "";
@@ -716,13 +354,4 @@
         script.async = true;
         document.body.appendChild(script);
       }, { once: true });
-    </script>
-    <script src="/cabinet.min.js?v=1021"></script>
-  </body>
-</html>
-
-
-
-
-
-
+    </script><script src="/cabinet.min.js?v=1021"></script></body></html>
