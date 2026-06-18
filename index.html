@@ -38,14 +38,6 @@
     <link rel="alternate icon" href="/favicon.ico" sizes="any" />
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="stylesheet" href="/style.css?v=1027" />
-    <script>
-      if ("scrollRestoration" in history) history.scrollRestoration = "manual";
-      if (!location.hash) {
-        window.addEventListener("pageshow", function () {
-          window.scrollTo(0, 0);
-        }, { once: true });
-      }
-    </script>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -1075,6 +1067,8 @@
       </footer>
     </div>
     <script>
+      if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+
       window.gcScrollReviews = function (button, direction) {
         var carousel = button && button.closest("[data-reviews-carousel]");
         var track = carousel && carousel.querySelector(".reviews-track");
@@ -1083,6 +1077,10 @@
         var width = card ? card.getBoundingClientRect().width + 20 : track.clientWidth;
         track.scrollBy({ left: direction * width, behavior: "smooth" });
       };
+
+      window.addEventListener("pageshow", function () {
+        if (!location.hash) window.scrollTo(0, 0);
+      });
 
       window.addEventListener("load", function () {
         document.querySelectorAll("[data-bg-default]").forEach(function (node) {
