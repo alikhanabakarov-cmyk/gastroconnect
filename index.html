@@ -38,6 +38,14 @@
     <link rel="alternate icon" href="/favicon.ico" sizes="any" />
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="stylesheet" href="/style.css?v=1027" />
+    <script>
+      if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+      if (!location.hash) {
+        window.addEventListener("pageshow", function () {
+          window.scrollTo(0, 0);
+        }, { once: true });
+      }
+    </script>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -374,7 +382,7 @@
             <div class="reviews-track" tabindex="0">
               <article class="review-card">
                 <div class="review-person">
-                  <img class="review-avatar" src="/assets/review-01.webp" width="52" height="52" alt="" loading="lazy" />
+                  <img class="review-avatar" src="/assets/review-01.webp" width="52" height="52" alt="" loading="eager" decoding="async" fetchpriority="low" />
                   <div>
                     <strong>Анна Морозова</strong>
                     <small>управляющая кафе</small>
@@ -386,7 +394,7 @@
               </article>
               <article class="review-card">
                 <div class="review-person">
-                  <img class="review-avatar" src="/assets/review-02.webp" width="52" height="52" alt="" loading="lazy" />
+                  <img class="review-avatar" src="/assets/review-02.webp" width="52" height="52" alt="" loading="eager" decoding="async" fetchpriority="low" />
                   <div>
                     <strong>Тимур Алиев</strong>
                     <small>су-шеф</small>
@@ -398,7 +406,7 @@
               </article>
               <article class="review-card">
                 <div class="review-person">
-                  <img class="review-avatar" src="/assets/review-03.webp" width="52" height="52" alt="" loading="lazy" />
+                  <img class="review-avatar" src="/assets/review-03.webp" width="52" height="52" alt="" loading="eager" decoding="async" fetchpriority="low" />
                   <div>
                     <strong>Лейла Х.</strong>
                     <small>поставщик восточных продуктов</small>
@@ -410,7 +418,7 @@
               </article>
               <article class="review-card">
                 <div class="review-person">
-                  <img class="review-avatar" src="/assets/review-04.webp" width="52" height="52" alt="" loading="lazy" />
+                  <img class="review-avatar" src="/assets/review-04.webp" width="52" height="52" alt="" loading="eager" decoding="async" fetchpriority="low" />
                   <div>
                     <strong>Денис Ким</strong>
                     <small>бариста</small>
@@ -422,7 +430,7 @@
               </article>
               <article class="review-card">
                 <div class="review-person">
-                  <img class="review-avatar" src="/assets/review-05.webp" width="52" height="52" alt="" loading="lazy" />
+                  <img class="review-avatar" src="/assets/review-05.webp" width="52" height="52" alt="" loading="eager" decoding="async" fetchpriority="low" />
                   <div>
                     <strong>Мария Рыжова</strong>
                     <small>администратор ресторана</small>
@@ -434,7 +442,7 @@
               </article>
               <article class="review-card">
                 <div class="review-person">
-                  <img class="review-avatar" src="/assets/review-06.webp" width="52" height="52" alt="" loading="lazy" />
+                  <img class="review-avatar" src="/assets/review-06.webp" width="52" height="52" alt="" loading="eager" decoding="async" fetchpriority="low" />
                   <div>
                     <strong>Руслан Г.</strong>
                     <small>управляющий доставкой</small>
@@ -446,7 +454,7 @@
               </article>
               <article class="review-card">
                 <div class="review-person">
-                  <img class="review-avatar" src="/assets/review-07.webp" width="52" height="52" alt="" loading="lazy" />
+                  <img class="review-avatar" src="/assets/review-07.webp" width="52" height="52" alt="" loading="eager" decoding="async" fetchpriority="low" />
                   <div>
                     <strong>София Ли</strong>
                     <small>официант</small>
@@ -456,7 +464,7 @@
               </article>
               <article class="review-card">
                 <div class="review-person">
-                  <img class="review-avatar" src="/assets/review-08.webp" width="52" height="52" alt="" loading="lazy" />
+                  <img class="review-avatar" src="/assets/review-08.webp" width="52" height="52" alt="" loading="eager" decoding="async" fetchpriority="low" />
                   <div>
                     <strong>Михаил Джонсон</strong>
                     <small>посудомойщик</small>
