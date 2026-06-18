@@ -614,9 +614,7 @@ button:disabled {
   display: block;
   flex: 0 0 auto;
   object-fit: cover;
-  background:
-    radial-gradient(circle at 50% 35%, rgba(255, 255, 255, 0.9), transparent 42%),
-    linear-gradient(135deg, rgba(6, 76, 59, 0.12), rgba(201, 154, 63, 0.22));
+  background: #eadfce;
   border: 3px solid rgba(255, 253, 248, 0.98);
   outline: 1px solid rgba(201, 154, 63, 0.32);
   box-shadow: 0 16px 34px rgba(6, 76, 59, 0.16);

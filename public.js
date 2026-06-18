@@ -646,7 +646,7 @@
     track.innerHTML = reviews
       .map((review, index) => {
         const num = String(index + 1).padStart(2, "0");
-        return `<article class="review-card"><div class="review-person"><img class="review-avatar" src="/assets/review-${num}.webp" width="52" height="52" alt="" loading="lazy" decoding="async" /><div><strong>${escapeText(review[0])}</strong><small>${escapeText(review[1])}</small></div></div><p>“${escapeText(review[2])}”</p></article>`;
+        return `<article class="review-card"><div class="review-person"><img class="review-avatar" src="/assets/review-${num}.webp" width="52" height="52" alt="" loading="eager" decoding="async" fetchpriority="low" /><div><strong>${escapeText(review[0])}</strong><small>${escapeText(review[1])}</small></div></div><p>“${escapeText(review[2])}”</p></article>`;
       })
       .join("");
   }
