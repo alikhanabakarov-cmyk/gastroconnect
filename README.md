@@ -33,8 +33,15 @@ Run:
 
 ```powershell
 node --check script.js
+node --check public.js
 node --check cabinet.js
 ```
+
+Before advertising, run `supabase-launch-fix.sql` in Supabase SQL Editor and configure Supabase Auth:
+
+- connect SMTP or disable mandatory email confirmation for the MVP;
+- verify that `public_submissions` accepts anonymous inserts;
+- verify that new Auth users get a row in `profiles`.
 
 Then verify the live pages with a cache-busting query, for example:
 

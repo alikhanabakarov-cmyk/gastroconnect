@@ -494,6 +494,21 @@
       return payload;
     }
 
+    function readableAuthError(error) {
+      const code = String(error?.code || error?.error_code || "");
+      const text = String(error?.message || "").toLowerCase();
+      if (code.includes("email_not_confirmed") || text.includes("email not confirmed")) {
+        return "Email не подтвержден. Откройте письмо Supabase и подтвердите регистрацию, либо отключите обязательное подтверждение email в Supabase на время MVP.";
+      }
+      if (code.includes("over_email_send_rate_limit") || text.includes("email rate limit")) {
+        return "Supabase временно ограничил отправку писем. Подключите SMTP в Supabase Authentication или повторите позже.";
+      }
+      if (code.includes("invalid_credentials") || text.includes("invalid login credentials")) {
+        return "Неверный email/телефон или пароль. Если вы только зарегистрировались, сначала подтвердите email.";
+      }
+      return error?.message || "Неизвестная ошибка авторизации.";
+    }
+
     async function refreshSession() {
       const client = window.supabaseClient;
       if (!client || !cabinetShortcut) return;
@@ -534,7 +549,7 @@
       const { data, error } = await client.auth.signUp(signUpPayload);
       if (error) {
         setBusy(false);
-        return (message.textContent = `Ошибка регистрации: ${error.message}`);
+        return (message.textContent = `Ошибка регистрации: ${readableAuthError(error)}`);
       }
       if (data?.session?.user) {
         try {
@@ -543,7 +558,7 @@
           return;
         } catch (profileError) {
           setBusy(false);
-          return (message.textContent = `Аккаунт создан, но профиль не сохранен: ${profileError.message}`);
+          return (message.textContent = `Аккаунт создан, но профиль не сохранен: ${profileError.message}. Проверьте supabase-launch-fix.sql в Supabase SQL Editor.`);
         }
       }
       setBusy(false);
@@ -570,14 +585,14 @@
       const { data, error } = await client.auth.signInWithPassword(credentials);
       if (error) {
         setBusy(false);
-        return (message.textContent = `Ошибка входа: ${error.message}`);
+        return (message.textContent = `Ошибка входа: ${readableAuthError(error)}`);
       }
       try {
         const profile = await ensureProfile(data.user, roleWasExplicit ? roleInput.value : "");
         window.location.href = profileCabinetUrl(profile);
       } catch (profileError) {
         setBusy(false);
-        message.textContent = `Вход выполнен, но профиль не проверен: ${profileError.message}`;
+        message.textContent = `Вход выполнен, но профиль не проверен: ${profileError.message}. Проверьте supabase-launch-fix.sql в Supabase SQL Editor.`;
       }
     });
 
