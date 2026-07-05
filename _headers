@@ -17,3 +17,27 @@
 
 /supabase-launch-fix.sql
   Cache-Control: no-store
+
+/contacts/*
+  Cache-Control: no-store
+
+/contacts.html
+  Cache-Control: no-store
+
+/privacy/*
+  Cache-Control: no-store
+
+/privacy.html
+  Cache-Control: no-store
+
+/terms/*
+  Cache-Control: no-store
+
+/terms.html
+  Cache-Control: no-store
+
+/personal-data-consent/*
+  Cache-Control: no-store
+
+/personal-data-consent.html
+  Cache-Control: no-store
