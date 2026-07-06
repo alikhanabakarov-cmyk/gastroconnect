@@ -558,7 +558,7 @@
           return;
         } catch (profileError) {
           setBusy(false);
-          return (message.textContent = `Аккаунт создан, но профиль не сохранен: ${profileError.message}. Проверьте supabase-launch-fix.sql в Supabase SQL Editor.`);
+          return (message.textContent = `Аккаунт создан, но профиль не сохранился: ${profileError.message}. Пожалуйста, напишите в поддержку.`);
         }
       }
       setBusy(false);
@@ -592,7 +592,7 @@
         window.location.href = profileCabinetUrl(profile);
       } catch (profileError) {
         setBusy(false);
-        message.textContent = `Вход выполнен, но профиль не проверен: ${profileError.message}. Проверьте supabase-launch-fix.sql в Supabase SQL Editor.`;
+        message.textContent = `Вход выполнен, но профиль не открылся: ${profileError.message}. Пожалуйста, напишите в поддержку.`;
       }
     });
 
