@@ -266,6 +266,27 @@
       source: row.source || "site",
       status: row.status || "new",
     };
+    const compactPayload = {
+      type: row.type,
+      title: row.title,
+      phone: row.phone,
+      telegram: row.telegram,
+      city: row.city,
+      data: {
+        ...row.data,
+        email: row.email || row.data?.email || "",
+        personalDataConsent: Boolean(row.personalDataConsent),
+        personalDataConsentDate: row.personalDataConsentDate || "",
+        ipAddress: row.ipAddress || "",
+        userAgent: row.userAgent || "",
+        source: row.source || "site",
+        status: row.status || "new",
+      },
+    };
+    const isSchemaMismatch = (error) =>
+      /PGRST204|schema cache|personal_data_consent|personal_data_consent_date|ip_address|user_agent|email|status|source/i.test(
+        String(error?.code || error?.message || error || ""),
+      );
     const client = window.supabaseClient;
     if (client) {
       const { error } = await withTimeout(
@@ -273,28 +294,45 @@
         3500,
         "public_submissions timeout",
       );
-      if (error) throw error;
+      if (error) {
+        if (!isSchemaMismatch(error)) throw error;
+        const retry = await withTimeout(
+          client.from(SUBMISSIONS_TABLE).insert(compactPayload),
+          3500,
+          "public_submissions compact timeout",
+        );
+        if (retry.error) throw retry.error;
+      }
       return true;
     }
     const { url, key } = await getSupabaseRestConfig();
-    const timeout = timeoutSignal(3500);
-    let response;
-    try {
-      response = await fetch(`${url}/rest/v1/${SUBMISSIONS_TABLE}`, {
-        method: "POST",
-        signal: timeout.signal,
-        headers: {
-          apikey: key,
-          Authorization: `Bearer ${key}`,
-          "Content-Type": "application/json",
-          Prefer: "return=minimal",
-        },
-        body: JSON.stringify(payload),
-      });
-    } finally {
-      timeout.clear();
+    async function post(body) {
+      const timeout = timeoutSignal(3500);
+      try {
+        const response = await fetch(`${url}/rest/v1/${SUBMISSIONS_TABLE}`, {
+          method: "POST",
+          signal: timeout.signal,
+          headers: {
+            apikey: key,
+            Authorization: `Bearer ${key}`,
+            "Content-Type": "application/json",
+            Prefer: "return=minimal",
+          },
+          body: JSON.stringify(body),
+        });
+        const text = response.ok ? "" : await response.text().catch(() => "");
+        return { response, text };
+      } finally {
+        timeout.clear();
+      }
     }
-    if (!response.ok) throw new Error(`public_submissions ${response.status}`);
+    const first = await post(payload);
+    if (!first.response.ok && isSchemaMismatch(first.text)) {
+      const retry = await post(compactPayload);
+      if (!retry.response.ok) throw new Error(`public_submissions ${retry.response.status}: ${retry.text}`);
+      return true;
+    }
+    if (!first.response.ok) throw new Error(`public_submissions ${first.response.status}: ${first.text}`);
     return true;
   }
   function initPublicForms() {
@@ -533,10 +571,10 @@
       const code = String(error?.code || error?.error_code || "");
       const text = String(error?.message || "").toLowerCase();
       if (code.includes("email_not_confirmed") || text.includes("email not confirmed")) {
-        return "Email не подтвержден. Откройте письмо Supabase и подтвердите регистрацию, либо отключите обязательное подтверждение email в Supabase на время MVP.";
+        return "Email ?? ???????????. ???????? ?????? ?? GastroConnect ? ??????????? ???????????.";
       }
       if (code.includes("over_email_send_rate_limit") || text.includes("email rate limit")) {
-        return "Supabase временно ограничил отправку писем. Подключите SMTP в Supabase Authentication или повторите позже.";
+        return "?????? ??????? ????? ???????? ?? ???????????. ?????????? ??? ??? ????? ????????? ????? ??? ???????? ?????? ????? ????? ?? ?????.";
       }
       if (code.includes("invalid_credentials") || text.includes("invalid login credentials")) {
         return "Неверный email/телефон или пароль. Если вы только зарегистрировались, сначала подтвердите email.";
