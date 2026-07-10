@@ -44,6 +44,20 @@
     } catch {}
   }
 
+  function timeoutSignal(ms) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), ms);
+    return { signal: controller.signal, clear: () => clearTimeout(timeoutId) };
+  }
+
+  function withTimeout(promise, ms, message = "request timeout") {
+    let timeoutId;
+    const timeout = new Promise((_, reject) => {
+      timeoutId = setTimeout(() => reject(new Error(message)), ms);
+    });
+    return Promise.race([promise, timeout]).finally(() => clearTimeout(timeoutId));
+  }
+
   function applySettings(settings) {
     if (!settings || typeof settings !== "object") return;
     document.querySelectorAll("[data-site-setting]").forEach((node) => {
@@ -128,11 +142,15 @@
     const client = window.supabaseClient;
     if (!client) return;
     try {
-      const { data, error } = await client
-        .from("site_settings")
-        .select("settings")
-        .eq("id", SETTINGS_ROW)
-        .maybeSingle();
+      const { data, error } = await withTimeout(
+        client
+          .from("site_settings")
+          .select("settings")
+          .eq("id", SETTINGS_ROW)
+          .maybeSingle(),
+        1500,
+        "site_settings timeout",
+      );
       if (error || !data?.settings) return;
       const next = mergeDeep(readJson(SETTINGS_KEY, {}), data.settings);
       writeJson(SETTINGS_KEY, next);
@@ -149,7 +167,13 @@
       };
       return window.__gcSupabaseRestConfig;
     }
-    const response = await fetch("/supabase.js?v=1002", { cache: "force-cache" });
+    const timeout = timeoutSignal(1500);
+    let response;
+    try {
+      response = await fetch("/supabase.js?v=1002", { cache: "force-cache", signal: timeout.signal });
+    } finally {
+      timeout.clear();
+    }
     if (!response.ok) throw new Error("supabase.js не загрузился");
     const source = await response.text();
     const url = source.match(/SUPABASE_URL\s*=\s*['"]([^'"]+)['"]/i)?.[1];
@@ -244,21 +268,32 @@
     };
     const client = window.supabaseClient;
     if (client) {
-      const { error } = await client.from(SUBMISSIONS_TABLE).insert(payload);
+      const { error } = await withTimeout(
+        client.from(SUBMISSIONS_TABLE).insert(payload),
+        3500,
+        "public_submissions timeout",
+      );
       if (error) throw error;
       return true;
     }
     const { url, key } = await getSupabaseRestConfig();
-    const response = await fetch(`${url}/rest/v1/${SUBMISSIONS_TABLE}`, {
-      method: "POST",
-      headers: {
-        apikey: key,
-        Authorization: `Bearer ${key}`,
-        "Content-Type": "application/json",
-        Prefer: "return=minimal",
-      },
-      body: JSON.stringify(payload),
-    });
+    const timeout = timeoutSignal(3500);
+    let response;
+    try {
+      response = await fetch(`${url}/rest/v1/${SUBMISSIONS_TABLE}`, {
+        method: "POST",
+        signal: timeout.signal,
+        headers: {
+          apikey: key,
+          Authorization: `Bearer ${key}`,
+          "Content-Type": "application/json",
+          Prefer: "return=minimal",
+        },
+        body: JSON.stringify(payload),
+      });
+    } finally {
+      timeout.clear();
+    }
     if (!response.ok) throw new Error(`public_submissions ${response.status}`);
     return true;
   }
@@ -651,5 +686,3 @@
   initReviewsCarousel();
   window.addEventListener("load", () => setTimeout(refreshSettings, 400), { once: true });
 })();
-
-

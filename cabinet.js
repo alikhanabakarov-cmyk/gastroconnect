@@ -225,6 +225,17 @@
     return error.message || "Неизвестная ошибка Supabase";
   }
 
+  function withTimeout(promise, ms = 6000, label = "Supabase") {
+    let timeoutId;
+    const timeout = new Promise((_, reject) => {
+      timeoutId = setTimeout(
+        () => reject(new Error(`${label}: превышено время ожидания`)),
+        ms,
+      );
+    });
+    return Promise.race([promise, timeout]).finally(() => clearTimeout(timeoutId));
+  }
+
   function normalizePublicRole(role) {
     return publicRoles.includes(role) ? role : "worker";
   }
@@ -265,12 +276,16 @@
   }
 
   async function updateMainProfile(payload) {
-    const { data, error } = await db
-      .from("profiles")
-      .update({ ...payload, updated_at: new Date().toISOString() })
-      .eq("id", state.user.id)
-      .select("*")
-      .maybeSingle();
+    const { data, error } = await withTimeout(
+      db
+        .from("profiles")
+        .update({ ...payload, updated_at: new Date().toISOString() })
+        .eq("id", state.user.id)
+        .select("*")
+        .maybeSingle(),
+      6000,
+      "profiles",
+    );
 
     if (!error && data) state.profile = data;
     return { error };
@@ -303,7 +318,11 @@
       user_agent: payload.userAgent || metadata.userAgent || navigator.userAgent || "",
       ip_address: payload.ipAddress || metadata.ipAddress || "",
     };
-    const result = await db.from("admin_user_accounts").upsert(consentPayload, { onConflict: "user_id" });
+    const result = await withTimeout(
+      db.from("admin_user_accounts").upsert(consentPayload, { onConflict: "user_id" }),
+      6000,
+      "admin_user_accounts",
+    );
     if (result.error && /personal_data_consent|personal_data_consent_date|user_agent|ip_address/i.test(result.error.message || "")) {
       return db.from("admin_user_accounts").upsert(basePayload, { onConflict: "user_id" });
     }
@@ -369,11 +388,11 @@
   }
 
   async function upsertProfile(table, payload) {
-    return db.from(table).upsert(payload, { onConflict: "user_id" });
+    return withTimeout(db.from(table).upsert(payload, { onConflict: "user_id" }), 6000, table);
   }
 
   async function insertRow(table, payload) {
-    return db.from(table).insert(payload);
+    return withTimeout(db.from(table).insert(payload), 6000, table);
   }
 
   async function updateRows(table, filters, payload) {
@@ -381,7 +400,7 @@
     Object.entries(filters).forEach(([key, filterValue]) => {
       query = query.eq(key, filterValue);
     });
-    return query;
+    return withTimeout(query, 6000, table);
   }
 
   async function selectRows(table, filters = {}, options = {}) {
@@ -396,7 +415,7 @@
     }
 
     if (options.limit) query = query.limit(options.limit);
-    return query;
+    return withTimeout(query, 6000, table);
   }
 
   async function selectRowsWithFallback(table, filters = {}, options = {}) {

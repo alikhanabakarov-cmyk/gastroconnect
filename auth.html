@@ -14,7 +14,7 @@
     <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" sizes="120x120" />
     <link rel="alternate icon" href="/favicon.ico" sizes="any" />
     <link rel="manifest" href="/site.webmanifest" />
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+
     <link rel="stylesheet" href="/style.css?v=1031" />
   </head>
   <body>
@@ -173,7 +173,7 @@
       </footer>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/assets/supabase-js-v2.min.js?v=2"></script>
     <script src="/supabase.js?v=1002"></script>
     <script>
       window.addEventListener("load", function () {
@@ -184,7 +184,7 @@
           }
         });
         var script = document.createElement("script");
-        script.src = "/public.js?v=1019";
+        script.src = "/public.js?v=1020";
         script.async = true;
         document.body.appendChild(script);
       }, { once: true });
