@@ -4,3 +4,4 @@ publish-v*/
 script-v*.js
 style-v*.css
 cabinet-v*.js
+dist/
