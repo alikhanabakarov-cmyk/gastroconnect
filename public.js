@@ -571,10 +571,10 @@
       const code = String(error?.code || error?.error_code || "");
       const text = String(error?.message || "").toLowerCase();
       if (code.includes("email_not_confirmed") || text.includes("email not confirmed")) {
-        return "Email ?? ???????????. ???????? ?????? ?? GastroConnect ? ??????????? ???????????.";
+        return "Email не подтвержден. Откройте письмо от GastroConnect и подтвердите регистрацию.";
       }
       if (code.includes("over_email_send_rate_limit") || text.includes("email rate limit")) {
-        return "?????? ??????? ????? ???????? ?? ???????????. ?????????? ??? ??? ????? ????????? ????? ??? ???????? ?????? ????? ????? ?? ?????.";
+        return "Сейчас слишком много запросов на регистрацию. Попробуйте ещё раз через несколько минут или оставьте заявку через форму на сайте.";
       }
       if (code.includes("invalid_credentials") || text.includes("invalid login credentials")) {
         return "Неверный email/телефон или пароль. Если вы только зарегистрировались, сначала подтвердите email.";
@@ -621,6 +621,29 @@
       const signUpPayload = method === "phone" ? { phone, password, options } : { email, password, options };
       const { data, error } = await client.auth.signUp(signUpPayload);
       if (error) {
+        const authErrorText = String(error?.code || error?.message || "").toLowerCase();
+        if (authErrorText.includes("email rate") || authErrorText.includes("over_email_send_rate_limit")) {
+          try {
+            const fallbackRow = makeSubmission(role, {
+              name,
+              city,
+              email,
+              phone,
+              title: name || email || phone || roleName[role],
+              personalDataConsent: true,
+              personalDataConsentDate: consentDate,
+              userAgent: navigator.userAgent || "",
+              authFallbackReason: "email_rate_limit",
+            });
+            saveLocalSubmission(fallbackRow);
+            await saveRemoteSubmission(fallbackRow);
+            setBusy(false);
+            setMode("login");
+            return (message.textContent = "Заявка принята. Мы получили ваши контакты и поможем завершить регистрацию.");
+          } catch {
+            // Keep the original auth error if even fallback lead capture is unavailable.
+          }
+        }
         setBusy(false);
         return (message.textContent = `Ошибка регистрации: ${readableAuthError(error)}`);
       }
