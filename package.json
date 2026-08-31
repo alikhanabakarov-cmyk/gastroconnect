@@ -4,6 +4,7 @@
   "private": true,
   "type": "commonjs",
   "scripts": {
-    "build": "node build-sites.js"
+    "build": "node build-sites.js",
+    "check": "node verify.js"
   }
 }
