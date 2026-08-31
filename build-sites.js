@@ -10,15 +10,17 @@ const skip = new Set([
   "dist",
   "node_modules",
   "build-sites.js",
+  "verify.js",
   "package.json",
   "package-lock.json",
 ]);
+const skipExtensions = new Set([".sql", ".md", ".zip"]);
 
 function copyDir(from, to) {
   fs.mkdirSync(to, { recursive: true });
   for (const entry of fs.readdirSync(from, { withFileTypes: true })) {
     if (skip.has(entry.name)) continue;
-    if (entry.name.endsWith(".zip")) continue;
+    if (skipExtensions.has(path.extname(entry.name).toLowerCase())) continue;
     if (entry.name.startsWith("preview-")) continue;
 
     const source = path.join(from, entry.name);
@@ -98,23 +100,24 @@ function resolvePath(pathname) {
     clean,
     clean.endsWith("/") ? clean + "index.html" : clean + "/index.html",
     clean.endsWith(".html") ? clean : clean + ".html",
-    "/index.html",
   ];
-  return candidates.find((candidate) => FILES[candidate]);
+  return candidates.find((candidate) => FILES[candidate]) || null;
 }
 
 export default {
   async fetch(request) {
     const url = new URL(request.url);
     const key = resolvePath(url.pathname);
-    const file = FILES[key];
+    const file = FILES[key || "/404.html"] || FILES["/index.html"];
     const headers = new Headers({
       "content-type": file.mime,
       "cache-control": file.cache,
       "x-content-type-options": "nosniff",
       "referrer-policy": "strict-origin-when-cross-origin",
+      "x-frame-options": "SAMEORIGIN",
+      "permissions-policy": "camera=(), microphone=(), geolocation=()",
     });
-    return new Response(decodeBase64(file.body), { status: key === "/index.html" && url.pathname !== "/" ? 404 : 200, headers });
+    return new Response(decodeBase64(file.body), { status: key ? 200 : 404, headers });
   },
 };
 `;

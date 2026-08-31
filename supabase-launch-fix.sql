@@ -247,7 +247,10 @@ create policy admin_user_accounts_insert_own
 on public.admin_user_accounts
 for insert
 to authenticated
-with check (user_id = auth.uid());
+with check (
+  public.is_admin()
+  or (user_id = auth.uid() and role in ('worker', 'restaurant', 'supplier'))
+);
 
 drop policy if exists admin_user_accounts_update_own_or_admin on public.admin_user_accounts;
 create policy admin_user_accounts_update_own_or_admin
@@ -255,4 +258,7 @@ on public.admin_user_accounts
 for update
 to authenticated
 using (user_id = auth.uid() or public.is_admin())
-with check (user_id = auth.uid() or public.is_admin());
+with check (
+  public.is_admin()
+  or (user_id = auth.uid() and role in ('worker', 'restaurant', 'supplier'))
+);
