@@ -1,0 +1,8 @@
+{
+  "name": "GastroConnect",
+  "description": "Платформа гибкой занятости и поставок для HoReCa в Москве: смены, персонал и заведения",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
