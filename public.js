@@ -337,20 +337,145 @@
   }
   function initPublicForms() {
     document.querySelectorAll("form[data-form-type]").forEach((form) => {
+      function getOrCreateErrorBadge(input) {
+        const parent = input.closest("label") || input.parentElement;
+        let badge = parent.querySelector(".field-error-msg");
+        if (!badge) {
+          badge = document.createElement("span");
+          badge.className = "field-error-msg";
+          parent.appendChild(badge);
+        }
+        return badge;
+      }
+
+      function validateField(input, isBlur = false) {
+        if (!input || input.type === "hidden" || input.type === "submit") return true;
+        const val = input.value.trim();
+        const badge = getOrCreateErrorBadge(input);
+        let isValid = true;
+        let errorMsg = "";
+
+        if (input.name === "name") {
+          if (!val) {
+            isValid = false;
+            errorMsg = "Пожалуйста, укажите имя";
+          } else if (val.length < 2) {
+            isValid = false;
+            errorMsg = "Имя должно содержать от 2 символов";
+          }
+        } else if (input.name === "phone" || input.type === "tel") {
+          const digits = val.replace(/\D/g, "");
+          if (!val) {
+            isValid = false;
+            errorMsg = "Укажите номер телефона для связи";
+          } else if (digits.length < 10) {
+            isValid = false;
+            errorMsg = "Введите корректный номер (10–11 цифр)";
+          }
+        } else if (input.name === "email" || input.type === "email") {
+          if (input.required && !val) {
+            isValid = false;
+            errorMsg = "Укажите email";
+          } else if (val && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
+            isValid = false;
+            errorMsg = "Некорректный формат email";
+          }
+        } else if (input.required && !val) {
+          isValid = false;
+          errorMsg = "Обязательное поле для заполнения";
+        }
+
+        if (isValid) {
+          input.classList.remove("is-invalid");
+          if (val.length > 0) input.classList.add("is-valid");
+          else input.classList.remove("is-valid");
+          badge.classList.remove("show");
+          badge.textContent = "";
+        } else {
+          input.classList.remove("is-valid");
+          if (isBlur || input.dataset.touched === "true") {
+            input.classList.add("is-invalid");
+            badge.textContent = errorMsg;
+            badge.classList.add("show");
+          }
+        }
+        return isValid;
+      }
+
+      form.querySelectorAll("input, select, textarea").forEach((input) => {
+        if (input.type === "hidden" || input.type === "submit") return;
+
+        if (input.name === "phone" || input.type === "tel") {
+          input.addEventListener("input", () => {
+            input.dataset.touched = "true";
+            let raw = input.value.replace(/\D/g, "");
+            if (raw.startsWith("7") || raw.startsWith("8")) raw = raw.slice(1);
+            if (raw.length > 0) {
+              let formatted = "+7 (";
+              formatted += raw.slice(0, 3);
+              if (raw.length > 3) formatted += ") " + raw.slice(3, 6);
+              if (raw.length > 6) formatted += "-" + raw.slice(6, 8);
+              if (raw.length > 8) formatted += "-" + raw.slice(8, 10);
+              input.value = formatted;
+            }
+            validateField(input);
+          });
+        } else if (input.type !== "checkbox") {
+          input.addEventListener("input", () => {
+            input.dataset.touched = "true";
+            validateField(input);
+          });
+        }
+
+        input.addEventListener("blur", () => {
+          input.dataset.touched = "true";
+          validateField(input, true);
+        });
+      });
+
+      const consentBox = form.querySelector('input[name="personalDataConsent"]');
+      if (consentBox) {
+        consentBox.addEventListener("change", () => {
+          const wrapper = consentBox.closest(".consent-checkbox") || consentBox.parentElement;
+          if (consentBox.checked) {
+            wrapper.classList.remove("is-invalid");
+          }
+        });
+      }
+
       form.addEventListener("submit", async (event) => {
         event.preventDefault();
         const button = form.querySelector('button[type="submit"], input[type="submit"]');
         const box = form.querySelector(".success");
-        if (button) button.disabled = true;
-        const rawData = Object.fromEntries(new FormData(form).entries());
-        if (rawData.personalDataConsent !== "true" && rawData.personalDataConsent !== "on") {
-          if (box) {
-            box.textContent = "\u041d\u0443\u0436\u043d\u043e \u043f\u0440\u0438\u043d\u044f\u0442\u044c \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b \u0438 \u0434\u0430\u0442\u044c \u0441\u043e\u0433\u043b\u0430\u0441\u0438\u0435 \u043d\u0430 \u043e\u0431\u0440\u0430\u0431\u043e\u0442\u043a\u0443 \u043f\u0435\u0440\u0441\u043e\u043d\u0430\u043b\u044c\u043d\u044b\u0445 \u0434\u0430\u043d\u043d\u044b\u0445.";
-            box.style.display = "block";
+
+        let formIsValid = true;
+        let firstInvalid = null;
+
+        form.querySelectorAll("input, select, textarea").forEach((input) => {
+          if (input.type === "hidden" || input.type === "submit" || input.type === "checkbox") return;
+          input.dataset.touched = "true";
+          const valid = validateField(input, true);
+          if (!valid) {
+            formIsValid = false;
+            if (!firstInvalid) firstInvalid = input;
           }
-          if (button) button.disabled = false;
+        });
+
+        const consent = form.querySelector('input[name="personalDataConsent"]');
+        if (consent && !consent.checked) {
+          formIsValid = false;
+          const wrapper = consent.closest(".consent-checkbox") || consent.parentElement;
+          wrapper.classList.add("is-invalid");
+          if (!firstInvalid) firstInvalid = consent;
+        }
+
+        if (!formIsValid) {
+          if (firstInvalid) firstInvalid.focus();
           return;
         }
+
+        if (button) button.disabled = true;
+        const rawData = Object.fromEntries(new FormData(form).entries());
         rawData.personalDataConsentDate = new Date().toISOString();
         rawData.userAgent = navigator.userAgent || "";
         rawData.ipAddress = "";
@@ -362,18 +487,20 @@
             box.setAttribute("role", "status");
             box.textContent =
               form.dataset.formType === "callback"
-                ? "\u0417\u0430\u044f\u0432\u043a\u0430 \u043d\u0430 \u0437\u0432\u043e\u043d\u043e\u043a \u043e\u0442\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u0430. \u041c\u044b \u0441\u0432\u044f\u0436\u0435\u043c\u0441\u044f \u0441 \u0432\u0430\u043c\u0438 \u043f\u043e \u0443\u043a\u0430\u0437\u0430\u043d\u043d\u043e\u043c\u0443 \u0442\u0435\u043b\u0435\u0444\u043e\u043d\u0443."
+                ? "Заявка на звонок отправлена. Мы свяжемся с вами по указанному телефону."
                 : form.dataset.formType === "feedback"
-                  ? "\u041e\u0431\u0440\u0430\u0449\u0435\u043d\u0438\u0435 \u043e\u0442\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u043e. \u041c\u044b \u043e\u0442\u0432\u0435\u0442\u0438\u043c \u043f\u043e \u0443\u043a\u0430\u0437\u0430\u043d\u043d\u044b\u043c \u043a\u043e\u043d\u0442\u0430\u043a\u0442\u0430\u043c."
+                  ? "Обращение отправлено. Мы ответим по указанным контактам."
                   : form.dataset.formType === "telegram_bot"
-                    ? "\u0417\u0430\u044f\u0432\u043a\u0430 \u043d\u0430 Telegram-\u0443\u0432\u0435\u0434\u043e\u043c\u043b\u0435\u043d\u0438\u044f \u043e\u0442\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u0430. \u041c\u044b \u0441\u0432\u044f\u0436\u0435\u043c\u0441\u044f \u0434\u043b\u044f \u043f\u043e\u0434\u043a\u043b\u044e\u0447\u0435\u043d\u0438\u044f."
-                    : "\u0417\u0430\u044f\u0432\u043a\u0430 \u043e\u0442\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u0430. \u041c\u044b \u043f\u043e\u043b\u0443\u0447\u0438\u043b\u0438 \u0432\u0430\u0448\u0438 \u043a\u043e\u043d\u0442\u0430\u043a\u0442\u044b \u0438 \u0441\u0432\u044f\u0436\u0435\u043c\u0441\u044f \u0441 \u0432\u0430\u043c\u0438.";
+                    ? "Заявка на Telegram-уведомления отправлена. Мы свяжемся для подключения."
+                    : "Заявка отправлена. Мы получили ваши контакты и свяжемся с вами.";
           }
         } catch {
-          if (box) box.textContent = "\u0417\u0430\u044f\u0432\u043a\u0430 \u0441\u043e\u0445\u0440\u0430\u043d\u0435\u043d\u0430 \u0432 \u044d\u0442\u043e\u043c \u0431\u0440\u0430\u0443\u0437\u0435\u0440\u0435. \u0415\u0441\u043b\u0438 \u0438\u043d\u0442\u0435\u0440\u043d\u0435\u0442 \u0438\u043b\u0438 \u0431\u0430\u0437\u0430 \u0432\u0440\u0435\u043c\u0435\u043d\u043d\u043e \u043d\u0435\u0434\u043e\u0441\u0442\u0443\u043f\u043d\u044b, \u043f\u043e\u0432\u0442\u043e\u0440\u0438\u0442\u0435 \u043e\u0442\u043f\u0440\u0430\u0432\u043a\u0443 \u043f\u043e\u0437\u0436\u0435.";
+          if (box) box.textContent = "Заявка сохранена в этом браузере. Если интернет или база временно недоступны, повторите отправку позже.";
         } finally {
           if (box) box.style.display = "block";
           form.reset();
+          form.querySelectorAll(".is-valid, .is-invalid").forEach((el) => el.classList.remove("is-valid", "is-invalid"));
+          form.querySelectorAll(".field-error-msg").forEach((el) => el.classList.remove("show"));
           if (button) button.disabled = false;
         }
       });

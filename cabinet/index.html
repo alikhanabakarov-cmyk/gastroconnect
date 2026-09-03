@@ -1,7 +1,7 @@
 <!doctype html><html lang="ru"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="yandex-verification" content="7809b97f5ab8ab49" /><title>Кабинет — GastroConnect</title><meta name="robots" content="noindex,nofollow" /><meta
       name="description"
       content="Личный кабинет GastroConnect для профилей, смен, приглашений и заявок по ролям."
-    /><meta name="theme-color" content="#064c3b" /><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" sizes="120x120" /><link rel="alternate icon" href="/favicon.ico" sizes="any" /><link rel="manifest" href="/site.webmanifest" /><link rel="stylesheet" href="/style.css?v=1031" /></head><body><div class="page-shell"><header class="site-header"><a class="brand" href="/" aria-label="GastroConnect"><span class="brand-mark" aria-hidden="true">GC</span><span class="brand-text">GastroConnect</span></a><nav class="main-nav" aria-label="Главное меню"><a href="/workers/">Сотрудникам</a><a href="/restaurants/">Заведениям</a><a href="/suppliers/">Поставщикам</a><a href="/contacts/">Контакты</a></nav><button id="logoutBtn" type="button">Выйти</button></header><main class="cabinet-page service-page"><section class="service-hero service-hero-cabinet"><div class="service-hero-copy"><p class="eyebrow" data-site-setting="cabinet.eyebrow">
+    /><meta name="theme-color" content="#064c3b" /><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" sizes="120x120" /><link rel="alternate icon" href="/favicon.ico" sizes="any" /><link rel="manifest" href="/site.webmanifest" /><link rel="stylesheet" href="/style.css?v=1037" /></head><body><div class="page-shell"><header class="site-header"><a class="brand" href="/" aria-label="GastroConnect"><span class="brand-mark" aria-hidden="true">GC</span><span class="brand-text">GastroConnect</span></a><nav class="main-nav" aria-label="Главное меню"><a href="/workers/">Сотрудникам</a><a href="/restaurants/">Заведениям</a><a href="/suppliers/">Поставщикам</a><a href="/contacts/">Контакты</a></nav><button id="logoutBtn" type="button">Выйти</button></header><main class="cabinet-page service-page"><section class="service-hero service-hero-cabinet"><div class="service-hero-copy"><p class="eyebrow" data-site-setting="cabinet.eyebrow">
               Рабочее пространство
             </p><h1 data-site-setting="cabinet.title">Кабинет GastroConnect</h1><p data-site-setting="cabinet.lead">
               Профили, смены, приглашения и заявки собраны в одном месте для
@@ -77,17 +77,417 @@
                 placeholder="коротко о себе, навыки и пожелания"
               ></textarea></label></div><div class="cabinet-actions form-actions"><button id="saveWorkerProfileBtn" type="button">
               Сохранить профиль работника
-            </button></div><p id="workerProfileMessage" class="message"></p><hr class="section-divider" /><h3>Приглашения на смены</h3><div class="cabinet-actions"><button id="loadInvitesBtn" type="button">
+            </button></div><p id="workerProfileMessage" class="message"></p><hr class="section-divider" />
+            <!-- Финансовый хаб и калькулятор заработка соискателя -->
+            <div class="worker-earnings-hub" id="workerEarningsHub">
+              <div class="worker-earnings-header">
+                <div>
+                  <span class="earnings-badge-chip">💰 Доход и выплаты соискателя</span>
+                  <h3 style="margin: 6px 0 4px; font-size: 24px; color: var(--green);">Сколько вы заработаете на сменах</h3>
+                  <p style="color: var(--muted); margin: 0; font-size: 14.5px;">
+                    Прозрачный расчет дохода, баланс завершенных смен и выплаты напрямую от заведений без скрытых комиссий (0%).
+                  </p>
+                </div>
+                <button id="refreshWorkerEarningsBtn" class="btn" type="button" style="padding: 8px 16px; font-size: 13px;">
+                  🔄 Обновить расчет
+                </button>
+              </div>
+
+              <!-- Карточки финансового баланса -->
+              <div class="earnings-stats-grid">
+                <div class="earnings-stat-card highlight-emerald">
+                  <div class="earnings-stat-label">Заработано всего</div>
+                  <div class="earnings-stat-val" id="workerTotalEarned">136 500 ₽</div>
+                  <div class="earnings-stat-note">✓ Выплачено ресторанами</div>
+                </div>
+                <div class="earnings-stat-card highlight-gold">
+                  <div class="earnings-stat-label">К выплате (ожидает)</div>
+                  <div class="earnings-stat-val" id="workerPendingPayout">16 500 ₽</div>
+                  <div class="earnings-stat-note">⏳ За 3 ближайшие смены</div>
+                </div>
+                <div class="earnings-stat-card">
+                  <div class="earnings-stat-label">Средняя ставка</div>
+                  <div class="earnings-stat-val" id="workerAvgShiftRate">5 500 ₽</div>
+                  <div class="earnings-stat-note">~458 ₽ в час (12ч смена)</div>
+                </div>
+                <div class="earnings-stat-card">
+                  <div class="earnings-stat-label">Отработано смен</div>
+                  <div class="earnings-stat-val" id="workerCompletedShiftsCount">25 смен</div>
+                  <div class="earnings-stat-note">100% выход без отмен</div>
+                </div>
+              </div>
+
+              <!-- Интерактивный калькулятор дохода -->
+              <div class="earnings-calc-card">
+                <div class="earnings-calc-grid">
+                  <div>
+                    <h4 style="margin: 0 0 6px; font-size: 18px; color: var(--green);">Интерактивный калькулятор заработка</h4>
+                    <p style="margin: 0 0 14px; font-size: 13.5px; color: #64748b;">
+                      Выберите специальность или настройте желаемую ставку и количество смен:
+                    </p>
+
+                    <!-- Пресеты популярных позиций -->
+                    <div style="font-size: 12px; font-weight: 750; color: #475569; text-transform: uppercase; letter-spacing: 0.03em;">
+                      Быстрый выбор должности:
+                    </div>
+                    <div class="calc-preset-chips" id="workerCalcPresets">
+                      <button type="button" class="calc-preset-btn active" data-rate="5500" data-tips="0" data-role="Повар ГЦ">🍳 Повар ГЦ (5 500 ₽)</button>
+                      <button type="button" class="calc-preset-btn" data-rate="5200" data-tips="0" data-role="Повар ХЦ">🥗 Повар ХЦ (5 200 ₽)</button>
+                      <button type="button" class="calc-preset-btn" data-rate="7200" data-tips="0" data-role="Су-шеф">👨‍🍳 Су-шеф (7 200 ₽)</button>
+                      <button type="button" class="calc-preset-btn" data-rate="5800" data-tips="0" data-role="Пиццайоло/Сушист">🍕 Пиццайоло (5 800 ₽)</button>
+                      <button type="button" class="calc-preset-btn" data-rate="4200" data-tips="0" data-role="Бариста">☕️ Бариста (4 200 ₽)</button>
+                      <button type="button" class="calc-preset-btn" data-rate="3500" data-tips="3500" data-role="Официант">🍷 Официант (3 500 ₽ + чай)</button>
+                      <button type="button" class="calc-preset-btn" data-rate="4800" data-tips="2500" data-role="Бармен">🍸 Бармен (4 800 ₽ + чай)</button>
+                      <button type="button" class="calc-preset-btn" data-rate="3400" data-tips="0" data-role="Клининг">🧼 Клининг / Котломой (3 400 ₽)</button>
+                    </div>
+
+                    <!-- Ползунок ставки -->
+                    <div class="calc-range-row">
+                      <div class="calc-range-head">
+                        <span>Ставка за 1 смену:</span>
+                        <strong id="workerCalcRateVal">5 500 ₽</strong>
+                      </div>
+                      <input type="range" class="calc-slider" id="workerCalcRateInput" min="3000" max="12000" step="100" value="5500" />
+                    </div>
+
+                    <!-- Ползунок количества смен -->
+                    <div class="calc-range-row">
+                      <div class="calc-range-head">
+                        <span>Смен в месяц:</span>
+                        <strong id="workerCalcShiftsVal">15 смен (график 2/2)</strong>
+                      </div>
+                      <input type="range" class="calc-slider" id="workerCalcShiftsInput" min="1" max="28" step="1" value="15" />
+                    </div>
+
+                    <!-- Надбавки -->
+                    <label class="calc-addon-toggle">
+                      <input type="checkbox" id="workerCalcTipsCheck" />
+                      <span>Учитывать чаевые и банкетные надбавки (~2 500 ₽ / смена)</span>
+                    </label>
+                    <label class="calc-addon-toggle">
+                      <input type="checkbox" id="workerCalcNightCheck" />
+                      <span>Ночные смены / усиление в пиковые часы (+20% к ставке)</span>
+                    </label>
+                  </div>
+
+                  <!-- Карточка итогового расчета -->
+                  <div class="calc-result-board">
+                    <div>
+                      <div class="calc-result-title">Чистый расчет на руки:</div>
+                      <div class="calc-result-main-sum" id="workerCalcMonthSum">82 500 ₽</div>
+                      <div class="calc-result-period-label" id="workerCalcPeriodNote">за 15 смен в месяц</div>
+
+                      <div class="calc-breakdown-table">
+                        <div class="calc-breakdown-row">
+                          <span>За 1 смену:</span>
+                          <strong id="workerCalcSingleShift">5 500 ₽</strong>
+                        </div>
+                        <div class="calc-breakdown-row">
+                          <span>В неделю (~4 смены):</span>
+                          <strong id="workerCalcWeekSum">22 000 ₽</strong>
+                        </div>
+                        <div class="calc-breakdown-row">
+                          <span>В год (~180 смен):</span>
+                          <strong id="workerCalcYearSum">990 000 ₽</strong>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="calc-payout-guarantee">
+                      🔒 <strong>Гарантия честной оплаты:</strong> 0% комиссия сервиса. Деньги выплачиваются заведением напрямую в конце каждой смены или раз в неделю по СБП / наличными.
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Калькулятор планирования накоплений и финансовых целей -->
+              <div class="worker-savings-goal-card" id="workerSavingsGoalCard">
+                <div class="savings-goal-header">
+                  <div>
+                    <span class="earnings-badge-chip" style="background: #fffbeb; border-color: #fde68a; color: #b45309;">🎯 Планирование накоплений</span>
+                    <h4 style="margin: 6px 0 4px; font-size: 20px; color: var(--green);">Калькулятор достижения финансовой цели</h4>
+                    <p style="color: #64748b; margin: 0; font-size: 13.5px;">
+                      Рассчитайте, сколько смен и времени потребуется, чтобы накопить на цель исходя из вашего текущего среднего заработка.
+                    </p>
+                  </div>
+                  <div class="savings-active-badge" id="savingsGoalStatusBadge">
+                    ⚡️ Текущая ставка: <strong id="savingsAvgRateBadge">5 500 ₽ / смена</strong>
+                  </div>
+                </div>
+
+                <div class="savings-goal-grid">
+                  <!-- Параметры цели -->
+                  <div class="savings-inputs-col">
+                    <div style="font-size: 12px; font-weight: 750; color: #475569; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 6px;">
+                      Быстрый выбор цели или своя мечта:
+                    </div>
+                    <div class="savings-presets-chips" id="savingsPresetsList">
+                      <button type="button" class="savings-preset-chip active" data-title="Новый смартфон (флагман)" data-amount="120000">📱 Смартфон (120 000 ₽)</button>
+                      <button type="button" class="savings-preset-chip" data-title="Отпуск на море" data-amount="150000">✈️ Отпуск (150 000 ₽)</button>
+                      <button type="button" class="savings-preset-chip" data-title="Проф. ножи и китель" data-amount="45000">🔪 Ножи и китель (45 000 ₽)</button>
+                      <button type="button" class="savings-preset-chip" data-title="Обучение шеф-мастерству" data-amount="85000">🎓 Обучение (85 000 ₽)</button>
+                      <button type="button" class="savings-preset-chip" data-title="Подушка безопасности на 3 мес." data-amount="200000">🛡 Подушка безопасности (200 000 ₽)</button>
+                      <button type="button" class="savings-preset-chip" data-title="Первый взнос за авто" data-amount="350000">🚗 Взнос на авто (350 000 ₽)</button>
+                    </div>
+
+                    <!-- Название цели -->
+                    <div class="savings-field-row" style="margin-top: 14px;">
+                      <label style="font-size: 13px; font-weight: 750; color: #334155; display: block; margin-bottom: 4px;">Название цели:</label>
+                      <input type="text" id="savingsGoalTitleInput" class="savings-text-input" value="Новый смартфон (флагман)" placeholder="Например: Поездка в горы, ноутбук..." />
+                    </div>
+
+                    <!-- Сумма цели -->
+                    <div class="savings-field-row" style="margin-top: 12px;">
+                      <div class="calc-range-head">
+                        <span>Необходимая сумма:</span>
+                        <strong id="savingsGoalAmountLabel" style="color: var(--green); font-size: 16px;">120 000 ₽</strong>
+                      </div>
+                      <input type="range" class="calc-slider" id="savingsGoalAmountSlider" min="10000" max="1000000" step="5000" value="120000" />
+                    </div>
+
+                    <!-- Стратегия: сколько откладывать -->
+                    <div style="margin-top: 16px; padding-top: 14px; border-top: 1px dashed #e2e8f0;">
+                      <div style="font-size: 12px; font-weight: 750; color: #475569; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 8px;">
+                        Сколько откладывать со смены в копилку:
+                      </div>
+                      <div class="savings-mode-tabs" id="savingsModeTabs">
+                        <button type="button" class="savings-mode-btn" data-pct="100">100% (вся смена)</button>
+                        <button type="button" class="savings-mode-btn active" data-pct="50">50% (комфортно 2/2)</button>
+                        <button type="button" class="savings-mode-btn" data-pct="30">30% (мягкий темп)</button>
+                        <button type="button" class="savings-mode-btn" data-pct="custom">Своя сумма</button>
+                      </div>
+
+                      <div id="savingsCustomAmountRow" style="display: none; margin-top: 10px;">
+                        <div class="calc-range-head">
+                          <span>Фиксированно со смены:</span>
+                          <strong id="savingsCustomPerShiftVal">2 500 ₽</strong>
+                        </div>
+                        <input type="range" class="calc-slider" id="savingsCustomPerShiftSlider" min="500" max="10000" step="100" value="2500" />
+                      </div>
+                    </div>
+
+                    <!-- График работы: смен в неделю -->
+                    <div style="margin-top: 14px;">
+                      <div class="calc-range-head">
+                        <span>График смен в неделю:</span>
+                        <strong id="savingsShiftsPerWeekLabel">4 смены (график 2/2 или 4/3)</strong>
+                      </div>
+                      <input type="range" class="calc-slider" id="savingsShiftsPerWeekSlider" min="1" max="7" step="1" value="4" />
+                    </div>
+                  </div>
+
+                  <!-- Правая колонка: Результат расчета и сроки -->
+                  <div class="savings-results-board">
+                    <div>
+                      <div class="savings-hero-badge">🎯 План достижения цели</div>
+                      <div class="savings-goal-name-preview" id="savingsTargetNamePreview">
+                        📱 Новый смартфон (флагман)
+                      </div>
+
+                      <div class="savings-big-metric">
+                        <div class="savings-big-number" id="savingsRequiredShifts">44 смены</div>
+                        <div class="savings-big-label" id="savingsTimeEstimateLabel">~2.7 месяца (11 недель)</div>
+                      </div>
+
+                      <!-- Прогресс-бар вех -->
+                      <div class="savings-progress-container">
+                        <div class="savings-progress-labels">
+                          <span>Старт (0 ₽)</span>
+                          <span id="savingsProgressPaceLabel">~11 000 ₽ / нед.</span>
+                          <span id="savingsProgressTargetLabel">120 000 ₽</span>
+                        </div>
+                        <div class="savings-progress-track">
+                          <div class="savings-progress-bar" id="savingsProgressBar" style="width: 35%;"></div>
+                        </div>
+                        <div class="savings-milestones" id="savingsMilestonesLabels">
+                          <span>25% (30 тыс)</span>
+                          <span>50% (60 тыс)</span>
+                          <span>75% (90 тыс)</span>
+                        </div>
+                      </div>
+
+                      <!-- Детализация -->
+                      <div class="savings-summary-list">
+                        <div class="savings-summary-row">
+                          <span>Откладываете со смены:</span>
+                          <strong id="savingsDepositPerShift">2 750 ₽</strong>
+                        </div>
+                        <div class="savings-summary-row">
+                          <span>В копилку за неделю:</span>
+                          <strong id="savingsDepositPerWeek">11 000 ₽</strong>
+                        </div>
+                        <div class="savings-summary-row">
+                          <span>В копилку за месяц:</span>
+                          <strong id="savingsDepositPerMonth">44 000 ₽</strong>
+                        </div>
+                        <div class="savings-summary-row highlight">
+                          <span>🎯 Прогнозная дата:</span>
+                          <strong id="savingsTargetDateEstimated">15 ноября 2026</strong>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="savings-acceleration-tip" id="savingsAccelerationTip">
+                      💡 <strong>Ускорение цели:</strong> +1 дополнительная смена в неделю сократит срок накопления на <strong>22 дня</strong>!
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- История начислений и выплат -->
+              <h4 style="margin: 24px 0 12px; font-size: 18px; color: var(--green);">Последние начисления и статус выплат</h4>
+              <div id="workerPayoutsList"></div>
+            </div><hr class="section-divider" />
+            <!-- Репутация и отзывы от заведений -->
+            <div class="worker-reviews-hub" id="workerReviewsHub">
+              <div class="worker-reviews-header">
+                <div>
+                  <span class="worker-badge-trust">⭐️ Репутация и рейтинг в HoReCa</span>
+                  <h3 style="margin: 6px 0 4px; font-size: 24px; color: var(--green);">Рейтинг и отзывы от заведений</h3>
+                  <p style="color: var(--muted); margin: 0; font-size: 14.5px;">
+                    Оценки и рекомендации от ресторанов, баров и кафе Москвы после завершенных смен.
+                  </p>
+                </div>
+                <button id="refreshWorkerReviewsBtn" class="btn" type="button" style="padding: 8px 16px; font-size: 13px;">
+                  🔄 Обновить отзывы
+                </button>
+              </div>
+
+              <!-- Карточка сводного рейтинга -->
+              <div class="worker-rating-summary-card" id="workerRatingSummaryCard">
+                <div class="rating-big-score-box">
+                  <div class="rating-big-num" id="workerAvgRatingNum">5.0</div>
+                  <div class="rating-stars" id="workerRatingStars">★★★★★</div>
+                  <div class="rating-total-count" id="workerTotalReviewsCount">На основе 0 отзывов</div>
+                </div>
+                <div class="rating-stats-bars" id="workerRatingBreakdown">
+                  <div class="rating-bar-row">
+                    <span>5 ★</span>
+                    <div class="rating-bar-track"><div class="rating-bar-fill" id="workerRating5Bar" style="width: 100%;"></div></div>
+                    <span class="rating-bar-val" id="workerRating5Val">100%</span>
+                  </div>
+                  <div class="rating-bar-row">
+                    <span>4 ★</span>
+                    <div class="rating-bar-track"><div class="rating-bar-fill" id="workerRating4Bar" style="width: 0%;"></div></div>
+                    <span class="rating-bar-val" id="workerRating4Val">0%</span>
+                  </div>
+                  <div class="rating-bar-row">
+                    <span>3 ★</span>
+                    <div class="rating-bar-track"><div class="rating-bar-fill" id="workerRating3Bar" style="width: 0%;"></div></div>
+                    <span class="rating-bar-val" id="workerRating3Val">0%</span>
+                  </div>
+                </div>
+                <div class="rating-badges-box" id="workerRatingPerks">
+                  <div class="rating-perk-badge">⚡️ 100% выход на смены без опозданий</div>
+                  <div class="rating-perk-badge">🔪 Строгое соответствие стандартам ТТК</div>
+                  <div class="rating-perk-badge">✨ Высокая оценка чистоты станции</div>
+                </div>
+              </div>
+
+              <!-- Список отзывов от заведений -->
+              <h4 style="margin: 24px 0 14px; font-size: 18px; color: var(--green);">Отзывы и благодарности от шефов</h4>
+              <div id="workerReviewsList" class="list-grid"></div>
+              <p id="workerReviewsMessage" class="message"></p>
+            </div><hr class="section-divider" /><h3>Приглашения на смены</h3><div class="cabinet-actions"><button id="loadInvitesBtn" type="button">
               Показать приглашения
             </button></div><div id="invitesList" class="list-grid"></div><p id="invitesMessage" class="message"></p><hr class="section-divider" /><h3>Мои отклики</h3><div class="cabinet-actions"><button id="loadWorkerApplicationsBtn" type="button">
               Показать мои отклики
-            </button></div><div id="workerApplicationsList" class="list-grid"></div><p id="workerApplicationsMessage" class="message"></p><hr class="section-divider" /><h3>Доступные смены</h3><label class="filter-label"
-            >Фильтр смен
-            <input
-              id="shiftSearchInput"
-              type="search"
-              placeholder="Повар, бариста, Москва, ставка..."
-            /></label><div class="cabinet-actions"><button id="loadShiftPostsBtn" type="button">Показать смены</button></div><div id="shiftPostsList" class="list-grid"></div><p id="shiftPostsMessage" class="message"></p></section><section id="restaurantCabinet" class="role-panel"><h2>Кабинет заведения</h2><p>
+            </button></div><div id="workerApplicationsList" class="list-grid"></div><p id="workerApplicationsMessage" class="message"></p><hr class="section-divider" />
+<div class="cabinet-section-head">
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+    <div>
+      <span class="live-dot" style="display: inline-block; width: 8px; height: 8px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981; margin-right: 6px;"></span>
+      <strong style="color: var(--gold); font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em;">Оперативная база смен</strong>
+      <h3 style="margin: 4px 0 0; font-size: 24px;">Открытые смены и вакансии (Москва и МО)</h3>
+    </div>
+    <button id="refreshWorkerShiftsBtn" class="btn" type="button" style="padding: 8px 16px; font-size: 13px;">
+      🔄 Обновить ленту смен
+    </button>
+  </div>
+  <p style="color: var(--muted); margin-bottom: 20px; font-size: 15px;">
+    Актуальные предложения с прямым откликом: выбирайте цех, минимальную ставку и район.
+  </p>
+</div>
+
+<!-- Фильтры смен для сотрудника -->
+<div class="tg-filter-panel" style="margin-bottom: 20px;">
+  <div class="tg-filter-row-top">
+    <div class="tg-filter-field">
+      <label for="workerShiftSearch">Поиск по ключевым словам или станции метро</label>
+      <input id="workerShiftSearch" type="text" placeholder="Например: горячий, Белорусская, 5000..." autocomplete="off" />
+    </div>
+    <div class="tg-filter-field">
+      <label for="workerShiftRoleSelect">Специализация / Цех</label>
+      <select id="workerShiftRoleSelect">
+        <option value="all">Все специализации</option>
+        <option value="hot">Повар горячего цеха</option>
+        <option value="cold">Повар холодного цеха</option>
+        <option value="chef">Су-шеф / Шеф-повар</option>
+        <option value="pizza">Пиццайоло</option>
+        <option value="sushi">Повар-сушист</option>
+        <option value="universal">Повар-универсал / Смены</option>
+        <option value="pastry">Кондитер / Пекарь</option>
+        <option value="prep">Повар-заготовщик</option>
+      </select>
+    </div>
+    <div class="tg-filter-field">
+      <label for="workerShiftMinRate">Минимальная ставка</label>
+      <select id="workerShiftMinRate">
+        <option value="0">Любая ставка</option>
+        <option value="4800">от 4 800 ₽ / смена</option>
+        <option value="5000">от 5 000 ₽ / смена</option>
+        <option value="5500">от 5 500 ₽ / смена</option>
+        <option value="6000">от 6 000 ₽ / смена</option>
+      </select>
+    </div>
+    <div class="tg-filter-field">
+      <label for="workerShiftSortSelect">Сортировка</label>
+      <select id="workerShiftSortSelect">
+        <option value="date_desc">Сначала свежие</option>
+        <option value="rate_desc">По высокой ставке (max)</option>
+        <option value="rate_asc">По возрастанию ставки</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="tg-chips-row" style="margin-top: 14px;">
+    <span class="tg-chip-label">Быстрый фильтр:</span>
+    <button class="tg-role-chip active" data-role="all" type="button">Все</button>
+    <button class="tg-role-chip" data-role="hot" type="button">Горячий цех</button>
+    <button class="tg-role-chip" data-role="cold" type="button">Холодный цех</button>
+    <button class="tg-role-chip" data-role="chef" type="button">Су-шеф</button>
+    <button class="tg-role-chip" data-role="pizza" type="button">Пиццайоло</button>
+    <button class="tg-role-chip" data-role="sushi" type="button">Сушист</button>
+    <button class="tg-role-chip" data-role="universal" type="button">Банкеты / Смены</button>
+    <button class="tg-role-chip" data-role="pastry" type="button">Кондитер</button>
+  </div>
+</div>
+
+<div class="tg-feed-stats" id="workerShiftStats" style="margin-bottom: 16px;">
+  <span class="tg-feed-stats-text">Загружаем актуальные предложения...</span>
+</div>
+
+<div class="tg-jobs-grid" id="workerLiveShiftsList" style="margin-bottom: 30px;">
+  <div class="tg-loading-spinner" style="grid-column: 1 / -1;">
+    <div class="tg-spinner-icon"></div>
+    <span>Загрузка открытых смен...</span>
+  </div>
+</div>
+
+<hr class="section-divider" />
+<h3>Смены, опубликованные заведениями GastroConnect</h3>
+<label class="filter-label">Фильтр смен платформы
+  <input
+    id="shiftSearchInput"
+    type="search"
+    placeholder="Повар, бариста, Москва, ставка..."
+  />
+</label>
+<div class="cabinet-actions">
+  <button id="loadShiftPostsBtn" type="button">Показать смены заведений</button>
+</div>
+<div id="shiftPostsList" class="list-grid"></div>
+<p id="shiftPostsMessage" class="message"></p></section><section id="restaurantCabinet" class="role-panel"><h2>Кабинет заведения</h2><p>
             Здесь заведение ведет профиль, публикует смены, смотрит анкеты
             работников и отправляет заявки поставщикам.
           </p><h3>Профиль заведения</h3><div class="cabinet-grid"><label
@@ -178,7 +578,130 @@
               Мои смены
             </button><button id="loadShiftApplicationsBtn" class="btn" type="button">
               Отклики работников
-            </button></div><p id="shiftPostMessage" class="message"></p><div id="restaurantShiftPostsList" class="list-grid"></div><div id="shiftApplicationsList" class="list-grid"></div><h3>Работники</h3><label class="filter-label"
+            </button></div><p id="shiftPostMessage" class="message"></p><div id="restaurantShiftPostsList" class="list-grid"></div><div id="shiftApplicationsList" class="list-grid"></div>
+
+<!-- GastroConnect Telegram Studio & Publisher (@gastroconnect) -->
+<div class="tg-publisher-studio" id="telegramPublisherStudio">
+  <div class="tg-studio-header">
+    <span class="tg-community-badge">🚀 Telegram Publisher Pro</span>
+    <h3>Публикация вакансий и контента в @gastroconnect</h3>
+    <p>Форматируйте вакансии и посты в фирменном стиле сообщества: структурированный текст, эмодзи-акценты, хэштеги цехов и прямые кнопки отклика.</p>
+  </div>
+
+  <div style="margin-bottom: 14px;">
+    <span style="font-size: 13px; font-weight: 800; color: var(--muted); display: block; margin-bottom: 8px;">Готовые шаблоны постов:</span>
+    <div class="tg-template-selector">
+      <button class="tg-tpl-btn active" type="button" data-tpl-id="hot_shift">🔥 Горячий цех</button>
+      <button class="tg-tpl-btn" type="button" data-tpl-id="sushi_shift">🍣 Суши-повар</button>
+      <button class="tg-tpl-btn" type="button" data-tpl-id="chef_tip_herbs">💡 Лайфхак шефа</button>
+      <button class="tg-tpl-btn" type="button" data-tpl-id="poll_fair_rate">📊 Опрос по ставкам</button>
+      <button class="tg-tpl-btn" type="button" data-tpl-id="techcard_sauce">🥩 Разбор техкарты</button>
+    </div>
+  </div>
+
+  <div class="tg-studio-body">
+    <div class="tg-editor-col">
+      <div class="tg-form-grid">
+        <div>
+          <label for="tgPostType">Тип публикации</label>
+          <select id="tgPostType">
+            <option value="job">🔥 Смена / Вакансия</option>
+            <option value="tip">💡 Лайфхак шефа / Обучение</option>
+            <option value="poll">📊 Опрос сообщества</option>
+            <option value="techcard">🥩 Разбор техкарты</option>
+            <option value="custom">📢 Произвольный анонс</option>
+          </select>
+        </div>
+        <div>
+          <label for="tgTargetChannel">Целевой канал</label>
+          <input id="tgTargetChannel" type="text" value="@gastroconnect" readonly style="background: rgba(0,0,0,0.03);" />
+        </div>
+
+        <div class="tg-job-only-field">
+          <label for="tgPostRole">Должность / Цех</label>
+          <input id="tgPostRole" type="text" placeholder="Повар горячего цеха" value="Повар горячего цеха" />
+        </div>
+        <div class="tg-job-only-field">
+          <label for="tgPostRate">Ставка за смену</label>
+          <input id="tgPostRate" type="text" placeholder="5 500 ₽ / смена" value="5 500 ₽ / смена" />
+        </div>
+        <div class="tg-job-only-field">
+          <label for="tgPostMetro">Метро / Локация</label>
+          <input id="tgPostMetro" type="text" placeholder="м. Белорусская (5 мин)" value="м. Белорусская (5 мин)" />
+        </div>
+        <div class="tg-job-only-field">
+          <label for="tgPostSchedule">График / Часы</label>
+          <input id="tgPostSchedule" type="text" placeholder="11:00 – 23:00 (12 ч)" value="11:00 – 23:00 (12 ч)" />
+        </div>
+        <div class="tg-job-only-field full">
+          <label for="tgPostPerks">Бонусы и условия (через запятую)</label>
+          <input id="tgPostPerks" type="text" placeholder="Питание, форма, такси до дома, чаевые" value="Двухразовое питание от шефа, стильная форма, такси после смены, чаевые с банкетов" />
+        </div>
+        <div class="tg-job-only-field full">
+          <label for="tgPostTasks">Обязанности</label>
+          <textarea id="tgPostTasks" placeholder="Приготовление горячих блюд по ТТК...">Приготовление горячих блюд европейской/паназиатской кухни по ТТК, поддержание идеальной чистоты на станции.</textarea>
+        </div>
+        <div class="tg-job-only-field full">
+          <label for="tgPostReqs">Требования</label>
+          <input id="tgPostReqs" type="text" placeholder="Опыт от 1 года, медкнижка" value="Опыт работы в горцехе от 1 года, действующая медкнижка, пунктуальность и скорость." />
+        </div>
+        <div class="tg-job-only-field full">
+          <label for="tgPostContacts">Контакт для отклика</label>
+          <input id="tgPostContacts" type="text" placeholder="@username или телефон" value="@gastroconnect (+7 910 433-47-29)" />
+        </div>
+
+        <div class="tg-custom-only-field full" style="display: none;">
+          <label for="tgPostCustomText">Текст публикации / Вопрос сообществу</label>
+          <textarea id="tgPostCustomText" style="min-height: 140px;" placeholder="Введите текст поста или разбора..."></textarea>
+        </div>
+      </div>
+
+      <div class="tg-studio-actions">
+        <button id="tgPublishBtn" class="btn primary" type="button">
+          🚀 Опубликовать в @gastroconnect
+        </button>
+        <button id="tgCopyFormattedBtn" class="btn" type="button">
+          📋 Скопировать пост
+        </button>
+        <button id="tgOpenChannelBtn" class="btn" type="button">
+          📲 Открыть @gastroconnect
+        </button>
+      </div>
+      <div id="tgStudioMsg" class="tg-toast-msg"></div>
+    </div>
+
+    <div class="tg-preview-col">
+      <div class="tg-phone-frame">
+        <div class="tg-phone-topbar">
+          <div class="tg-avatar">GC</div>
+          <div class="tg-chat-meta">
+            <span class="tg-chat-name">GastroConnect | Клуб Шефов</span>
+            <span class="tg-chat-sub">канал • @gastroconnect</span>
+          </div>
+        </div>
+        <div class="tg-phone-screen">
+          <div class="tg-post-bubble">
+            <div class="tg-post-text" id="tgPostPreviewText">Загрузка предпросмотра...</div>
+            <div class="tg-bubble-footer">
+              <div class="tg-bubble-reactions">
+                <span class="tg-reaction">🔥 42</span>
+                <span class="tg-reaction">👍 19</span>
+                <span class="tg-reaction">❤️ 8</span>
+              </div>
+              <span>14:35</span>
+            </div>
+          </div>
+          <div class="tg-inline-buttons">
+            <a href="https://t.me/gastroconnect" target="_blank" class="tg-inline-btn">⚡️ Откликнуться на смену</a>
+            <a href="https://t.me/gastroconnect" target="_blank" class="tg-inline-btn" style="background: rgba(255,255,255,0.08);">💬 Обсудить в комментариях</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3>Работники</h3><label class="filter-label"
             >Фильтр работников
             <input
               id="workerSearchInput"
@@ -1125,4 +1648,5 @@ if (window.supabase?.createClient) {
 })();
 </script>
 <script src="/cabinet.js?v=1025"></script>
+<script src="/telegram-studio.js?v=1032"></script>
 </body></html>

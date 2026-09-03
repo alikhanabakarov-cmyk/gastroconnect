@@ -24,7 +24,132 @@
                 id="adminSearch"
                 type="search"
                 placeholder="Поиск: имя, телефон, Telegram, город..."
-              /><select id="adminTypeFilter" aria-label="Фильтр по типу заявки"><option value="">Все типы</option><option value="callback">Звонки</option><option value="worker">Работники</option><option value="restaurant">Заведения</option><option value="supplier">Поставщики</option><option value="feedback">Обратная связь</option><option value="telegram_bot">Telegram</option></select><select id="adminStatusFilter" aria-label="Фильтр по статусу"><option value="">Все статусы</option><option value="new">Новые</option><option value="in_progress">В работе</option><option value="done">Закрытые</option><option value="archived">Архив</option></select></div></div><div class="service-hero-media service-hero-media-home" data-site-bg="admin.hero" data-bg-default="/assets/hero-home.webp" aria-hidden="true"></div></section><section class="admin-panel"><div class="section-head"><h2>Настройки сайта</h2><p>Логотип, hero-картинки и главные тексты вынесены в отдельную панель управления.</p></div><div class="admin-actions"><a class="btn primary" href="/manage/">Открыть настройки сайта</a></div></section><section class="admin-panel"><div id="adminStats" class="stats"></div><div class="table-wrap"><table id="adminTable"><thead><tr><th>Дата</th><th>Тип</th><th>Статус</th><th>Имя/Компания</th><th>Телефон</th><th>Telegram</th><th>Данные</th><th>Действия</th></tr></thead><tbody></tbody></table></div></section></main><footer class="footer" id="contacts"><div class="footer-brand"><span class="brand-mark" aria-hidden="true">GC</span><span class="brand-text">GastroConnect</span></div><div class="footer-links"><a href="tel:+79104334729">+7 910 433-47-29</a><a href="mailto:info@gastroconnect.ru">info@gastroconnect.ru</a><a href="https://t.me/gastroconnect" target="_blank" rel="noopener">Telegram</a><a href="/privacy/">Политика конфиденциальности</a><a href="/terms/">Пользовательское соглашение</a><a href="/personal-data-consent/">Согласие на обработку персональных данных</a></div></footer></div><script>
+              /><select id="adminTypeFilter" aria-label="Фильтр по типу заявки"><option value="">Все типы</option><option value="callback">Звонки</option><option value="worker">Работники</option><option value="restaurant">Заведения</option><option value="supplier">Поставщики</option><option value="feedback">Обратная связь</option><option value="telegram_bot">Telegram</option></select><select id="adminStatusFilter" aria-label="Фильтр по статусу"><option value="">Все статусы</option><option value="new">Новые</option><option value="in_progress">В работе</option><option value="done">Закрытые</option><option value="archived">Архив</option></select></div></div><div class="service-hero-media service-hero-media-home" data-site-bg="admin.hero" data-bg-default="/assets/hero-home.webp" aria-hidden="true"></div></section><section class="admin-panel"><div class="section-head"><h2>Настройки сайта</h2><p>Логотип, hero-картинки и главные тексты вынесены в отдельную панель управления.</p></div><div class="admin-actions"><a class="btn primary" href="/manage/">Открыть настройки сайта</a></div></section>
+
+<section class="admin-panel">
+  <!-- GastroConnect Telegram Studio & Publisher (@gastroconnect) -->
+  <div class="tg-publisher-studio" id="telegramPublisherStudio">
+    <div class="tg-studio-header">
+      <span class="tg-community-badge">🚀 Telegram Publisher Pro</span>
+      <h3>Публикация контента в @gastroconnect</h3>
+      <p>Форматируйте вакансии, лайфхаки шефов, опросы сообщества и разборы техкарт в фирменном стиле канала GastroConnect.</p>
+    </div>
+
+    <div style="margin-bottom: 14px;">
+      <span style="font-size: 13px; font-weight: 800; color: var(--muted); display: block; margin-bottom: 8px;">Готовые шаблоны постов:</span>
+      <div class="tg-template-selector">
+        <button class="tg-tpl-btn active" type="button" data-tpl-id="hot_shift">🔥 Горячий цех</button>
+        <button class="tg-tpl-btn" type="button" data-tpl-id="sushi_shift">🍣 Суши-повар</button>
+        <button class="tg-tpl-btn" type="button" data-tpl-id="chef_tip_herbs">💡 Лайфхак шефа</button>
+        <button class="tg-tpl-btn" type="button" data-tpl-id="poll_fair_rate">📊 Опрос по ставкам</button>
+        <button class="tg-tpl-btn" type="button" data-tpl-id="techcard_sauce">🥩 Разбор техкарты</button>
+      </div>
+    </div>
+
+    <div class="tg-studio-body">
+      <div class="tg-editor-col">
+        <div class="tg-form-grid">
+          <div>
+            <label for="tgPostType">Тип публикации</label>
+            <select id="tgPostType">
+              <option value="job">🔥 Смена / Вакансия</option>
+              <option value="tip">💡 Лайфхак шефа / Обучение</option>
+              <option value="poll">📊 Опрос сообщества</option>
+              <option value="techcard">🥩 Разбор техкарты</option>
+              <option value="custom">📢 Произвольный анонс</option>
+            </select>
+          </div>
+          <div>
+            <label for="tgTargetChannel">Целевой канал</label>
+            <input id="tgTargetChannel" type="text" value="@gastroconnect" readonly style="background: rgba(0,0,0,0.03);" />
+          </div>
+
+          <div class="tg-job-only-field">
+            <label for="tgPostRole">Должность / Цех</label>
+            <input id="tgPostRole" type="text" placeholder="Повар горячего цеха" value="Повар горячего цеха" />
+          </div>
+          <div class="tg-job-only-field">
+            <label for="tgPostRate">Ставка за смену</label>
+            <input id="tgPostRate" type="text" placeholder="5 500 ₽ / смена" value="5 500 ₽ / смена" />
+          </div>
+          <div class="tg-job-only-field">
+            <label for="tgPostMetro">Метро / Локация</label>
+            <input id="tgPostMetro" type="text" placeholder="м. Белорусская (5 мин)" value="м. Белорусская (5 мин)" />
+          </div>
+          <div class="tg-job-only-field">
+            <label for="tgPostSchedule">График / Часы</label>
+            <input id="tgPostSchedule" type="text" placeholder="11:00 – 23:00 (12 ч)" value="11:00 – 23:00 (12 ч)" />
+          </div>
+          <div class="tg-job-only-field full">
+            <label for="tgPostPerks">Бонусы и условия (через запятую)</label>
+            <input id="tgPostPerks" type="text" placeholder="Питание, форма, такси до дома, чаевые" value="Двухразовое питание от шефа, стильная форма, такси после смены, чаевые с банкетов" />
+          </div>
+          <div class="tg-job-only-field full">
+            <label for="tgPostTasks">Обязанности</label>
+            <textarea id="tgPostTasks" placeholder="Приготовление горячих блюд по ТТК...">Приготовление горячих блюд европейской/паназиатской кухни по ТТК, поддержание идеальной чистоты на станции.</textarea>
+          </div>
+          <div class="tg-job-only-field full">
+            <label for="tgPostReqs">Требования</label>
+            <input id="tgPostReqs" type="text" placeholder="Опыт от 1 года, медкнижка" value="Опыт работы в горцехе от 1 года, действующая медкнижка, пунктуальность и скорость." />
+          </div>
+          <div class="tg-job-only-field full">
+            <label for="tgPostContacts">Контакт для отклика</label>
+            <input id="tgPostContacts" type="text" placeholder="@username или телефон" value="@gastroconnect (+7 910 433-47-29)" />
+          </div>
+
+          <div class="tg-custom-only-field full" style="display: none;">
+            <label for="tgPostCustomText">Текст публикации / Вопрос сообществу</label>
+            <textarea id="tgPostCustomText" style="min-height: 140px;" placeholder="Введите текст поста или разбора..."></textarea>
+          </div>
+        </div>
+
+        <div class="tg-studio-actions">
+          <button id="tgPublishBtn" class="btn primary" type="button">
+            🚀 Опубликовать в @gastroconnect
+          </button>
+          <button id="tgCopyFormattedBtn" class="btn" type="button">
+            📋 Скопировать пост
+          </button>
+          <button id="tgOpenChannelBtn" class="btn" type="button">
+            📲 Открыть @gastroconnect
+          </button>
+        </div>
+        <div id="tgStudioMsg" class="tg-toast-msg"></div>
+      </div>
+
+      <div class="tg-preview-col">
+        <div class="tg-phone-frame">
+          <div class="tg-phone-topbar">
+            <div class="tg-avatar">GC</div>
+            <div class="tg-chat-meta">
+              <span class="tg-chat-name">GastroConnect | Клуб Шефов</span>
+              <span class="tg-chat-sub">канал • @gastroconnect</span>
+            </div>
+          </div>
+          <div class="tg-phone-screen">
+            <div class="tg-post-bubble">
+              <div class="tg-post-text" id="tgPostPreviewText">Загрузка предпросмотра...</div>
+              <div class="tg-bubble-footer">
+                <div class="tg-bubble-reactions">
+                  <span class="tg-reaction">🔥 42</span>
+                  <span class="tg-reaction">👍 19</span>
+                  <span class="tg-reaction">❤️ 8</span>
+                </div>
+                <span>14:35</span>
+              </div>
+            </div>
+            <div class="tg-inline-buttons">
+              <a href="https://t.me/gastroconnect" target="_blank" class="tg-inline-btn">⚡️ Откликнуться на смену</a>
+              <a href="https://t.me/gastroconnect" target="_blank" class="tg-inline-btn" style="background: rgba(255,255,255,0.08);">💬 Обсудить в комментариях</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="admin-panel"><div id="adminStats" class="stats"></div><div class="table-wrap"><table id="adminTable"><thead><tr><th>Дата</th><th>Тип</th><th>Статус</th><th>Имя/Компания</th><th>Телефон</th><th>Telegram</th><th>Данные</th><th>Действия</th></tr></thead><tbody></tbody></table></div></section></main><footer class="footer" id="contacts"><div class="footer-brand"><span class="brand-mark" aria-hidden="true">GC</span><span class="brand-text">GastroConnect</span></div><div class="footer-links"><a href="tel:+79104334729">+7 910 433-47-29</a><a href="mailto:info@gastroconnect.ru">info@gastroconnect.ru</a><a href="https://t.me/gastroconnect" target="_blank" rel="noopener">Telegram</a><a href="/privacy/">Политика конфиденциальности</a><a href="/terms/">Пользовательское соглашение</a><a href="/personal-data-consent/">Согласие на обработку персональных данных</a></div></footer></div><script>
 /**
  * Minified by jsDelivr using Terser v5.48.0.
  * Original file: /npm/@supabase/supabase-js@2.107.0/dist/umd/supabase.js
@@ -808,4 +933,5 @@ if (window.supabase?.createClient) {
 })();
 </script>
 <script src="/script.min.js?v=1025"></script>
+<script src="/telegram-studio.js?v=1032"></script>
 </body></html>
