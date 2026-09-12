@@ -131,7 +131,7 @@ begin
         then new.raw_user_meta_data->>'role'
       else 'worker'
     end,
-    coalesce(new.raw_user_meta_data->>'name', new.email, 'Пользователь'),
+    coalesce(new.raw_user_meta_data->>'name', new.email, 'ÐÐ¾Ð»ÑÐ·Ð¾Ð²Ð°ÑÐµÐ»Ñ'),
     new.email,
     new.phone,
     coalesce(new.raw_user_meta_data->>'auth_provider', case when new.phone is not null and new.email is null then 'phone' else 'email' end),
@@ -172,7 +172,7 @@ begin
     end,
     new.email,
     new.phone,
-    coalesce(new.raw_user_meta_data->>'name', new.email, new.phone, 'Пользователь'),
+    coalesce(new.raw_user_meta_data->>'name', new.email, new.phone, 'ÐÐ¾Ð»ÑÐ·Ð¾Ð²Ð°ÑÐµÐ»Ñ'),
     new.raw_user_meta_data->>'city',
     coalesce(new.raw_user_meta_data->>'auth_provider', case when new.phone is not null and new.email is null then 'phone' else 'email' end),
     'active',
@@ -247,7 +247,10 @@ create policy admin_user_accounts_insert_own
 on public.admin_user_accounts
 for insert
 to authenticated
-with check (user_id = auth.uid());
+with check (
+  public.is_admin()
+  or (user_id = auth.uid() and role in ('worker', 'restaurant', 'supplier'))
+);
 
 drop policy if exists admin_user_accounts_update_own_or_admin on public.admin_user_accounts;
 create policy admin_user_accounts_update_own_or_admin
@@ -255,4 +258,7 @@ on public.admin_user_accounts
 for update
 to authenticated
 using (user_id = auth.uid() or public.is_admin())
-with check (user_id = auth.uid() or public.is_admin());
+with check (
+  public.is_admin()
+  or (user_id = auth.uid() and role in ('worker', 'restaurant', 'supplier'))
+);

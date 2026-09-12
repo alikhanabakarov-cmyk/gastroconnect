@@ -1,17 +1,17 @@
-﻿# GastroConnect
+ï»¿# GastroConnect
 
 Static GitHub Pages site for the GastroConnect HoReCa marketplace.
 
 ## Main Pages
 
-- `index.html` — home page
-- `workers.html` — worker landing page
-- `restaurants.html` — restaurant landing page
-- `suppliers.html` — supplier landing page
-- `auth.html` — role-based login and registration
-- `cabinet.html` — worker, restaurant, supplier and admin cabinet
-- `manage.html` — public admin settings page
-- `admin.html` — protected admin entry, if server auth is enabled
+- `index.html` â home page
+- `workers.html` â worker landing page
+- `restaurants.html` â restaurant landing page
+- `suppliers.html` â supplier landing page
+- `auth.html` â role-based login and registration
+- `cabinet.html` â worker, restaurant, supplier and admin cabinet
+- `manage.html` â public admin settings page
+- `admin.html` â protected admin entry, if server auth is enabled
 
 ## Assets
 
@@ -32,10 +32,12 @@ Default logos:
 Run:
 
 ```powershell
-node --check script.js
-node --check public.js
-node --check cabinet.js
+npm run check
 ```
+
+`npm run check` validates JS syntax, verifies that the inline copies of `public.js` and
+`supabase.js` embedded in the HTML pages match their source files, checks that every
+referenced asset exists, and reports duplicate element ids.
 
 Before advertising, run `supabase-launch-fix.sql` in Supabase SQL Editor and configure Supabase Auth:
 
