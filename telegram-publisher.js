@@ -2,7 +2,7 @@
 // Designed for @gastroconnect channel & community
 
 const DEFAULT_CHANNEL = '@gastroconnect';
-const DEFAULT_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8692318442:AAHSI6lUSeZG_hDepBhfJBE43LIuSjrubVU';
+const DEFAULT_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || 'REPLACE_ME';
 const DEFAULT_CHAT_ID = null;
 const SITE_URL = 'https://gastroconnect.ru';
 const SITE_WORKERS_URL = 'https://gastroconnect.ru/workers/';
